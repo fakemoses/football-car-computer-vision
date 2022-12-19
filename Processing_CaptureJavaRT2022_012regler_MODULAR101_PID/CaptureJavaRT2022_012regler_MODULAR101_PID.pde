@@ -1,5 +1,7 @@
 import ipcapture.*;
 import hypermedia.net.*;
+import java.awt.*;
+import processing.video.*;
 
 //Herausgezogene wichtige Parameter des Systems
 boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = false;
@@ -34,7 +36,7 @@ String NACHRICHT = "";
 //String TEMPERATUR = "";
 //String IP = "192.168.137.92";
 //String IP = "192.168.0.102";
-String IP = "192.168.0.104";
+String IP = "192.168.178.70";
 int PORT = 6000;
 
 //UDP udp;  // define the UDP object
@@ -43,7 +45,6 @@ Antrieb antrieb;
 IPCapture cam;
 Bildverarbeitung bildverarbeitung;
 Regler regler;
-Filtering filter;
 
 void setup() 
 {
@@ -51,7 +52,6 @@ void setup()
   cam = new IPCapture(this, "http://"+IP+":81/stream", "", "");
   cam.start();
   bildverarbeitung = new Bildverarbeitung(cam);
-  filter  = new Filtering(cam);
   udpcomfort = new UDPcomfort(IP,PORT);
   antrieb = new Antrieb(udpcomfort);  
   regler = new Regler(antrieb);  
@@ -63,7 +63,8 @@ boolean AKTIV = false;
 
 void draw() 
 {    
-    int[][] BILD = filter.filterColor(255,0,0);
+    //int [][] BILD = bildverarbeitung.holeFarbeBild("ROT");
+    int[][] BILD = bildverarbeitung.holeBildHSV();
     image(cam,0,0);
     float dx = (width/2.0f)/(float)BILD[0].length;
     float dy = (height/2.0f)/(float)BILD.length;
@@ -168,4 +169,8 @@ void keyPressed()
        NACHRICHT = "Kameralicht AUS";
   }
   
+}
+
+void captureEvent(Capture c) {
+  c.read();
 }
