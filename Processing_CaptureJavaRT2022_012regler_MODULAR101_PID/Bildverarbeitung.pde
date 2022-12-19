@@ -33,6 +33,8 @@ public class Bildverarbeitung
                 for(int k=0;k<bild[i].length;k++)
                 {
                     int wert = pix[u];
+                    
+                    // Using "right shift" as a faster technique than red(), green(), and blue()
                     int ROT    = (wert  >> 8) & 0xFF;
                     int GRUEN  = wert & 0xFF;
                     int BLAU   = (wert >> 16) & 0xFF;

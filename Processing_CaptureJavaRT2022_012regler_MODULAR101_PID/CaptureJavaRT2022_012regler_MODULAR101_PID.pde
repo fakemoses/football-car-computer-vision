@@ -43,6 +43,7 @@ Antrieb antrieb;
 IPCapture cam;
 Bildverarbeitung bildverarbeitung;
 Regler regler;
+Filtering filter;
 
 void setup() 
 {
@@ -50,6 +51,7 @@ void setup()
   cam = new IPCapture(this, "http://"+IP+":81/stream", "", "");
   cam.start();
   bildverarbeitung = new Bildverarbeitung(cam);
+  filter  = new Filtering(cam);
   udpcomfort = new UDPcomfort(IP,PORT);
   antrieb = new Antrieb(udpcomfort);  
   regler = new Regler(antrieb);  
@@ -61,7 +63,7 @@ boolean AKTIV = false;
 
 void draw() 
 {    
-    int[][] BILD = bildverarbeitung.holeRotbild();
+    int[][] BILD = filter.filterColor(255,0,0);
     image(cam,0,0);
     float dx = (width/2.0f)/(float)BILD[0].length;
     float dy = (height/2.0f)/(float)BILD.length;
@@ -75,6 +77,7 @@ void draw()
           {
               if(BILD[i][k]==0)
               {
+                //draw bnw image pixel by pixel
                    rect(width/2+(float)k*dx,0+(float)i*dy,dx,dy);
               }
           }
