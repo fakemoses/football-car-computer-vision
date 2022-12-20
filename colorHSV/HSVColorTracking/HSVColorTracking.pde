@@ -1,19 +1,11 @@
-/**
- * HSVColorTracking
- * Greg Borenstein
- * https://github.com/atduskgreg/opencv-processing-book/blob/master/code/hsv_color_tracking/HSVColorTracking/HSVColorTracking.pde
- *
- * Modified by Jordi Tost @jorditost (color selection)
- *
- * University of Applied Sciences Potsdam, 2014
- */
+
 
 import gab.opencv.*;
 import processing.video.*;
 import java.awt.Rectangle;
 
 Capture video;
-OpenCV opencv, opencv2, opencv3, opencv4;
+OpenCV opencv, opencv2;
 PImage img, img2, imghsv;
 PImage lowerH1, lowerV1, lowerS1;
 PImage lowerH2, lowerV2, lowerS2;
@@ -47,11 +39,13 @@ void draw() {
   opencv.useColor(HSB);
 
   opencv.setGray(opencv.getH().clone());
-  opencv.inRange(0, 10);
+  opencv.inRange(lowerRed1[0], higherRed1[0]);
   lowerH1 = opencv.getSnapshot();
 
+  println(lowerRed1[1]);
+
   opencv.setGray(opencv.getS().clone());
-  opencv.inRange(50, 255);
+  opencv.inRange(lowerRed1[1], higherRed1[1]);
   lowerS1 = opencv.getSnapshot();
 
   opencv.diff(lowerH1);
@@ -60,7 +54,7 @@ void draw() {
   diff1 = opencv.getSnapshot();
 
   opencv.setGray(opencv.getV().clone());
-  opencv.inRange(50, 255);
+  opencv.inRange(lowerRed1[2], higherRed1[2]);
   lowerV1 = opencv.getSnapshot();
 
   opencv.diff(diff1);
@@ -72,11 +66,11 @@ void draw() {
   opencv2.useColor(HSB);
 
   opencv2.setGray(opencv2.getH().clone());
-  opencv2.inRange(170, 180);
+  opencv2.inRange(lowerRed2[0], higherRed2[0]);
   lowerH2 = opencv2.getSnapshot();
 
   opencv2.setGray(opencv2.getS().clone());
-  opencv2.inRange(50, 255);
+  opencv2.inRange(lowerRed2[1], higherRed2[1]);
   lowerS2 = opencv2.getSnapshot();
 
   opencv2.diff(lowerH2);
@@ -85,7 +79,7 @@ void draw() {
   diff3 = opencv2.getSnapshot();
 
   opencv2.setGray(opencv2.getV().clone());
-  opencv2.inRange(50, 255);
+  opencv2.inRange(lowerRed2[2], higherRed2[2]);
   lowerV2 = opencv2.getSnapshot();
 
   opencv2.diff(diff3);
@@ -93,31 +87,23 @@ void draw() {
   opencv2.invert();
   diff4 = opencv2.getSnapshot();
 
-  int c1 = 0;
-  int c2 = 0;
   for (int i = 0; i< diff4.width; i++) {
     for (int j=0; j< img.height; j++) {
       color c = diff4.get(i, j);
       color d = diff2.get(i, j);
-      if (c == -16777216) {
+      if (c != -16777216) {
         total.set(i, j, c);
-        c1++;
         continue;
       }
 
-      if (d == -16777216) {
+      if (d != -16777216) {
         total.set(i, j, d);
         continue;
       }
 
-      //total.set(i, j, d);
+      total.set(i, j, d);
     }
   }
-
-  println(c1);
-  println(c2);
-
-  // <8> Display background images
 
   image(img, 0, 0);
   image(lowerH1, img.width, 0);
@@ -133,37 +119,4 @@ void draw() {
   image(diff3, img.width*4, img.height);
   image(diff4, img.width*5, img.height);
   image(total, 0, img.height*2);
-}
-
-PImage getMask(PImage img, int low[], int high[]) {
-  opencv = new OpenCV(this, img);
-  opencv.loadImage(img);
-  opencv.useColor(HSB);
-
-  opencv.setGray(opencv.getH().clone());
-  opencv.inRange(low[0], high[0]);
-  opencv.threshold(50);
-  lowerH1 = opencv.getSnapshot();
-
-  opencv.setGray(opencv.getS().clone());
-  opencv.inRange(low[1], high[1]);
-  opencv.threshold(50);
-  lowerS1 = opencv.getSnapshot();
-
-  opencv.diff(lowerS1);
-  opencv.threshold(0);
-  opencv.invert();
-  diff1 = opencv.getSnapshot();
-
-  opencv.setGray(opencv.getV().clone());
-  opencv.inRange(low[2], high[2]);
-  opencv.threshold(50);
-  lowerV1 = opencv.getSnapshot();
-
-  opencv.diff(diff1);
-  opencv.threshold(0);
-  opencv.invert();
-  diff2 = opencv.getSnapshot();
-
-  return diff2;
 }
