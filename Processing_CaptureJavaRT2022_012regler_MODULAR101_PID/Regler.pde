@@ -1,4 +1,4 @@
-public class Regler
+ public class Regler
 {
     private float spx = 0.0;
     private Antrieb antrieb;

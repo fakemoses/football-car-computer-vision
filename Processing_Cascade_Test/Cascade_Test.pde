@@ -4,7 +4,7 @@ import java.awt.*;
 import processing.video.*;
 
 OpenCV opencv;
-String IP = "192.168.178.68";
+String IP = "192.168.178.70";
 int PORT = 6000;
 IPCapture cam;
 
@@ -33,13 +33,13 @@ void draw(){
   noFill();
   stroke(0, 255, 0);
   strokeWeight(3);
-  //println(balls.length);
+  println(balls.length);
   for (int i = 0; i < balls.length; i++) {
-    println(balls[i].x + "," + balls[i].y);
+    //println(balls[i].x + "," + balls[i].y);
     rect(balls[i].x, balls[i].y, balls[i].width, balls[i].height);
   }
 }
 
-void captureEvent(Capture c) {
-  c.read();
-}
+//void captureEvent(Capture c) {
+//  c.read();
+//}
