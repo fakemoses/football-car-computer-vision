@@ -17,41 +17,6 @@ class PWindow extends PApplet {
   boolean setLocation, setTitle, makeResizable;
   String title;
 
-  PWindow() {
-    super();
-    PApplet.runSketch(new String[] {this.getClass().getSimpleName()}, this);
-  };
-
-  PWindow(int x_, int y_) {
-    super();
-    x = x_;
-    y = y_;
-    setLocation = true;
-    PApplet.runSketch(new String[] {this.getClass().getSimpleName()}, this);
-  };
-
-  PWindow(int x_, int y_, int ww, int hh) {
-    super();
-    x = x_;
-    y = y_;
-    w = ww;
-    hh = hh;
-
-    setLocation = true;
-    PApplet.runSketch(new String[] {this.getClass().getSimpleName()}, this);
-  };
-
-  PWindow(int x_, int y_, int ww, int hh, String s) {
-    super();
-    x = x_;
-    y = y_;
-    w = ww;
-    h = hh;
-    setLocation = true;
-    title = s;
-    setTitle = true;
-    PApplet.runSketch(new String[] {this.getClass().getSimpleName()}, this);
-  };
 
   // Method that should be called in this case
   PWindow(IPCapture cam, int x_, int y_, int ww, int hh, String s) {
@@ -67,18 +32,6 @@ class PWindow extends PApplet {
     PApplet.runSketch(new String[] {this.getClass().getSimpleName()}, this);
   };
 
-  PWindow(int x_, int y_, String s, boolean k) {
-    super();
-    x = x_;
-    y = y_;
-    setLocation = true;
-    title = s;
-    setTitle = true;
-    makeResizable = true;
-    PApplet.runSketch(new String[] {this.getClass().getSimpleName()}, this);
-  };
-
-
   void settings() {
     if (w>0&&h>0)size(w, h);
     else size(320, 240);
@@ -87,7 +40,7 @@ class PWindow extends PApplet {
   void setup() {
     frameRate(10);
     //if (setLocation)surface.setLocation(x, y);
-    //if (setTitle)surface.setTitle(title);
+    if (setTitle)surface.setTitle(title);
     //if (makeResizable)surface.setResizable(true);
     opencv = new OpenCV(this, this.cam);
     opencv.loadCascade("ball_detection.xml");
@@ -96,7 +49,7 @@ class PWindow extends PApplet {
   void draw() {
     this.cam.read();
     opencv.loadImage(this.cam);
-    Rectangle[] balls = opencv.detect(1.3, 4, 0, 30, 300);
+    Rectangle[] balls = this.detectObject();
     image(opencv.getInput(), 0, 0);
     noFill();
     stroke(0, 255, 0);
@@ -107,4 +60,11 @@ class PWindow extends PApplet {
       rect(balls[i].x, balls[i].y, balls[i].width, balls[i].height);
     }
   };
+  
+  //get the bbox here
+  public Rectangle[] detectObject() {
+    Rectangle[] balls = opencv.detect(1.3, 4, 0, 30, 300);
+    return balls;
+  }
+
 };
