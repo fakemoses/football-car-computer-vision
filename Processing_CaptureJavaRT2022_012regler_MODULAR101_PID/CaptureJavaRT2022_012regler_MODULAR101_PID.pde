@@ -3,6 +3,9 @@ import hypermedia.net.*;
 import java.awt.*;
 import processing.video.*;
 import gab.opencv.*;
+import java.awt.Frame;
+import processing.awt.PSurfaceAWT;
+import processing.awt.PSurfaceAWT.SmoothCanvas;
 
 //Herausgezogene wichtige Parameter des Systems
 boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = false;
@@ -46,16 +49,15 @@ Antrieb antrieb;
 IPCapture cam;
 Bildverarbeitung bildverarbeitung;
 Regler regler;
-Detection detect;
-OpenCV opencv;
+PWindow win;
 
 void setup()
 {
-  size(960, 480);
+  size(640, 480);
   cam = new IPCapture(this, "http://"+IP+":81/stream", "", "");
   cam.start();
-  opencv = new OpenCV(this, cam);
-  detect = new Detection(opencv, "ball_detection.xml");
+  win = new PWindow(cam, 320, 0, 320, 240, "Cascade Detection");
+  surface.setLocation(-5, 0);
   bildverarbeitung = new Bildverarbeitung(cam);
   udpcomfort = new UDPcomfort(IP, PORT);
   antrieb = new Antrieb(udpcomfort);
@@ -68,13 +70,13 @@ boolean AKTIV = false;
 
 void draw()
 {
-  int [][] BILD = bildverarbeitung.holeFarbeBild();
+  int[][] BILD = bildverarbeitung.holeRotbild();
   image(cam, 0, 0);
-  float dx = (width/3.0f)/(float)BILD[0].length;
+  float dx = (width/2.0f)/(float)BILD[0].length;
   float dy = (height/2.0f)/(float)BILD.length;
   noStroke();
   fill(200);
-  rect(width/3, 0, width/3, height/2);
+  rect(width/2, 0, width/2, height/2);
   fill(0);
   for (int i=0; i<BILD.length; i++)
   {
@@ -82,14 +84,10 @@ void draw()
     {
       if (BILD[i][k]==0)
       {
-        //draw bnw image pixel by pixel
-        rect(width/3+(float)k*dx, 0+(float)i*dy, dx, dy);
+        rect(width/2+(float)k*dx, 0+(float)i*dy, dx, dy);
       }
     }
   }
-  // OpenCV
-  opencv.loadImage(cam);
-  detect.draw();
 
   boolean erfolg = regler.erzeugeStellsignalAusRotbild(BILD);
 
@@ -98,7 +96,7 @@ void draw()
     float spx = regler.holeSchwerpunkt();
     stroke(255, 0, 0);
     strokeWeight(3.0);
-    line(width/3+(float)spx, 0, width/3+(float)spx, height/2);
+    line(width/2+(float)spx, 0, width/2+(float)spx, height/2);
   }
 
   fill(255);

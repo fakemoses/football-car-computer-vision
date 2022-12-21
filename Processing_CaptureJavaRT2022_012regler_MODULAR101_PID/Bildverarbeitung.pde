@@ -16,7 +16,7 @@ public class Bildverarbeitung
     this.cam = cam;
   }
 
-  public int[][] holeFarbeBild()
+  public int[][] holeRotbild()
   {
     if (cam.isAvailable())
     {
