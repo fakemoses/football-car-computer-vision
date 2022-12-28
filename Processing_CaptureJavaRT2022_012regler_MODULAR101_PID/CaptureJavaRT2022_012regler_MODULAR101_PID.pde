@@ -49,7 +49,14 @@ Antrieb antrieb;
 IPCapture cam;
 Bildverarbeitung bildverarbeitung;
 Regler regler;
+
+// Class for new window -> OpenCV Cascade
 PWindow win;
+
+// HSV Color Extraction
+boolean yellow = false;
+ColorHSV maskYellow;
+PImage img, out1;
 
 void setup()
 {
@@ -58,7 +65,7 @@ void setup()
   cam.start();
   win = new PWindow(cam, 320, 0, 320, 240, "Cascade Detection");
   surface.setLocation(-5, 0);
-  bildverarbeitung = new Bildverarbeitung(cam);
+  bildverarbeitung = new Bildverarbeitung();
   udpcomfort = new UDPcomfort(IP, PORT);
   antrieb = new Antrieb(udpcomfort);
   regler = new Regler(antrieb);
@@ -70,7 +77,22 @@ boolean AKTIV = false;
 
 void draw()
 {
-  int[][] BILD = bildverarbeitung.holeRotbild();
+  int[][] BILD;
+  if(!yellow){
+    //RGB only
+    
+    bildverarbeitung.extractColorRGB(cam);
+    BILD = bildverarbeitung.getRed();
+  }else{
+    //HSV
+    //Apply HSV Masking then compute the int [][] BILD value
+    
+    maskYellow = new ColorHSV("Yellow", cam);
+    out1 = maskYellow.getMask(cam, true);
+    bildverarbeitung.extractColorHSV(out1);
+    BILD = bildverarbeitung.getYellow();
+  }
+  
   image(cam, 0, 0);
   float dx = (width/2.0f)/(float)BILD[0].length;
   float dy = (height/2.0f)/(float)BILD.length;
