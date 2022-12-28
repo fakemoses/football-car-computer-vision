@@ -4,34 +4,24 @@ import gab.opencv.*;
 import processing.video.*;
 import java.awt.Rectangle;
 
+
 Capture video;
-OpenCV opencv, opencv2;
-PImage img, img2, imghsv;
-PImage lowerH1, lowerV1, lowerS1;
-PImage lowerH2, lowerV2, lowerS2;
-PImage diff1, diff2, diff3, diff4;
-PImage mask1, mask2, total;
-PImage src, colorFilteredImage;
+OpenCV opencv;
+PImage img, out1, out2, out3, out4, out5, out6, out7;
+PImage imgBlue, imgYellow;
+
 ArrayList<Contour> contours;
-PImage returnimg;
-
-
-int lowerRed1[] = {0, 50, 50};
-int higherRed1[] = {10, 255, 255};
-
-int lowerRed2[] = {170, 50, 50};
-int higherRed2[] = {180, 255, 255};
-
+ColorHSV maskRED1, maskRED2;
+ColorHSV maskBlue, maskYellow;
 
 GetColors extract;
 
 void setup() {
-  img = loadImage("./data/redLine.jpg");
+  img = loadImage("./data/redBall.jpg");
+  imgBlue = loadImage("./data/blueBall.jpg");
+  imgYellow = loadImage("./data/yellowBall.jpg");
 
-  opencv = new OpenCV(this, img);
-  opencv2 = new OpenCV(this, img);
-
-  total = createImage(img.width, img.height, RGB);
+  contours = new ArrayList<Contour>();
 
   extract = new GetColors();
 
@@ -105,19 +95,4 @@ void draw() {
     fill(0, 255, 0);
     ellipse(r.x + r.width/2, r.y + r.height/2, 10, 10);
   }
-
-  image(img, 0, 0);
-  image(lowerH1, img.width, 0);
-  image(lowerS1, img.width*2, 0);
-  image(lowerV1, img.width*3, 0);
-  image(diff1, img.width*4, 0);
-  image(diff2, img.width*5, 0);
-
-  image(img, 0, img.height);
-  image(lowerH2, img.width, img.height);
-  image(lowerS2, img.width*2, img.height);
-  image(lowerV2, img.width*3, img.height);
-  image(diff3, img.width*4, img.height);
-  image(diff4, img.width*5, img.height);
-  image(total, 0, img.height*2);
 }
