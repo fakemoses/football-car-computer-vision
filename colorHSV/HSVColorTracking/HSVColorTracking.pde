@@ -23,6 +23,8 @@ int lowerRed2[] = {170, 50, 50};
 int higherRed2[] = {180, 255, 255};
 
 
+GetColors extract;
+
 void setup() {
   img = loadImage("./data/redLine.jpg");
 
@@ -31,78 +33,77 @@ void setup() {
 
   total = createImage(img.width, img.height, RGB);
 
-  size(1920, 800);
+  extract = new GetColors();
+
+  maskRED1 = new ColorHSV("Red1", img);
+  maskRED2 = new ColorHSV("Red2", img);
+  maskBlue = new ColorHSV("Blue", imgBlue);
+  maskYellow = new ColorHSV("Yellow", imgYellow);
+
+  // red
+  out1 = maskRED1.getMask(img, false);
+  out2 = maskRED2.getMask(img, false);
+  out3 = maskRED2.combineMask(out1, img);
+
+  //blue yellow
+  out4 = maskBlue.getMask(imgBlue, false);
+  out5 = maskYellow.getMask(imgYellow, false);
+
+  //if color
+  out6 = maskBlue.getMask(imgBlue, true);
+  out7 = maskYellow.getMask(imgYellow, true);
+
+  extract.extractColor(out7);
+
+  size(1280, 720);
+  frameRate(10);
 }
 
 void draw() {
-  opencv.loadImage(img);
-  opencv.useColor(HSB);
 
-  opencv.setGray(opencv.getH().clone());
-  opencv.inRange(lowerRed1[0], higherRed1[0]);
-  lowerH1 = opencv.getSnapshot();
+  image(img, 0, 0);
+  image(out1, img.width, 0);
+  image(out2, img.width*2, 0);
+  image(out3, img.width*3, 0);
+  image(imgBlue, 0, img.height);
+  image(out4, img.width, img.height);
+  image(out6, img.width*2, img.height);
+  image(imgYellow, 0, img.height*2);
+  image(out5, img.width, img.height*2);
+  image(out7, img.width*2, img.height*2);
 
-  println(lowerRed1[1]);
-
-  opencv.setGray(opencv.getS().clone());
-  opencv.inRange(lowerRed1[1], higherRed1[1]);
-  lowerS1 = opencv.getSnapshot();
-
-  opencv.diff(lowerH1);
-  opencv.threshold(0);
-  opencv.invert();
-  diff1 = opencv.getSnapshot();
-
-  opencv.setGray(opencv.getV().clone());
-  opencv.inRange(lowerRed1[2], higherRed1[2]);
-  lowerV1 = opencv.getSnapshot();
-
-  opencv.diff(diff1);
-  opencv.threshold(0);
-  opencv.invert();
-  diff2 = opencv.getSnapshot();
-
-  opencv2.loadImage(img);
-  opencv2.useColor(HSB);
-
-  opencv2.setGray(opencv2.getH().clone());
-  opencv2.inRange(lowerRed2[0], higherRed2[0]);
-  lowerH2 = opencv2.getSnapshot();
-
-  opencv2.setGray(opencv2.getS().clone());
-  opencv2.inRange(lowerRed2[1], higherRed2[1]);
-  lowerS2 = opencv2.getSnapshot();
-
-  opencv2.diff(lowerH2);
-  opencv2.threshold(0);
-  opencv2.invert();
-  diff3 = opencv2.getSnapshot();
-
-  opencv2.setGray(opencv2.getV().clone());
-  opencv2.inRange(lowerRed2[2], higherRed2[2]);
-  lowerV2 = opencv2.getSnapshot();
-
-  opencv2.diff(diff3);
-  opencv2.threshold(0);
-  opencv2.invert();
-  diff4 = opencv2.getSnapshot();
-
-  for (int i = 0; i< diff4.width; i++) {
-    for (int j=0; j< img.height; j++) {
-      color c = diff4.get(i, j);
-      color d = diff2.get(i, j);
-      if (c != -16777216) {
-        total.set(i, j, c);
-        continue;
+  int [][] BILD = extract.getYellow();
+  float dx = (width/4)/(float)BILD[0].length;
+  float dy = (height/3)/(float)BILD.length;
+  noStroke();
+  fill(200);
+  rect(img.width*3, img.height, img.width, img.height);
+  fill(0);
+  for (int i=0; i<BILD.length; i++)
+  {
+    for (int k=0; k<BILD[i].length; k++)
+    {
+      if (BILD[i][k]==0)
+      {
+        rect(img.width*3+(float)k*dx, img.height+(float)i*dy, dx, dy);
       }
-
-      if (d != -16777216) {
-        total.set(i, j, d);
-        continue;
-      }
-
-      total.set(i, j, d);
     }
+  }
+
+  contours = maskRED2.getContour();
+
+  if (contours.size() > 0) {
+    Contour biggestContour = contours.get(0);
+    Rectangle r = biggestContour.getBoundingBox();
+
+    noFill();
+    strokeWeight(2);
+    stroke(0, 255, 0);
+    rect(r.x, r.y, r.width, r.height);
+
+    noStroke();
+    fill(0, 255, 0);
+    ellipse(r.x + r.width/2, r.y + r.height/2, 10, 10);
   }
 
   image(img, 0, 0);
