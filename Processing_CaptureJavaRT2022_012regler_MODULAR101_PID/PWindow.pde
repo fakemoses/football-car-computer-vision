@@ -60,11 +60,10 @@ class PWindow extends PApplet {
       rect(balls[i].x, balls[i].y, balls[i].width, balls[i].height);
     }
   };
-  
+
   //get the bbox here
   public Rectangle[] detectObject() {
     Rectangle[] balls = opencv.detect(1.3, 4, 0, 30, 300);
     return balls;
   }
-
 };
