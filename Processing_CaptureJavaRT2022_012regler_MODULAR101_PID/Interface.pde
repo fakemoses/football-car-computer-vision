@@ -1,4 +1,4 @@
 public interface Interface {
-    public abstract startThread();
-    public abstract stopThread();
+    public abstract void startThread();
+    public abstract void stopThread();
 }

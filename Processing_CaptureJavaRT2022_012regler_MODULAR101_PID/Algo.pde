@@ -1,4 +1,4 @@
-public class Algo extends {
+public class Algo {
     
     private IPCapture cam;
     Bildverarbeitung bildverarbeitung;
@@ -15,11 +15,11 @@ public class Algo extends {
         /* should bileVerarbaitung also run on different thread?
         Right now it is running on main Thread by runColorDetection();
         bildverarbeitung.start(); */
-        lineDetection.start();
+        lineDetection.startThread();
     }
     
     public void runColorExtraction() {
-        bildVerarbeitung.extractColorRGB(cam);
+        bildverarbeitung.extractColorRGB(cam);
         
         // then maybe pakai getter -> set semua RGB dekat sini
         // boleh pass RGB dekat Thread for calculation kalau nak
@@ -29,7 +29,7 @@ public class Algo extends {
     
     public void Eval() {
         // Here will run evaluation
-        if (lineDetection.getEvalValue()) {
+        if (lineDetection.getEvalValue() > 0) {
             // calc eval ?
             //something something
             // if pass -> set EVALRESULT

@@ -1,11 +1,11 @@
 // Example implementation of a thread
 
-public class LineDetection extends Interface, Runnable{
+public class LineDetection implements Interface, Runnable{
     
     //Basic
     private Thread myThread = null;
     private boolean STARTED = false;
-    private evalValue;
+    private int evalValue;
     
     public void startThread() {
         if (myThread == null) {
@@ -30,6 +30,6 @@ public class LineDetection extends Interface, Runnable{
     }
     
     // getters for evaluation for EVAL()
-    public void getEvalValue() { return evalValue;}
+    public int getEvalValue() { return evalValue;}
     
 }

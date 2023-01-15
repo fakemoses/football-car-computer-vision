@@ -10,7 +10,7 @@ import processing.awt.PSurfaceAWT.SmoothCanvas;
 //Herausgezogene wichtige Parameter des Systems
 boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = false;
 float VORTRIEB = 0.7;
-float PROPORTIONALE_VERSTAERKUNG = 0.58;
+float PROPORTIONALE_VERSTAERKUNG = 0.50;
 float INTEGRALE_VERSTAERKUNG = 0.15f;
 float DIFFERENTIALE_VERSTAERKUNG = 0.1f;
 float ASYMMETRIE = 1.01; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
@@ -51,6 +51,7 @@ Bildverarbeitung bildverarbeitung;
 Regler regler;
 Algo algo;
 LineDetection lineDetection;
+DrawWindow mainWin;
 
 // Class for new window -> OpenCV Cascade
 PWindow win;
@@ -73,6 +74,7 @@ void setup()
     regler = new Regler(antrieb);
     
     lineDetection = new LineDetection();
+    mainWin = new DrawWindow();
     algo = new Algo(cam, bildverarbeitung, lineDetection);
     algo.startALL();
     frameRate(10);
@@ -88,62 +90,8 @@ void draw()
     int evalValue = algo.getEvalResult();
     
     // -> set evalValue to motor
-    
-    
-    // /**/ OLD STUFF
-    // int[][] BILD;
-    // if (!yellow) {
-    //     //RGB only
-    
-    //     bildverarbeitung.extractColorRGB(cam);
-    //     BILD = bildverarbeitung.getRed();
-// } else{
-    //     //HSV
-    //     //Apply HSV Masking then compute the int [][] BILD value
-    
-    //     maskYellow = new ColorHSV("Yellow", cam);
-    //     out1 = maskYellow.getMask(cam, true);
-    //     bildverarbeitung.extractColorHSV(out1);
-    //     BILD = bildverarbeitung.getYellow();
-// }
-    
-    // image(cam, 0, 0);
-    // float dx = (width / 2.0f) / (float)BILD[0].length;
-    // float dy = (height / 2.0f) / (float)BILD.length;
-    // noStroke();
-    // fill(200);
-    // rect(width / 2, 0, width / 2, height / 2);
-    // fill(0);
-    // for (inti = 0; i < BILD.length; i++)
-    // {
-    //     for (intk = 0; k < BILD[i].length; k++)
-    //     {
-    //         if (BILD[i][k] ==  0)
-    //             {
-    //             rect(width / 2 + (float)k * dx, 0 + (float)i * dy, dx, dy);
-    //         }
-    //     }
-// }
-    
-    // boolean erfolg = regler.erzeugeStellsignalAusRotbild(BILD);
-    
-    // if (erfolg)
-    //     {
-    //     float spx = regler.holeSchwerpunkt();
-    //     stroke(255, 0, 0);
-    //     strokeWeight(3.0);
-    //     line(width / 2 + (float)spx, 0, width / 2 + (float)spx, height / 2);
-// }
-    
-    // fill(255);
-    // rect(0, height / 2, width, height / 2);
-    // fill(0);
-    // textSize(30);
-    // text(NACHRICHT, 20, height - height / 3);
-    // text(udpcomfort.getTemperatur(), 20, height - height / 6);
-    
-    // fill(255, 0, 0);
-    // text((int)regler.getProzent() + "%" + " e=" + regler.getRegeldifferenz(), 20, height - height / 2);
+    mainWin.draw();
+
 }
 
 void keyPressed()

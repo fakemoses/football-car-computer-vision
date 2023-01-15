@@ -20,7 +20,7 @@ public class Regler
     // only processes the spx value
     // todo :but something sussy here
     // instead of spx, pakai prozent ?
-    public boolean setMotorSignal(int spx)
+    public boolean setMotorSignal(int spx, int[][] BILD)
     {
         //Schwerpunkt berechnen und einzeichnen
         //und Prozent an roten Pixeln ermitteln
