@@ -70,7 +70,7 @@ void setup()
   udpcomfort = new UDPcomfort(IP, PORT);
   antrieb = new Antrieb(udpcomfort);
   regler = new Regler(antrieb);
-  action = new FootballAction();
+  action = new FootballAction(win);
   frameRate(10);
 }
 

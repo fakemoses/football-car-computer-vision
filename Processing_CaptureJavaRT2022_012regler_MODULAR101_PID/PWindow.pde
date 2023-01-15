@@ -59,6 +59,9 @@ public class PWindow extends PApplet {
       //println(balls[i].x + "," + balls[i].y);
       rect(balls[i].x, balls[i].y, balls[i].width, balls[i].height);
     }
+    
+    //since detection is done here, all other movements has to be done here.
+    action.detectBall();
   };
 
   //get the bbox here
