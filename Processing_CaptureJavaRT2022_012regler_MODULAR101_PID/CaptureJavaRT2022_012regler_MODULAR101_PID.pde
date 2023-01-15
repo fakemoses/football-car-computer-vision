@@ -49,6 +49,7 @@ Antrieb antrieb;
 IPCapture cam;
 Bildverarbeitung bildverarbeitung;
 Regler regler;
+FootballAction action;
 
 // Class for new window -> OpenCV Cascade
 PWindow win;
@@ -69,6 +70,7 @@ void setup()
   udpcomfort = new UDPcomfort(IP, PORT);
   antrieb = new Antrieb(udpcomfort);
   regler = new Regler(antrieb);
+  action = new FootballAction();
   frameRate(10);
 }
 
