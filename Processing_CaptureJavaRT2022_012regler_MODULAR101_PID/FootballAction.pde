@@ -38,16 +38,19 @@ public class FootballAction {
       //check if image is actually a ball. Like check the color. If it is a ball then call SPX to get direction
       // (new idea) count white pixels to detect ball
       double threshold = 20.0;
+      
+      // observations: ball detected is printed only when threshold is set to a negative number. all positive numbers including zero returns nothing detected
 
       for (int i = 0; i < balls.length; i++) {
         double white_percent = countWhitePixels(balls[i].x, balls[i].y, balls[i].width, balls[i].height, b);
         if (white_percent > threshold) {
           is_rect = true;
           idx = i;
+          println("ball detected");
         }
       }
       if (!is_rect) {
-        print("nothing detected");
+        println("nothing detected");
       } else {
         // process whole thing inside here
         regler.erzeugeStellsignalAusRotbild(b);
