@@ -11,6 +11,8 @@
  if opponent does not have the ball, switch back to neutralMode()  */
 import java.awt.*;
 import gab.opencv.*;
+import processing.awt.PSurfaceAWT;
+import processing.awt.PSurfaceAWT.SmoothCanvas;
 
 public class FootballAction {
   PWindow window ;
