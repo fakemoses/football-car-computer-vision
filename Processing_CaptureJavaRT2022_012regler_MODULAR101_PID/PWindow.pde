@@ -17,7 +17,9 @@ public class PWindow extends PApplet {
   boolean setLocation, setTitle, makeResizable;
   String title;
 
-
+  Bildverarbeitung bildverarbeitung;
+  int [][] bild;
+  
   // Method that should be called in this case
   PWindow(IPCapture cam, int x_, int y_, int ww, int hh, String s) {
     super();
@@ -44,10 +46,13 @@ public class PWindow extends PApplet {
     //if (makeResizable)surface.setResizable(true);
     opencv = new OpenCV(this, this.cam);
     opencv.loadCascade("ball_detection.xml");
+    bildverarbeitung = new Bildverarbeitung();
   };
 
   void draw() {
     this.cam.read();
+    bildverarbeitung.extractColorRGB(cam);
+    bild = bildverarbeitung.getRed(); 
     opencv.loadImage(this.cam);
     Rectangle[] balls = this.detectObject();
     image(opencv.getInput(), 0, 0);
@@ -68,6 +73,10 @@ public class PWindow extends PApplet {
   public Rectangle[] detectObject() {
     Rectangle[] balls = opencv.detect(1.3, 4, 0, 30, 300);
     return balls;
+  }
+  
+  public int[][] getBild() {
+   return bild; 
   }
 
  
