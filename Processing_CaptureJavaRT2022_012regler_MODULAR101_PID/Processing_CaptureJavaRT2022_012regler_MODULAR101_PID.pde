@@ -98,16 +98,14 @@ void draw()
     redMask = algo.bildverarbeitung.getRedMask();
     image(camI, 0, 0);
     image(redMask, 320, 0);
+    PImage bimg;
+    bimg = algo.lineDetection.bimg;
+    image(bimg, 640, 0);
     stroke(255, 0, 0);
     strokeWeight(3);
     
-    // ArrayList<Point> list = algo.bildverarbeitung.getRedList();
-    // if (list.size()>400) {
-    //     ransac.run(list);
-    //     Line l = ransac.getBestLine();
     Point[] intersectionPoint = algo.lineDetection.getIntersectionPoints();
     line(intersectionPoint[0].x, intersectionPoint[0].y, intersectionPoint[1].x, intersectionPoint[1].y);
-// }
     
     // -> set evalValue to motor
     // mainWin.draw();

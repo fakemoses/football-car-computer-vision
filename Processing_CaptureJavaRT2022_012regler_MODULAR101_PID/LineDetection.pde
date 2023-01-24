@@ -7,7 +7,12 @@ public class LineDetection implements Interface, Runnable{
     private boolean STARTED = false;
     private int evalValue;
     private ArrayList<Point> points = new ArrayList<Point>();
+    PImage bimg = new PImage(320,240);
+    
+    // ! Object should be declared here ?!
+    // no modularity innit ?
     RANSAC ransac = new RANSAC(500,0.2,320,240);
+    Boundary boundary = new Boundary(320,240);
     
     public void startThread() {
         if (myThread == null) {
@@ -30,6 +35,10 @@ public class LineDetection implements Interface, Runnable{
             // do something
             // all codes run here
             ransac.run(points);
+            Line l = ransac.getBestLine();
+            if (l != null) {
+                bimg= boundary.updateImage(ransac.getBestLine());
+            }
         }
     }
     
