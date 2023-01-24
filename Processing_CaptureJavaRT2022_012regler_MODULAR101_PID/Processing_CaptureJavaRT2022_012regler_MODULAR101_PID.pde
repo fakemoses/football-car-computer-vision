@@ -40,7 +40,7 @@ String NACHRICHT = "";
 //String TEMPERATUR = "";
 //String IP = "192.168.137.92";
 //String IP = "192.168.0.102";
-String IP = "192.168.178.70";
+String IP = "192.168.178.48";
 int PORT = 6000;
 
 //UDP udp;  // define the UDP object
@@ -52,6 +52,7 @@ Regler regler;
 Algo algo;
 LineDetection lineDetection;
 DrawWindow mainWin;
+RANSAC ransac;
 
 // Class for new window -> OpenCV Cascade
 PWindow win;
@@ -60,13 +61,13 @@ PWindow win;
 boolean yellow = false;
 ColorHSV maskYellow;
 PImage img, out1;
-
+PImage redMask, camI, greenMask, blueMask, yellowMask;
 void setup()
 {
-    size(640, 480);
+    size(1000, 1000);
     cam = new IPCapture(this, "http://" + IP + ":81/stream", "", "");
     cam.start();
-    win = new PWindow(cam, 320, 0, 320, 240, "Cascade Detection");
+    // win = new PWindow(cam, 320, 0, 320, 240, "Cascade Detection");
     surface.setLocation( -5, 0);
     bildverarbeitung = new Bildverarbeitung();
     udpcomfort = new UDPcomfort(IP, PORT);
@@ -74,9 +75,15 @@ void setup()
     regler = new Regler(antrieb);
     
     lineDetection = new LineDetection();
-    mainWin = new DrawWindow();
+    // mainWin = new DrawWindow();
     algo = new Algo(cam, bildverarbeitung, lineDetection);
     algo.startALL();
+    ransac = new RANSAC(500,0.2,320,240);
+    redMask = createImage(320, 240, RGB);
+    greenMask = createImage(320, 240, RGB);
+    blueMask = createImage(320, 240, RGB);
+    yellowMask = createImage(320, 240, RGB);
+    camI = createImage(320, 240, RGB);
     frameRate(10);
 }
 
@@ -85,13 +92,27 @@ boolean AKTIV = false;
 
 void draw()
 {
-    //Only THIS  ?!?!
     algo.runColorExtraction();
     int evalValue = algo.getEvalResult();
+    camI = algo.bildverarbeitung.getCameraImage();
+    redMask = algo.bildverarbeitung.getRedMask();
+    image(camI, 0, 0);
+    image(redMask, 320, 0);
+    stroke(255, 0, 0);
+    strokeWeight(3);
+    
+    // ArrayList<Point> list = algo.bildverarbeitung.getRedList();
+    // if (list.size()>400) {
+    //     ransac.run(list);
+    //     Line l = ransac.getBestLine();
+    Point[] intersectionPoint = algo.lineDetection.getIntersectionPoints();
+    line(intersectionPoint[0].x, intersectionPoint[0].y, intersectionPoint[1].x, intersectionPoint[1].y);
+// }
     
     // -> set evalValue to motor
-    mainWin.draw();
-
+    // mainWin.draw();
+    // antrieb.fahrt(0.0, 0.0);
+    
 }
 
 void keyPressed()
