@@ -4,6 +4,7 @@ public class Algo {
     Bildverarbeitung bildverarbeitung;
     LineDetection lineDetection;
     private int EVALRESULT;
+    
     public Algo(IPCapture cam, Bildverarbeitung bildverarbeitung, LineDetection lineDetection) {
         // in constructor -> start all thread
         this.cam = cam;
@@ -20,15 +21,15 @@ public class Algo {
     
     public void runColorExtraction() {
         bildverarbeitung.extractColorRGB(cam);
-        
+        lineDetection.setPoints(bildverarbeitung.getRedList());
         // then maybe pakai getter -> set semua RGB dekat sini
         // boleh pass RGB dekat Thread for calculation kalau nak
     }
     
     
-    
     public void Eval() {
         // Here will run evaluation
+        // todo: implement Mediator pattern
         if (lineDetection.getEvalValue() > 0) {
             // calc eval ?
             //something something
