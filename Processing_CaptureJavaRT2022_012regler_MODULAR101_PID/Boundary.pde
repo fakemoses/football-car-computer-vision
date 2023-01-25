@@ -10,7 +10,7 @@ public class Boundary {
     private Line currentLine;
     private Line prevLine = new Line();
     private final int maxPixelsCount;
-    private double threshhold = 0.17;
+    private double threshhold = 0.3;
     private int greenCount = 0;
     
     public Boundary(PImage image) {
@@ -119,12 +119,12 @@ public class Boundary {
     
     public boolean isHelpNeeded() {
         if (greenCount == 0) {
-            println("No Green Pixels");
+            // println("No Green Pixels");
             return false;
         }
         double percentage = (double)greenCount / maxPixelsCount;
         boolean result = percentage < threshhold;
-        println("Green Pixels: " + greenCount + " / " + maxPixelsCount + " = " + percentage + " < " + threshhold + " = " + result);
+        // println("Green Pixels: " + greenCount + " / " + maxPixelsCount + " = " + percentage + " < " + threshhold + " = " + result);
         return percentage < threshhold;
     }
 }

@@ -6,6 +6,7 @@ import gab.opencv.*;
 import java.awt.Frame;
 import processing.awt.PSurfaceAWT;
 import processing.awt.PSurfaceAWT.SmoothCanvas;
+import java.util.Collections;
 
 //Herausgezogene wichtige Parameter des Systems
 boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = false;
@@ -52,7 +53,9 @@ Bildverarbeitung bildverarbeitung;
 Regler regler;
 Algo algo;
 LineDetection lineDetection;
+BallDetection ballDetection;
 DrawWindow mainWin;
+MotorControl motorControl;
 RANSAC ransac;
 
 // Class for new window -> OpenCV Cascade
@@ -75,10 +78,13 @@ void setup()
     udpcomfort = new UDPcomfort(IP, PORT);
     antrieb = new Antrieb(udpcomfort);
     regler = new Regler(antrieb);
-    
-    lineDetection = new LineDetection();
+    motorControl = new MotorControl(antrieb);
+    lineDetection = new LineDetection(motorControl);
+    ballDetection = new BallDetection(motorControl);
+    motorControl.register(lineDetection,1);
+    motorControl.register(ballDetection,2);
     // mainWin = new DrawWindow();
-    algo = new Algo(cam, bildverarbeitung, lineDetection, antrieb);
+    algo = new Algo(cam, bildverarbeitung, lineDetection, antrieb, ballDetection);
     algo.startALL();
     ransac = new RANSAC(500,0.2,320,240);
     redMask = createImage(320, 240, RGB);
@@ -110,6 +116,7 @@ void draw()
     if (AKTIV) {
         algo.controlMotor();
     }
+    motorControl.run();
     // -> set evalValue to motor
     // mainWin.draw();
     // antrieb.fahrt(0.0, 0.0);
@@ -132,11 +139,13 @@ void keyPressed()
     } else if (key ==  '0') //stopp
         {
         antrieb.fahrt(0.0, 0.0);
+        motorControl.stop();
         NACHRICHT = "Fahrt gestoppt";
         AKTIV = false;
     } else if (key ==  '1') //beide vor
         {
         // antrieb.fahrt(1.0, 1.0);
+        motorControl.start();
         NACHRICHT = "Fahrt VORWÄRTS";
         AKTIV = true;
     } else if (key ==  '2') //beide rueck
