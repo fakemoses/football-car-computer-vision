@@ -10,7 +10,8 @@ public class Boundary {
     private Line currentLine;
     private Line prevLine = new Line();
     private final int maxPixelsCount;
-    private double threshhold = 0.3;
+    private double threshhold = 0.17;
+    private int greenCount = 0;
     
     public Boundary(PImage image) {
         this.image = new PImage(image.width, image.height, RGB);
@@ -34,7 +35,7 @@ public class Boundary {
     }
     
     public PImage updateImage(Line l) {
-        int c = 0;
+        greenCount = 0;
         this.currentLine = l;
         if (prevLine.isDefined()) {
             for (int i = 0; i < image.width; i++) {
@@ -42,21 +43,13 @@ public class Boundary {
                     int region = whereAmI(new Point(i, j));
                     if (region == 1) {
                         image.set(i, j, color(0, 255, 0));
-                        c++;
+                        greenCount++;
                     } else if (region == 2) {
                         image.set(i, j, color(255, 0, 0));
                     } else {
                         image.set(i, j, color(0, 0, 255));
                     }
                 }
-            }
-            double percent = (double) c / maxPixelsCount;
-            if (percent < threshhold) {
-                // println("HELP ME");
-                // * update Motor to do something 
-            }
-            else {
-                // println("I'm fine");
             }
         }
         prevLine = currentLine;
@@ -122,5 +115,16 @@ public class Boundary {
         } else {
             return 3;
         } 
+    }
+    
+    public boolean isHelpNeeded() {
+        if (greenCount == 0) {
+            println("No Green Pixels");
+            return false;
+        }
+        double percentage = (double)greenCount / maxPixelsCount;
+        boolean result = percentage < threshhold;
+        println("Green Pixels: " + greenCount + " / " + maxPixelsCount + " = " + percentage + " < " + threshhold + " = " + result);
+        return percentage < threshhold;
     }
 }

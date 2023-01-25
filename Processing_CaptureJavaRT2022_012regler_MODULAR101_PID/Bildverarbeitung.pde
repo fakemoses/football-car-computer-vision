@@ -59,7 +59,7 @@ public class Bildverarbeitung
         {
         if (cam.isAvailable()) {
             cam.read();
-            //image(cam,0,0);
+            // image(cam,0,0);
             cam.updatePixels();
             int[] pix = cam.pixels;
             if (pix!= null)

@@ -13,7 +13,8 @@ float VORTRIEB = 0.7;
 float PROPORTIONALE_VERSTAERKUNG = 0.50;
 float INTEGRALE_VERSTAERKUNG = 0.15f;
 float DIFFERENTIALE_VERSTAERKUNG = 0.1f;
-float ASYMMETRIE = 1.01; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
+float ASYMMETRIE = 1.0; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
+// float ASYMMETRIE = 1.01; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 
 //VERSION FÜR TP-Link_59C2
 
@@ -61,10 +62,11 @@ PWindow win;
 boolean yellow = false;
 ColorHSV maskYellow;
 PImage img, out1;
-PImage redMask, camI, greenMask, blueMask, yellowMask;
+PImage redMask, camI;
+
 void setup()
 {
-    size(1000, 1000);
+    size(640, 640);
     cam = new IPCapture(this, "http://" + IP + ":81/stream", "", "");
     cam.start();
     // win = new PWindow(cam, 320, 0, 320, 240, "Cascade Detection");
@@ -76,15 +78,12 @@ void setup()
     
     lineDetection = new LineDetection();
     // mainWin = new DrawWindow();
-    algo = new Algo(cam, bildverarbeitung, lineDetection);
+    algo = new Algo(cam, bildverarbeitung, lineDetection, antrieb);
     algo.startALL();
     ransac = new RANSAC(500,0.2,320,240);
     redMask = createImage(320, 240, RGB);
-    greenMask = createImage(320, 240, RGB);
-    blueMask = createImage(320, 240, RGB);
-    yellowMask = createImage(320, 240, RGB);
     camI = createImage(320, 240, RGB);
-    frameRate(10);
+    frameRate(60);
 }
 
 
@@ -96,17 +95,21 @@ void draw()
     int evalValue = algo.getEvalResult();
     camI = algo.bildverarbeitung.getCameraImage();
     redMask = algo.bildverarbeitung.getRedMask();
-    image(camI, 0, 0);
+    image(cam, 0, 0);
     image(redMask, 320, 0);
     PImage bimg;
     bimg = algo.lineDetection.bimg;
-    image(bimg, 640, 0);
+    image(bimg, 0, 240);
     stroke(255, 0, 0);
     strokeWeight(3);
     
     Point[] intersectionPoint = algo.lineDetection.getIntersectionPoints();
-    line(intersectionPoint[0].x, intersectionPoint[0].y, intersectionPoint[1].x, intersectionPoint[1].y);
+    line(intersectionPoint[0].x, intersectionPoint[0].y, intersectionPoint[1].x, intersectionPoint[1].y);    
     
+    
+    if (AKTIV) {
+        algo.controlMotor();
+    }
     // -> set evalValue to motor
     // mainWin.draw();
     // antrieb.fahrt(0.0, 0.0);
@@ -133,7 +136,7 @@ void keyPressed()
         AKTIV = false;
     } else if (key ==  '1') //beide vor
         {
-        antrieb.fahrt(1.0, 1.0);
+        // antrieb.fahrt(1.0, 1.0);
         NACHRICHT = "Fahrt VORWÄRTS";
         AKTIV = true;
     } else if (key ==  '2') //beide rueck

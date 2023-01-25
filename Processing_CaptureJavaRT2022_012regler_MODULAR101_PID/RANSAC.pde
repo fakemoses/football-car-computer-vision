@@ -10,6 +10,7 @@ public class RANSAC {
     private final int imgHeight;
     
     private Line best_line;
+    private int temp = 0;
     
     public RANSAC(int numIterations, double threshold, PImage image) {
         this(numIterations, threshold, image.width, image.height);
@@ -23,30 +24,39 @@ public class RANSAC {
     }
     
     public void run(ArrayList<Point> points) {
-        if (points.size() < 400) {
-            println("Not enough points to run RANSAC");
-            return;
-        }
-        best_inliers = 0;
-        for (int i = 0; i < numIterations; i++) {
-            Point p1 = points.get((int)(Math.random() * points.size()));
-            Point p2 = points.get((int)(Math.random() * points.size()));
-            Line line = new Line(p1, p2);
-            
-            ArrayList<Point> inliers = new ArrayList<Point>();
-            for (Point p : points) {
-                if (Math.abs(line.distanceFromLine(p)) < threshold) {
-                    inliers.add(p);
-                }
-            }
-            
-            if (inliers.size() > best_inliers) {
-                best_inliers = inliers.size();
-                best_line = line;
-            }
-        }
+        // println("size: " + points.size());
+        // temp++;
         
-        confidence = (double)best_inliers / points.size();
+        if (points.size() < 400) {
+            // huh 
+            // -> cannot early return ?
+            println("Not enough points to run RANSAC " + points.size());
+            // return;
+            // Point p1 = points.get((int)(Math.random() * points.size()));
+            
+        }
+        else{
+            // println("enuf");
+            best_inliers = 0;
+            for (int i = 0; i < numIterations; i++) {
+                Point p1 = points.get((int)(Math.random() * points.size()));
+                Point p2 = points.get((int)(Math.random() * points.size()));
+                Line line = new Line(p1, p2);
+                
+                ArrayList<Point> inliers = new ArrayList<Point>();
+                for (Point p : points) {
+                    if (Math.abs(line.distanceFromLine(p)) < threshold) {
+                        inliers.add(p);
+                    }
+                }
+                
+                if (inliers.size() > best_inliers) {
+                    best_inliers = inliers.size();
+                    best_line = line;
+                }
+                confidence = (double)best_inliers / points.size();
+            } 
+        }
     }
     
     public Line getBestLine() {
@@ -108,7 +118,7 @@ class Line {
         // if not it will located at top image boundary
         // end will NEVER be located at left image boundary
         
-        // todo: set variable size from global ?
+        // todo : set variable size from global ?
         Point start;
         Point end;
         

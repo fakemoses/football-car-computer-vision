@@ -9,6 +9,9 @@ public class LineDetection implements Interface, Runnable{
     private ArrayList<Point> points = new ArrayList<Point>();
     PImage bimg = new PImage(320,240);
     
+    // private long startTime = Systems.currentTimeMillis();
+    // int frames = 0;
+    
     // ! Object should be declared here ?!
     // no modularity innit ?
     RANSAC ransac = new RANSAC(500,0.2,320,240);
@@ -31,14 +34,20 @@ public class LineDetection implements Interface, Runnable{
     
     public void run() {
         while(STARTED) {
+            // frames++;
             // println("Thread running");
             // do something
             // all codes run here
+            if (points.size() < 400) {
+                delay(50);
+                continue;
+            }
             ransac.run(points);
             Line l = ransac.getBestLine();
             if (l != null) {
-                bimg= boundary.updateImage(ransac.getBestLine());
+                bimg = boundary.updateImage(l);
             }
+            // delay(50);
         }
     }
     
