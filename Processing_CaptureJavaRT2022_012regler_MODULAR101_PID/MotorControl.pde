@@ -1,11 +1,3 @@
-interface Mediator {
-    void notify(ThreadInterface sender, int direction);
-}
-
-interface MotorHandler{
-    void execute();
-}
-
 public class MotorControl implements Mediator {
     private Antrieb antrieb;
     private boolean MOTOR_RUNNING = false;

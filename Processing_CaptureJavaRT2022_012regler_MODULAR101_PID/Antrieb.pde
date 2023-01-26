@@ -60,7 +60,4 @@ public class Antrieb
             udpcomfort.send(3,0);
         }   
     }
-    public void fahrt2(float links, float rechts) {
-        println("links: " + links + " rechts: " + rechts);
-    }
 }

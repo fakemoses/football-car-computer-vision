@@ -57,7 +57,7 @@ BallDetection ballDetection;
 DrawWindow mainWin;
 MotorControl motorControl;
 RANSAC ransac;
-
+Boundary boundary;
 // Class for new window -> OpenCV Cascade
 PWindow win;
 
@@ -65,31 +65,42 @@ PWindow win;
 boolean yellow = false;
 ColorHSV maskYellow;
 PImage img, out1;
-PImage redMask, camI;
+PImage redMask, camI, bimg;
 
 void setup()
 {
     size(640, 640);
+    frameRate(60);
+    
+    redMask = createImage(320, 240, RGB);
+    camI = createImage(320, 240, RGB);
+    bimg = createImage(320, 240, RGB);
+    
     cam = new IPCapture(this, "http://" + IP + ":81/stream", "", "");
     cam.start();
-    // win = new PWindow(cam, 320, 0, 320, 240, "Cascade Detection");
     surface.setLocation( -5, 0);
+    
+    // win = new PWindow(cam, 320, 0, 320, 240, "Cascade Detection");
+    // mainWin = new DrawWindow();
+    
     bildverarbeitung = new Bildverarbeitung();
     udpcomfort = new UDPcomfort(IP, PORT);
     antrieb = new Antrieb(udpcomfort);
     regler = new Regler(antrieb);
+    
     motorControl = new MotorControl(antrieb);
-    lineDetection = new LineDetection(motorControl);
+    
+    ransac = new RANSAC(500,0.2,320,240);
+    boundary = new Boundary(320,240);
+    lineDetection = new LineDetection(motorControl, ransac, boundary);
+    
     ballDetection = new BallDetection(motorControl);
+    
     motorControl.register(lineDetection,1);
     motorControl.register(ballDetection,2);
-    // mainWin = new DrawWindow();
-    algo = new Algo(cam, bildverarbeitung, lineDetection, antrieb, ballDetection);
+    
+    algo = new Algo(cam, bildverarbeitung, lineDetection, ballDetection);
     algo.startALL();
-    ransac = new RANSAC(500,0.2,320,240);
-    redMask = createImage(320, 240, RGB);
-    camI = createImage(320, 240, RGB);
-    frameRate(60);
 }
 
 
@@ -98,29 +109,23 @@ boolean AKTIV = false;
 void draw()
 {
     algo.runColorExtraction();
-    int evalValue = algo.getEvalResult();
+    // int evalValue = algo.getEvalResult();
     camI = algo.bildverarbeitung.getCameraImage();
     redMask = algo.bildverarbeitung.getRedMask();
+    bimg = algo.lineDetection.bimg;
+    
     image(cam, 0, 0);
     image(redMask, 320, 0);
-    PImage bimg;
-    bimg = algo.lineDetection.bimg;
     image(bimg, 0, 240);
+    
     stroke(255, 0, 0);
     strokeWeight(3);
     
     Point[] intersectionPoint = algo.lineDetection.getIntersectionPoints();
     line(intersectionPoint[0].x, intersectionPoint[0].y, intersectionPoint[1].x, intersectionPoint[1].y);    
     
-    
-    if (AKTIV) {
-        algo.controlMotor();
-    }
     motorControl.run();
-    // -> set evalValue to motor
-    // mainWin.draw();
-    // antrieb.fahrt(0.0, 0.0);
-    
+    // mainWin.draw();    
 }
 
 void keyPressed()

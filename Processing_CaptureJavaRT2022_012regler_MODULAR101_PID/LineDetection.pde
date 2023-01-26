@@ -7,19 +7,16 @@ public class LineDetection implements ThreadInterface, Runnable{
     private boolean STARTED = false;
     private int evalValue;
     private ArrayList<Point> points = new ArrayList<Point>();
-    private MotorControl motorControl;
     PImage bimg = new PImage(320,240);
     
-    // private long startTime = Systems.currentTimeMillis();
-    // int frames = 0;
+    RANSAC ransac;
+    Boundary boundary;
+    private MotorControl motorControl;
     
-    // ! Object should be declared here ?!
-    // no modularity innit ?
-    RANSAC ransac = new RANSAC(500,0.2,320,240);
-    Boundary boundary = new Boundary(320,240);
-    
-    public LineDetection(MotorControl motorControl) {
+    public LineDetection(MotorControl motorControl, RANSAC ransac, Boundary boundary) {
         this.motorControl = motorControl;
+        this.ransac = ransac;
+        this.boundary = boundary;
     }
     
     public void startThread() {
