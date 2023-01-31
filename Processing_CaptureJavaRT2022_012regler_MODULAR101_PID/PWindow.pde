@@ -61,7 +61,7 @@ public class PWindow extends PApplet {
     strokeWeight(3);
     //println(balls.length);
     for (int i = 0; i < balls.length; i++) {
-      //println(balls[i].x + "," + balls[i].y);
+      println("rect: " + balls[i].x + "," + balls[i].y + "," + balls[i].width + "," + balls[i].height);
       rect(balls[i].x, balls[i].y, balls[i].width, balls[i].height);
     }
     

@@ -72,6 +72,7 @@ public class FootballAction {
     }
     double area_white;
     area_white = ((double)white_count/(w*h))*100;
+    println("white % : " + area_white);
     return area_white;
   }
 }

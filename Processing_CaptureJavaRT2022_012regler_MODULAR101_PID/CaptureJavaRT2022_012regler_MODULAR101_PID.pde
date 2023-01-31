@@ -40,7 +40,7 @@ String NACHRICHT = "";
 //String TEMPERATUR = "";
 //String IP = "192.168.137.92";
 //String IP = "192.168.0.102";
-String IP = "192.168.137.143";
+String IP = "192.168.137.137";
 int PORT = 6000;
 
 //UDP udp;  // define the UDP object
