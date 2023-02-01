@@ -60,6 +60,10 @@ RANSAC ransac;
 Boundary boundary;
 // Class for new window -> OpenCV Cascade
 PWindow win;
+OscP5 oscP5;
+NetAddress myRemoteLocation;
+Comm comm;
+String isBall = "/isBall";
 
 // HSV Color Extraction
 boolean yellow = false;
@@ -79,6 +83,10 @@ void setup()
     cam = new IPCapture(this, "http://" + IP + ":81/stream", "", "");
     cam.start();
     surface.setLocation( -5, 0);
+
+    oscP5 = new OscP5(this,12000); // Port that the client will listen to
+    myRemoteLocation = new NetAddress("192.168.178.43",12000); // IP and port of the server that the client will send to
+    comm = new Comm(oscP5,myRemoteLocation,isBall); // Unique id for the communication
     
     win = new PWindow(cam, 320, 0, 320, 240, "Cascade Detection");
     // mainWin = new DrawWindow();
@@ -142,6 +150,12 @@ void draw()
     
     motorControl.run();
     // mainWin.draw();    
+}
+
+//event handler for OSC messages
+void oscEvent(OscMessage theOscMessage) {
+   /* check if theOscMessage has the address pattern we are looking for. */
+  comm.onEventRun(theOscMessage);       
 }
 
 public double countWhitePixels(int x, int y, int w, int h, int[][] bild) {
