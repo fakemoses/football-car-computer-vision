@@ -70,7 +70,7 @@ PImage redMask, camI, bimg;
 void setup()
 {
     size(640, 640);
-    frameRate(60);
+    frameRate(10);
     
     redMask = createImage(320, 240, RGB);
     camI = createImage(320, 240, RGB);
@@ -80,7 +80,7 @@ void setup()
     cam.start();
     surface.setLocation( -5, 0);
     
-    // win = new PWindow(cam, 320, 0, 320, 240, "Cascade Detection");
+    win = new PWindow(cam, 320, 0, 320, 240, "Cascade Detection");
     // mainWin = new DrawWindow();
     
     bildverarbeitung = new Bildverarbeitung();
@@ -94,7 +94,7 @@ void setup()
     boundary = new Boundary(320,240);
     lineDetection = new LineDetection(motorControl, ransac, boundary);
     
-    ballDetection = new BallDetection(motorControl);
+    ballDetection = new BallDetection(motorControl, win, bildverarbeitung);
     
     motorControl.register(lineDetection,1);
     motorControl.register(ballDetection,2);
@@ -105,27 +105,82 @@ void setup()
 
 
 boolean AKTIV = false;
+PImage sub = null;
 
 void draw()
 {
     algo.runColorExtraction();
     // int evalValue = algo.getEvalResult();
     camI = algo.bildverarbeitung.getCameraImage();
-    redMask = algo.bildverarbeitung.getRedMask();
+    redMask = algo.bildverarbeitung.getBlueMask();
+    int[][] red = algo.bildverarbeitung.getRed();
     bimg = algo.lineDetection.bimg;
+    
+    Rectangle[] rects = win.detectObject();
     
     image(cam, 0, 0);
     image(redMask, 320, 0);
     image(bimg, 0, 240);
     
     stroke(255, 0, 0);
-    strokeWeight(3);
+    noFill();
+    // if (rects != null) {    
+    //     for (int i = 0;i < rects.length;i++) {
+    //         rect(rects[i].x,rects[i].y,rects[i].width,rects[i].height);
+    //         sub = redMask.get(rects[i].x, rects[i].y, rects[i].width, rects[i].height);
+    //         double white = countWhitePixels(rects[i].x, rects[i].y, rects[i].width, rects[i].height, sub);
+    //         println("White: " + white);
+    //     } 
+// }
+    // strokeWeight(3);
+    // if (sub != null) {
+    //     image(sub, 320, 240);
+// }
     
     Point[] intersectionPoint = algo.lineDetection.getIntersectionPoints();
     line(intersectionPoint[0].x, intersectionPoint[0].y, intersectionPoint[1].x, intersectionPoint[1].y);    
     
     motorControl.run();
     // mainWin.draw();    
+}
+
+public double countWhitePixels(int x, int y, int w, int h, int[][] bild) {
+    int white_count = 0;
+    int i = 0;
+    int j = 0;
+    
+    for (i = y; i < y + h; i++) {
+        for (j = x; j < x + w; j++) {
+            int val = bild[j][i];
+            if (val == 0) {
+                // white_count++;
+                // println("Bild: " + bild[j][i]);
+                white_count++;
+            }
+        }
+    }
+    println("YJ: " + y + " " + j + " " + h + " " + w);
+    double area_white;
+    println("white count: " + white_count);
+    area_white = ((double)white_count / (w * h)) * 100;
+    // println("white % : " + area_white);
+    return area_white;
+}
+public double countWhitePixels(int x, int y, int w, int h, PImage bild) {
+    int white_count = 0;
+    
+    int pix[] = bild.pixels;
+    
+    for (int i = 0; i < pix.length; i++) {
+        if (pix[i] == color(255, 255, 255)) {
+            white_count++;
+        }
+    }
+    double area_white;
+    println("white count: " + white_count);
+    area_white = ((double)white_count / (w * h)) * 100;
+    // println("white % : " + area_white);
+    return area_white;
 }
 
 void keyPressed()

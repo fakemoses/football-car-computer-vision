@@ -42,4 +42,5 @@ with open(OUTPUT_FILE, "w") as f:
         # If the image has a label, write the annotation to the output file
 
         if label is not None:
-            f.write(os.path.join(IMAGE_DIR, image_file) + " 1 " + " ".join(str(x) for x in label) + "\n")
+            f.write(os.path.join(IMAGE_DIR, image_file) + " 1 " +
+                    " ".join(str(x) for x in label) + "\n")

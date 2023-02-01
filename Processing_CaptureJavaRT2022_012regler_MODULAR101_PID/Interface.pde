@@ -5,7 +5,7 @@ public interface ThreadInterface {
 }
 
 interface Mediator {
-    void notify(ThreadInterface sender, int direction);
+    void notify(ThreadInterface sender, float direction);
 }
 
 interface MotorHandler{

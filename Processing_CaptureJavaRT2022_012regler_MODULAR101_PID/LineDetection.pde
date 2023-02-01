@@ -50,7 +50,7 @@ public class LineDetection implements ThreadInterface, Runnable{
                 bimg = boundary.updateImage(l);
             }
             if (boundary.isHelpNeeded()) {
-                motorControl.notify(this, 0);
+                // motorControl.notify(this, 0);
             }
         }
     }

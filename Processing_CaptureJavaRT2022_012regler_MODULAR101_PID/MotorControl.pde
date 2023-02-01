@@ -38,6 +38,27 @@ public class MotorControl implements Mediator {
             antrieb.fahrt(1, 1);
         }
     }
+    class ForwardHandler2 implements MotorHandler {
+        float direction;
+        ForwardHandler2(float d) {
+            this.direction = d;
+            println("MotorControl: direction: " + direction);
+        }
+        @Override
+        public void execute() {
+            if (direction >  0) {
+                println("MotorControl: Turning right");
+                antrieb.fahrt(0,1);
+            } else if (direction < 0) {
+                println("MotorControl: Turning left");
+                antrieb.fahrt(1,0);
+            } else
+            { 
+                println("MotorControl: Going straight");
+                antrieb.fahrt(1,1);
+            }
+        }
+    }
     
     public MotorControl(Antrieb antrieb) {
         this.antrieb = antrieb;
@@ -93,7 +114,7 @@ public class MotorControl implements Mediator {
     }
     
     @Override
-    public void notify(ThreadInterface sender, int direction) {
+    public void notify(ThreadInterface sender, float direction) {
         int loopCount = 50;
         println("Received notification from " + sender.getThreadName() + " --> direction: " + direction);
         if (sender instanceof LineDetection) {
@@ -101,7 +122,7 @@ public class MotorControl implements Mediator {
         }
         
         if (sender instanceof BallDetection) {
-            updateTasks(sender, loopCount, new ForwardHandler());
+            updateTasks(sender, 1, new ForwardHandler2(direction));
         }
     }
     
