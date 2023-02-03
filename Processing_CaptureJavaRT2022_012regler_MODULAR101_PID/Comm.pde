@@ -20,7 +20,7 @@ class Comm{
         oscP5.send(myMessage, this.myRemoteLocation);
     }
 
-    public getOpponentHasBall() {
+    public int getOpponentHasBall() {
         return this.opponentHasBall;
     }
 
