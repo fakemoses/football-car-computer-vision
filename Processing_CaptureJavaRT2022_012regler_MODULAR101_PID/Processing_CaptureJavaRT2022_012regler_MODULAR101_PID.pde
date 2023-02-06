@@ -54,6 +54,7 @@ Regler regler;
 Algo algo;
 LineDetection lineDetection;
 BallDetection ballDetection;
+CarDetection carDetection;
 DrawWindow mainWin;
 MotorControl motorControl;
 RANSAC ransac;
@@ -103,11 +104,13 @@ void setup()
     lineDetection = new LineDetection(motorControl, ransac, boundary);
     
     ballDetection = new BallDetection(motorControl, win, bildverarbeitung);
+
+    carDetection = new CarDetection(motorControl, win, bildverarbeitung);
     
     motorControl.register(lineDetection,1);
     motorControl.register(ballDetection,2);
     
-    algo = new Algo(cam, bildverarbeitung, lineDetection, ballDetection);
+    algo = new Algo(cam, bildverarbeitung, lineDetection, ballDetection, carDetection);
     algo.startALL();
 }
 

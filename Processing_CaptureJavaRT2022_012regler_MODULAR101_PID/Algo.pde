@@ -4,14 +4,16 @@ public class Algo {
     Bildverarbeitung bildverarbeitung;
     LineDetection lineDetection;
     BallDetection ballDetection;
+    CarDetection carDetection;
     
     
-    public Algo(IPCapture cam, Bildverarbeitung bildverarbeitung, LineDetection lineDetection, BallDetection ballDetection) {
+    public Algo(IPCapture cam, Bildverarbeitung bildverarbeitung, LineDetection lineDetection, BallDetection ballDetection, CarDetection carDetection) {
         // in constructor -> start all thread
         this.cam = cam;
         this.bildverarbeitung = bildverarbeitung;
         this.lineDetection = lineDetection;
         this.ballDetection = ballDetection;
+        this.carDetection = carDetection;
     }
     
     public void startALL() {
@@ -20,6 +22,7 @@ public class Algo {
         bildverarbeitung.start(); */
         lineDetection.startThread();
         ballDetection.startThread();
+        carDetection.startThread();
     }
     
     public void runColorExtraction() {

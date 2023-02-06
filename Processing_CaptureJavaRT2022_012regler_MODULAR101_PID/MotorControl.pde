@@ -124,6 +124,9 @@ public class MotorControl implements Mediator {
         if (sender instanceof BallDetection) {
             updateTasks(sender, 1, new ForwardHandler2(direction));
         }
+        if (sender instanceof CarDetection){
+            updateTasks(sender, 1, new ForwardHandler2(direction));
+        }
     }
     
     private boolean isTaskAvailable() {
