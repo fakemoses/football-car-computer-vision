@@ -7,13 +7,14 @@ public class LineDetection implements ThreadInterface, Runnable{
     private boolean STARTED = false;
     private int evalValue;
     private ArrayList<Point> points = new ArrayList<Point>();
+    private Line ransacLine;
     PImage bimg = new PImage(320,240);
     
-    RANSAC ransac;
+    Ransac ransac;
     Boundary boundary;
     private MotorControl motorControl;
     
-    public LineDetection(MotorControl motorControl, RANSAC ransac, Boundary boundary) {
+    public LineDetection(MotorControl motorControl, Ransac ransac, Boundary boundary) {
         this.motorControl = motorControl;
         this.ransac = ransac;
         this.boundary = boundary;
@@ -42,17 +43,18 @@ public class LineDetection implements ThreadInterface, Runnable{
         while(STARTED) {
             if (points.size() < 400) {
                 delay(50);
+                ransacLine = null;
                 continue;
             }
             ransac.run(points);
-            Line l = ransac.getBestLine();
-            if (l != null) {
-                bimg = boundary.updateImage(l);
+            ransacLine = ransac.getBestLine();
+            if (ransacLine != null) {
+                bimg = boundary.updateImage(ransacLine);
             }
             if (boundary.isHelpNeeded()) {
                 // motorControl.notify(this, 0);
             }
-            delay(50);
+            delay(100);
         }
     }
     
@@ -69,4 +71,7 @@ public class LineDetection implements ThreadInterface, Runnable{
         return  l.intersectionAtImageBorder();
     }
     
+    public Line getRansacLine() {
+        return ransacLine != null ? ransacLine : null;
+    }
 }

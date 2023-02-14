@@ -1,5 +1,7 @@
 import gab.opencv.*;
 
+
+// todo: add HSV here?
 public class Bildverarbeitung
 {
     int[][] bild = new int[240][320];
@@ -95,9 +97,34 @@ public class Bildverarbeitung
         return bildY;
     }
     
-    
+    // todo: clean up this mess
     // temp
     public PImage toPImage(int[][] b) {
+        PImage mask = new PImage(b[0].length, b.length);
+        int pixMask[] = mask.pixels;
+        int max = 0;
+        // int max = 20;
+        // convert back to PImage
+        int u = 0;
+        for (int i = 0; i < b.length; i++)
+        {
+            for (int k = 0; k < b[i].length; k++)
+            {
+                // set to max white if value is above threshold
+                if (b[i][k] > max) {
+                    b[i][k] = 255;
+                }
+                else{b[i][k] = 0;}
+                pixMask[u] = color(b[i][k], b[i][k], b[i][k]);
+                u++;
+            }
+        }
+        mask.updatePixels();
+        return mask;
+    }
+    
+    // temp
+    public PImage toPImage2(int[][] b) {
         resetList();
         PImage mask = new PImage(b[0].length, b.length);
         int pixMask[] = mask.pixels;
@@ -131,7 +158,7 @@ public class Bildverarbeitung
     
     //temp
     public PImage getRedMask() {
-        return toPImage(bildR);
+        return toPImage2(bildR);
     }
     
     //temp

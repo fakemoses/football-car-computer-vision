@@ -1,4 +1,4 @@
-public class RANSAC {
+public class Ransac {
     
     private final int numIterations;
     private final double threshold;
@@ -12,28 +12,23 @@ public class RANSAC {
     private Line best_line;
     private int temp = 0;
     
-    public RANSAC(int numIterations, double threshold, PImage image) {
+    public Ransac(int numIterations, double threshold, PImage image) {
         this(numIterations, threshold, image.width, image.height);
     }
     
-    public RANSAC(int numIterations, double threshold, int imgWidth, int imgHeight) {
+    public Ransac(int numIterations, double threshold, int imgWidth, int imgHeight) {
         this.numIterations = numIterations;
         this.threshold = threshold;
         this.imgWidth = imgWidth;
         this.imgHeight = imgHeight;
     }
     
-    public void run(ArrayList<Point> points) {
-        // println("size: " + points.size());
-        // temp++;
-        
+    public void run(ArrayList<Point> points) {       
         if (points.size() < 400) {
-            // huh 
-            // -> cannot early return ?
-            println("Not enough points to run RANSAC " + points.size());
-            // return;
-            // Point p1 = points.get((int)(Math.random() * points.size()));
-            
+            // -> cannot early return ? -> thread spin
+            println("Not enough points to run Ransac " + points.size());
+            delay(100);
+            return; 
         }
         else{
             // println("enuf");
@@ -82,6 +77,8 @@ class Point {
     }
 }
 
+
+// todo: use phi, rho instead of m, c -> no infinite slope
 class Line {
     Point a;
     Point b;
@@ -176,6 +173,37 @@ class Line {
     
     public double distanceFromLine(Point p) {
         return Math.abs((b.y - a.y) * p.x - (b.x - a.x) * p.y + b.x * a.y - b.y * a.x) / Math.sqrt(Math.pow(b.y - a.y, 2) + Math.pow(b.x - a.x, 2));
+    }
+    
+    public ArrayList<Point> getPoints(int thickness) {
+        ArrayList<Point> points = new ArrayList<Point>();
+        Point[] intersectionPoints = intersectionAtImageBorder();
+        Point start = intersectionPoints[0];
+        Point end = intersectionPoints[1];
+        for (int x = start.x; x <= end.x; x++) {
+            int y = (int)(m * x + c);
+            for (int i = ceil(y - thickness / 2); i <= floor(y + thickness / 2); i++) {
+                points.add(new Point(x,i));
+            }
+        }
+        
+        if (start.y <= end.y) {
+            for (int y = start.y; y <= end.y; y++) {
+                int x = (int)((y - c) / m);
+                for (int i = ceil(x - thickness / 2); i <= floor(x + thickness / 2); i++) {
+                    points.add(new Point(i,y));
+                }
+            }
+        }
+        else {
+            for (int y = start.y; y >= end.y; y--) {
+                int x = (int)((y - c) / m);
+                for (int i = ceil(x - thickness / 2); i <= floor(x + thickness / 2); i++) {
+                    points.add(new Point(i,y));
+                }
+            }
+        }
+        return points;
     }   
 }
 

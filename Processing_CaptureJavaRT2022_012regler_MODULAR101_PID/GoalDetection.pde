@@ -7,17 +7,17 @@ public class GoalDetection implements ThreadInterface, Runnable{
     private boolean STARTED = false;
     private MotorControl motorControl;
     Bildverarbeitung bv;
-    private ColorHSV yellowMask;  
+    private ColorHSV yellowCV;  
     private ArrayList<Contour> contours;
-    PImage yellowImage;
+    PImage yellowMask;
     
     private PWindow window;
     
     
-    public GoalDetection(MotorControl motorControl , Bildverarbeitung bv, ColorHSV yellowMask) {
+    public GoalDetection(MotorControl motorControl , Bildverarbeitung bv, ColorHSV yellowCV) {
         this.motorControl = motorControl;
         this.bv = bv;
-        this.yellowMask = yellowMask;
+        this.yellowCV = yellowCV;
         
     }
     
@@ -40,24 +40,8 @@ public class GoalDetection implements ThreadInterface, Runnable{
     
     public void run() {
         while(STARTED) {
-            // implementation here
-            println("GoalDetection");
-            yellowImage = yellowMask.getMask(bv.getCameraImage(),false);
-            contours = yellowMask.getContour();
-            
-            if (contours.size() > 0) {
-                Contour biggestContour = contours.get(0);
-                Rectangle r = biggestContour.getBoundingBox();
-                
-                noFill();
-                strokeWeight(2);
-                stroke(0, 255, 0);
-                rect(r.x, r.y, r.width, r.height);
-                
-                noStroke();
-                fill(0, 255,0);
-                ellipse(r.x + r.width / 2, r.y + r.height / 2, 10, 10);
-            } 
+            yellowMask = yellowCV.getMask(bv.getCameraImage(),false);
+            contours = yellowCV.getContour();
             
             delay(100);
             // motorControl.notify(this,direction);
@@ -73,8 +57,8 @@ public class GoalDetection implements ThreadInterface, Runnable{
         return r;
     }
     
-    public PImage getYellowImage() {
-        return yellowImage;
+    public PImage getYellowMask() {
+        return yellowMask;
     }
     
     public double countWhitePixels(int x, int y, int w, int h, int[][] bild) {
