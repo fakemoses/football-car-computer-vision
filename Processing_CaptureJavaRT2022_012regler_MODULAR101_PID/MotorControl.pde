@@ -124,8 +124,13 @@ public class MotorControl implements Mediator {
         if (sender instanceof BallDetection) {
             updateTasks(sender, 1, new ForwardHandler2(direction));
         }
-        if (sender instanceof CarDetection){
+        
+        if (sender instanceof CarDetection) {
             updateTasks(sender, 1, new ForwardHandler2(direction));
+        }
+        
+        else {
+            println("MotorControl: Unknown sender // not registered");
         }
     }
     
@@ -159,7 +164,11 @@ public class MotorControl implements Mediator {
         }
         println("MotorControl: Executing task: " + task.instance.getThreadName());
         task.handler.execute();
-        task.loopCount--;
+        --task.loopCount;
+        if (task.loopCount == 0) {
+            // println("MotorControl: Task " + task.instance.getThreadName() + " is finished");
+            // task = null;
+        }
     }
     
 }

@@ -21,8 +21,8 @@ public class Algo {
         Right now it is running on main Thread by runColorDetection();
         bildverarbeitung.start(); */
         lineDetection.startThread();
-        ballDetection.startThread();
-        carDetection.startThread();
+        // ballDetection.startThread();
+        // carDetection.startThread();
     }
     
     public void runColorExtraction() {

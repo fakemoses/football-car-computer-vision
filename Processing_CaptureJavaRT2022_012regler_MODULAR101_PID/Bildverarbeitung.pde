@@ -19,14 +19,15 @@ public class Bildverarbeitung
     private void computeColor(int[] pix) {
         //println("OKAY");
         int u = 0;
-        for (int i = 0; i < bild.length; i++)
-            for (int k = 0; k < bild[i].length; k++)
+        for (int i = 0; i < bild.length; i++) {
+            for (int k = 0; k < bild[i].length; k++) {
                 bild[i][k] = pix[u++];
+            } 
+        }
+        
         u = 0;
-        for (int i = 0; i < bild.length; i++)
-            {
-            for (int k = 0; k < bild[i].length; k++)
-                {
+        for (int i = 0; i < bild.length; i++) {
+            for (int k = 0; k < bild[i].length; k++) {
                 int wert = pix[u];
                 
                 // Using"right shift" as a faster technique than red(), green(), and blue()
@@ -54,12 +55,10 @@ public class Bildverarbeitung
     }
     
     //only when extracting non RGB
-    
     public void extractColorRGB(IPCapture cam)
         {
         if (cam.isAvailable()) {
             cam.read();
-            // image(cam,0,0);
             cam.updatePixels();
             int[] pix = cam.pixels;
             if (pix!= null)
@@ -112,10 +111,39 @@ public class Bildverarbeitung
                 // set to max white if value is above threshold
                 if (b[i][k] > max) {
                     b[i][k] = 255;
-                    redList.add(new Point(k, i));
-                    // redList.add(new Point(i, k));
+                    // redList.add(new Point(k, i));
+                } else{
+                    b[i][k] = 0;
                 }
-                else{b[i][k] = 0;}
+                
+                pixMask[u] = color(b[i][k], b[i][k], b[i][k]);
+                u++;
+            }
+        }
+        mask.updatePixels();
+        return mask;
+    }
+    // temp
+    public PImage toPImageR(int[][] b) {
+        resetList();
+        PImage mask = new PImage(b[0].length, b.length);
+        int pixMask[] = mask.pixels;
+        int max = 0;
+        // int max = 20;
+        // convert back to PImage
+        int u = 0;
+        for (int i = 0; i < b.length; i++)
+        {
+            for (int k = 0; k < b[i].length; k++)
+            {
+                // set to max white if value is above threshold
+                if (b[i][k] > max) {
+                    b[i][k] = 255;
+                    redList.add(new Point(k, i));
+                } else{
+                    b[i][k] = 0;
+                }
+                
                 pixMask[u] = color(b[i][k], b[i][k], b[i][k]);
                 u++;
             }
@@ -131,7 +159,7 @@ public class Bildverarbeitung
     
     //temp
     public PImage getRedMask() {
-        return toPImage(bildR);
+        return toPImageR(bildR);
     }
     
     //temp
