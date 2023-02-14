@@ -1,20 +1,24 @@
 // Example implementation of a thread
 
-public class BallDetection implements ThreadInterface, Runnable{
+public class GoalDetection implements ThreadInterface, Runnable{
     
     //Basic
     private Thread myThread = null;
     private boolean STARTED = false;
     private MotorControl motorControl;
     Bildverarbeitung bv;
+    private ColorHSV yellowMask;  
+    private ArrayList<Contour> contours;
+    PImage yellowImage;
     
     private PWindow window;
     
     
-    public BallDetection(MotorControl motorControl, PWindow window, Bildverarbeitung bv) {
+    public GoalDetection(MotorControl motorControl , Bildverarbeitung bv, ColorHSV yellowMask) {
         this.motorControl = motorControl;
-        this.window = window;
         this.bv = bv;
+        this.yellowMask = yellowMask;
+        
     }
     
     public void startThread() {
@@ -31,54 +35,46 @@ public class BallDetection implements ThreadInterface, Runnable{
     }
     
     public String getThreadName() {
-        return "BallDetection";
+        return "GoalDetection";
     }
     
     public void run() {
         while(STARTED) {
             // implementation here
-            /*
-            *
-            *
-            *
-            *
-            */
-            Rectangle[] rect = window.detectObject();
-            int[][] bild = bv.getRed();
-            PImage redmask = bv.getBlueMask();
-            double threshold = 15.0;
-            boolean is_rect = false;
-            float direction = 0;
+            println("GoalDetection");
+            yellowImage = yellowMask.getMask(bv.getCameraImage(),false);
+            contours = yellowMask.getContour();
             
-            // println("rect: ");
-            if (rect != null) {
-                int idx = 0;
-                for (int i = 0; i < rect.length; i++) {
-                    // println(r.x + " " + r.y + " " + r.width + " " + r.height);
-                    PImage sub = redmask.get(rect[i].x, rect[i].y, rect[i].width, rect[i].height);
-                    Rectangle r = rect[i];
-                    double white_percent = countWhitePixels(r.x, r.y, r.width, r.height, sub);
-                    println("white % : " + white_percent);
-                    if (white_percent > threshold) {
-                        is_rect = true;
-                        idx = i;
-                        println("ball detected");
-                        direction = (rect[idx].x + rect[idx].width / 2) - (320 / 2);
-                        break;
-                    }
-                } 
-                if (direction > 0) {
-                    println("turn right");
-                } else {
-                    println("turn left");
-                }
-            }
+            if (contours.size() > 0) {
+                Contour biggestContour = contours.get(0);
+                Rectangle r = biggestContour.getBoundingBox();
+                
+                noFill();
+                strokeWeight(2);
+                stroke(0, 255, 0);
+                rect(r.x, r.y, r.width, r.height);
+                
+                noStroke();
+                fill(0, 255,0);
+                ellipse(r.x + r.width / 2, r.y + r.height / 2, 10, 10);
+            } 
             
-            delay(500);
-            println("direction: " + direction);
-            // independently notify the motorControl thread
+            delay(100);
             // motorControl.notify(this,direction);
         }
+    }
+    
+    public Rectangle getBoundingBox() {
+        if (contours == null || contours.size() == 0) {
+            return null;
+        }
+        Contour biggestContour = contours.get(0);
+        Rectangle r = biggestContour.getBoundingBox();
+        return r;
+    }
+    
+    public PImage getYellowImage() {
+        return yellowImage;
     }
     
     public double countWhitePixels(int x, int y, int w, int h, int[][] bild) {

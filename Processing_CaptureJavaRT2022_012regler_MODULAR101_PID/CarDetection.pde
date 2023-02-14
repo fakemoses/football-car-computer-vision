@@ -52,7 +52,7 @@ public class CarDetection implements ThreadInterface, Runnable {
         }
 
         delay(500);
-        motorControl.notify(this,direction);
+        // motorControl.notify(this,direction);
         
     }
 }
