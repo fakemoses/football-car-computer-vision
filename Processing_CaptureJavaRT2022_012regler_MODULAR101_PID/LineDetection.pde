@@ -53,7 +53,7 @@ public class LineDetection implements ThreadInterface, Runnable{
                 
             }
             if (boundary.isHelpNeeded()) {
-                motorControl.notify(this, motorControl.Reverse(),3);
+                motorControl.notify(this, motorControl.Reverse(), 7);
             }
             delay(50);
         }

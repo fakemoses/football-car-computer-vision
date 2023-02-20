@@ -45,7 +45,7 @@ String NACHRICHT = "";
 String IP = "192.168.178.48";
 int PORT = 6000;
 
-double antriebMultiplier = 0.5;
+double antriebMultiplier = 0.75;
 
 //UDP udp;  // define the UDP object
 UDPcomfort udpcomfort;  // define the UDP object
@@ -129,7 +129,7 @@ void setup() {
     yellowCV = new ColorHSV("Yellow", redMask);
     goalDetection = new GoalDetection(motorControl, bildverarbeitung, yellowCV);
     
-    // motorControl.register(lineDetection,1);
+    motorControl.register(lineDetection,1);
     motorControl.register(ballDetection,3);
     motorControl.register(goalDetection,2);
     

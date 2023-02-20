@@ -29,16 +29,20 @@ public class MotorControl implements Mediator {
         }
         @Override
         public void execute() {
-            if (direction >  0) {
+            if (direction <  0) {
                 println("MotorControl: Turning right");
-                antrieb.fahrt(0.6,0.2); 
-            } else if (direction < 0) {
+                antrieb.fahrt(1,0.5); 
+            } else if (direction > 0) {
                 println("MotorControl: Turning left");
-                antrieb.fahrt(0.2,0.6);
+                antrieb.fahrt(0.5,1);
             } else { 
                 println("MotorControl: Going straight");
                 antrieb.fahrt(1,1);
             }
+            
+            // float links = 0.5 - (direction / 2);
+            // float rechts = 0.5 + (direction / 2);
+            // antrieb.fahrt(links, rechts);
         }
     }
     
