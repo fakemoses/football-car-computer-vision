@@ -1,12 +1,13 @@
-class Task implements Comparable<Task>, Loopable{
-    ThreadInterface instance;
-    int priority;
-    int loopCount = 0;
-    MotorHandler handler;
+class Task implements Comparable<Task>, TaskProperties{
+    private final int priority;
+    private final ThreadInterface instance;
+    private int loopCount;
+    private MotorHandler handler;
     
     public Task(ThreadInterface instance, int priority) {
         this.instance = instance;
-        this.priority = priority;
+        this.priority = priority;	
+        this.loopCount = 0;
     }
     
     @Override
@@ -24,7 +25,19 @@ class Task implements Comparable<Task>, Loopable{
     }
     
     public void setLoopCount(int count) {
-        this.loopCount = loopCount;
+        this.loopCount = count;
+    }
+    
+    public ThreadInterface getInstance() {
+        return this.instance;
+    }
+    
+    public void setHandler(MotorHandler handler) {
+        this.handler = handler;
+    }
+    
+    public MotorHandler getHandler() {
+        return this.handler;
     }
     
     public void loop() {
@@ -34,4 +47,5 @@ class Task implements Comparable<Task>, Loopable{
     public void execute() {
         handler.execute();
     }
+    
 }

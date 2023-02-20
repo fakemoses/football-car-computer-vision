@@ -143,8 +143,8 @@ void draw() {
     ld_result = algo.getLineDetectionResult(ld_color, ld_thickness);
     redMask = algo.bildverarbeitung.getRedMask();
     boundary_result = algo.lineDetection.bimg;
-    // gd_result = algo.getGoalDetectionResult(gd_color, gd_thickess);
-    // yellowMask = algo.goalDetection.getYellowMask();
+    gd_result = algo.getGoalDetectionResult(gd_color, gd_thickess);
+    yellowMask = algo.goalDetection.getYellowMask();
     
     Rectangle[] rects = win.detectObject();
     

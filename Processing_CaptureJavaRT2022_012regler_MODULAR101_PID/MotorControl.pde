@@ -8,7 +8,7 @@ public class MotorControl implements Mediator {
         tasks = new TaskArray();
     }
     
-    
+    // todo: seperate the motor control from the motor handler
     class ReverseHandler implements MotorHandler {
         @Override
         public void execute() {
@@ -20,20 +20,10 @@ public class MotorControl implements Mediator {
         return new ReverseHandler();
     }
     
+    // waiting Aaron
     class ForwardHandler implements MotorHandler {
-        @Override
-        public void execute() {
-            antrieb.fahrt(1, 1);
-        }
-    }
-    
-    public ForwardHandler Forward2() {
-        return new ForwardHandler();
-    }
-    
-    class ForwardHandler2 implements MotorHandler {
         float direction;
-        ForwardHandler2(float d) {
+        ForwardHandler(float d) {
             this.direction = d;
             println("MotorControl: direction: " + direction);
         }
@@ -45,16 +35,15 @@ public class MotorControl implements Mediator {
             } else if (direction < 0) {
                 println("MotorControl: Turning left");
                 antrieb.fahrt(1,0);
-            } else
-            { 
+            } else { 
                 println("MotorControl: Going straight");
                 antrieb.fahrt(1,1);
             }
         }
     }
     
-    public ForwardHandler2 Forward(float d) {
-        return new ForwardHandler2(d);
+    public ForwardHandler Forward(float d) {
+        return new ForwardHandler(d);
     }
     
     class TurnHandler implements MotorHandler {
@@ -66,11 +55,7 @@ public class MotorControl implements Mediator {
     
     public TurnHandler Turn() {
         return new TurnHandler();
-    }
-    
-    
-    
-    
+    }   
     
     public void start() {
         if (!MOTOR_RUNNING) {
@@ -97,68 +82,24 @@ public class MotorControl implements Mediator {
         Collections.sort(tasks);
     }
     
-    private void updateTasks(ThreadInterface instance, int loopCount, MotorHandler handler) {
-        for (Task task : tasks) {
-            // ignore if the loopCount is not 0(alreadyin execution)
-            if (task.instance == instance && task.loopCount == 0) {
-                println("MotorControl: Succesfully update Task: " + task.instance.getThreadName());
-                task.loopCount = loopCount;
-                task.handler = handler;
-                return;
-            }
-        }
-        println("Failed to update tasks");
-    }
-    
-    // direction is used for turning
-    private void updateTasks(ThreadInterface instance, int loopCount, double direction) {
-        for (Task task : tasks) {
-            // ignore if the loopCount is not 0 (already in execution)
-            if (task.instance == instance && task.loopCount == 0) {
-                task.loopCount = loopCount;
-            }
-        }
+    @Override
+    public void notify(ThreadInterface sender, MotorHandler handler, int loopCount) {
+        println("Received notification from " + sender.getThreadName() + " --> direction : " + "not implements");
+        tasks.updateTask(sender, handler, loopCount);
     }
     
     @Override
-    public void notify(ThreadInterface sender, float direction) {
-        int loopCount = 10;
-        println("Received notification from " + sender.getThreadName() + " --> direction: " + direction);
-        if (sender instanceof LineDetection) {
-            updateTasks(sender, loopCount, new ReverseHandler());
-        }
-        
-        if (sender instanceof BallDetection) {
-            updateTasks(sender, 1, new ForwardHandler2(direction));
-        }
-        if (sender instanceof CarDetection) {
-            updateTasks(sender, 1, new ForwardHandler2(direction));
-        }
+    public void notify(ThreadInterface sender, MotorHandler handler) {
+        notify(sender, handler, 1);
     }
-    
-    public void notify(ThreadInterface sender, float direction, MotorHandler handler) {
-        int loopCount = 10;
-        println("Received notification from " + sender.getThreadName() + " --> direction : " + direction);
-        if (sender instanceof LineDetection) {
-            updateTasks(sender, loopCount, handler);
-        }
-        
-        if (sender instanceof BallDetection) {
-            updateTasks(sender, 1, handler);
-        }
-        if (sender instanceof CarDetection) {
-            updateTasks(sender, 1, new ForwardHandler2(direction));
-        }
-    }
-    
     
     public void run() {
         if (!MOTOR_RUNNING) {
             // println("MotorControl : Motor is not running");
             return;
         }
+        println("MotorControl: Running");
         tasks.execute();
     }
-    
 }
 

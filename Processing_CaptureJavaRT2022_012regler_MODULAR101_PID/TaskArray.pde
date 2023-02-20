@@ -1,4 +1,4 @@
-class TaskArray<T extends Loopable> extends ArrayList<T> {
+class TaskArray<T extends TaskProperties> extends ArrayList<T> {
     public T getHighestPriorityTask() {
         for (T task : this) {
             if (task.getLoopCount() > 0) {
@@ -10,7 +10,6 @@ class TaskArray<T extends Loopable> extends ArrayList<T> {
     
     public boolean isTaskAvailable() {
         for (T task : this) {
-            // if (((Task)task).getLoopCount() > 0) {
             if (task.getLoopCount() > 0) {
                 return true;
             }
@@ -18,9 +17,13 @@ class TaskArray<T extends Loopable> extends ArrayList<T> {
         return false;
     }
     
-    private void loopAll() {
+    public void updateTask(ThreadInterface sender, MotorHandler handler, int loopCount) {
         for (T task : this) {
-            task.loop();
+            if (task.getInstance() == sender) {
+                task.setLoopCount(loopCount);
+                task.setHandler(handler);
+                break;
+            }
         }
     }
     
@@ -32,4 +35,12 @@ class TaskArray<T extends Loopable> extends ArrayList<T> {
         task.execute();
         loopAll();
     }
+    
+    private void loopAll() {
+        for (T task : this) {
+            task.loop();
+        }
+    }
+    
+    
 }
