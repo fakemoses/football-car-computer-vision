@@ -11,6 +11,7 @@ public class GoalDetection implements ThreadInterface, Runnable{
     private ArrayList<Contour> contours;
     private final int MIN_WIDTH = 10;
     private final int MIN_HEIGHT = 10;
+    private final int MIN_AREA = 200;
     private Rectangle boundingBox;
     PImage yellowMask;
     
@@ -46,7 +47,15 @@ public class GoalDetection implements ThreadInterface, Runnable{
             yellowMask = yellowCV.getMask(bv.getCameraImage(),false);
             contours = yellowCV.getContour();
             boundingBox = isValid();
-            motorControl.notify(this,motorControl.Turn());
+            if (boundingBox!= null) {
+                int xCenter = getXPos(boundingBox);
+                float motorSignal = toMotorSignalLinear(xCenter);
+                // motorControl.notify(this,motorSignal);
+                println("xCenter: " + xCenter + " motorSignal: " + motorSignal);
+                motorControl.notify(this,motorControl.Forward(motorSignal));
+            } else{
+                motorControl.notify(this,motorControl.Turn());
+            }
             delay(50);
         }
     }
@@ -59,53 +68,31 @@ public class GoalDetection implements ThreadInterface, Runnable{
         return yellowMask;
     }
     
-    public double countWhitePixels(int x, int y, int w, int h, int[][] bild) {
-        int white_count = 0;
-        
-        for (int i = y; i < y + h; i++) {
-            for (int j = x; j < x + w; j++) {
-                int val = bild[j][i];
-                if (val != 0) {
-                    // white_count++;
-                    println("Bild: " + bild[j][i]);
-                    white_count++;
-                }
-            }
-        }
-        double area_white;
-        println("white count: " + white_count);
-        println("w: " + w + " h: " + h);
-        area_white = ((double)white_count / (w * h)) * 100;
-        println("white % : " + area_white);
-        return area_white;
-    }
-    
-    public double countWhitePixels(int x, int y, int w, int h, PImage bild) {
-        int white_count = 0;
-        
-        int pix[] = bild.pixels;
-        
-        for (int i = 0; i < pix.length; i++) {
-            if (pix[i] == color(255, 255, 255)) {
-                white_count++;
-            }
-        }
-        double area_white;
-        println("white count: " + white_count);
-        area_white = ((double)white_count / (w * h)) * 100;
-        // println("white % : " + area_white);
-        return area_white;
-    }
-    
     public Rectangle isValid() {
         if (contours == null || contours.size() == 0) {
             return null;
         }
         Contour biggestContour = contours.get(0);
         Rectangle r = biggestContour.getBoundingBox();
-        if (r.width < MIN_WIDTH || r.height < MIN_HEIGHT) {
+        if (r.width < MIN_WIDTH ||  r.height < MIN_HEIGHT) {
+            return null;
+        }
+        
+        if (r.width * r.height < MIN_AREA) {
             return null;
         }
         return r;
     }
+    
+    public int getXPos(Rectangle r) {
+        return r.x + r.width / 2;
+        
+    }
+    
+    
+    public float toMotorSignalLinear(int xCenter) {
+        int MAXWIDTH = 320; // todo: set variable 
+        return(float)(xCenter - (MAXWIDTH / 2)) / (MAXWIDTH / 2);
+    }
+    
 }
