@@ -45,6 +45,8 @@ String NACHRICHT = "";
 String IP = "192.168.178.48";
 int PORT = 6000;
 
+double antriebMultiplier = 0.5;
+
 //UDP udp;  // define the UDP object
 UDPcomfort udpcomfort;  // define the UDP object
 Antrieb antrieb;
@@ -111,7 +113,7 @@ void setup() {
     
     bildverarbeitung = new Bildverarbeitung();
     udpcomfort = new UDPcomfort(IP, PORT);
-    antrieb = new Antrieb(udpcomfort);
+    antrieb = new Antrieb(udpcomfort, antriebMultiplier);
     regler = new Regler(antrieb);
     
     motorControl = new MotorControl(antrieb);
@@ -127,8 +129,9 @@ void setup() {
     yellowCV = new ColorHSV("Yellow", redMask);
     goalDetection = new GoalDetection(motorControl, bildverarbeitung, yellowCV);
     
-    motorControl.register(lineDetection,1);
-    motorControl.register(ballDetection,2);
+    // motorControl.register(lineDetection,1);
+    motorControl.register(ballDetection,3);
+    motorControl.register(goalDetection,2);
     
     algo = new Algo(cam, bildverarbeitung, lineDetection, ballDetection, carDetection, goalDetection);
     algo.startALL();
@@ -152,8 +155,8 @@ void draw() {
     image(ld_result, 0, camHeight);
     image(redMask, camWidth, camHeight);
     image(boundary_result, camWidth * 2, camHeight);
-    // image(gd_result, 0, camHeight * 2);
-    // image(yellowMask, camWidth, camHeight * 2);
+    image(gd_result, 0, camHeight * 2);
+    image(yellowMask, camWidth, camHeight * 2);
     
     motorControl.run();
     // mainWin.draw();    

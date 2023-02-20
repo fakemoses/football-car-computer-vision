@@ -9,6 +9,9 @@ public class GoalDetection implements ThreadInterface, Runnable{
     Bildverarbeitung bv;
     private ColorHSV yellowCV;  
     private ArrayList<Contour> contours;
+    private final int MIN_WIDTH = 10;
+    private final int MIN_HEIGHT = 10;
+    private Rectangle boundingBox;
     PImage yellowMask;
     
     private PWindow window;
@@ -42,19 +45,14 @@ public class GoalDetection implements ThreadInterface, Runnable{
         while(STARTED) {
             yellowMask = yellowCV.getMask(bv.getCameraImage(),false);
             contours = yellowCV.getContour();
-            
-            delay(100);
-            // motorControl.notify(this,direction);
+            boundingBox = isValid();
+            motorControl.notify(this,motorControl.Turn());
+            delay(50);
         }
     }
     
     public Rectangle getBoundingBox() {
-        if (contours == null || contours.size() == 0) {
-            return null;
-        }
-        Contour biggestContour = contours.get(0);
-        Rectangle r = biggestContour.getBoundingBox();
-        return r;
+        return boundingBox;
     }
     
     public PImage getYellowMask() {
@@ -97,5 +95,17 @@ public class GoalDetection implements ThreadInterface, Runnable{
         area_white = ((double)white_count / (w * h)) * 100;
         // println("white % : " + area_white);
         return area_white;
+    }
+    
+    public Rectangle isValid() {
+        if (contours == null || contours.size() == 0) {
+            return null;
+        }
+        Contour biggestContour = contours.get(0);
+        Rectangle r = biggestContour.getBoundingBox();
+        if (r.width < MIN_WIDTH || r.height < MIN_HEIGHT) {
+            return null;
+        }
+        return r;
     }
 }
