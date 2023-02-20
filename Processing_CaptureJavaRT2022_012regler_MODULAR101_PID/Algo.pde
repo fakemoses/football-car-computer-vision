@@ -24,8 +24,8 @@ public class Algo {
         bildverarbeitung.start(); */
         lineDetection.startThread();
         ballDetection.startThread();
-        carDetection.startThread();
-        goalDetection.startThread();
+        // carDetection.startThread();
+        // goalDetection.startThread();
     }
     
     public void runColorExtraction() {

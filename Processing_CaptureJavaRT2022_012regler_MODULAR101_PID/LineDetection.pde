@@ -50,9 +50,11 @@ public class LineDetection implements ThreadInterface, Runnable{
             ransacLine = ransac.getBestLine();
             if (ransacLine != null) {
                 bimg = boundary.updateImage(ransacLine);
+                
             }
             if (boundary.isHelpNeeded()) {
                 // motorControl.notify(this, 0);
+                motorControl.notify(this, 0, motorControl.Reverse());
             }
             delay(100);
         }

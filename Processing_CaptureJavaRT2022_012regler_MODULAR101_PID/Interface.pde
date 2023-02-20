@@ -11,3 +11,11 @@ interface Mediator {
 interface MotorHandler{
     void execute();
 }
+
+interface Loopable{
+    int loopCount = 0;
+    void setLoopCount(int count);
+    int getLoopCount();
+    void loop();
+    void execute();
+}

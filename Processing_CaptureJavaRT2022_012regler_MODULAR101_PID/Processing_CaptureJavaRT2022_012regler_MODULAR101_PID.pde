@@ -143,8 +143,8 @@ void draw() {
     ld_result = algo.getLineDetectionResult(ld_color, ld_thickness);
     redMask = algo.bildverarbeitung.getRedMask();
     boundary_result = algo.lineDetection.bimg;
-    gd_result = algo.getGoalDetectionResult(gd_color, gd_thickess);
-    yellowMask = algo.goalDetection.getYellowMask();
+    // gd_result = algo.getGoalDetectionResult(gd_color, gd_thickess);
+    // yellowMask = algo.goalDetection.getYellowMask();
     
     Rectangle[] rects = win.detectObject();
     
@@ -152,10 +152,10 @@ void draw() {
     image(ld_result, 0, camHeight);
     image(redMask, camWidth, camHeight);
     image(boundary_result, camWidth * 2, camHeight);
-    image(gd_result, 0, camHeight * 2);
-    image(yellowMask, camWidth, camHeight * 2);
+    // image(gd_result, 0, camHeight * 2);
+    // image(yellowMask, camWidth, camHeight * 2);
     
-    // motorControl.run();
+    motorControl.run();
     // mainWin.draw();    
 }
 

@@ -77,7 +77,8 @@ public class BallDetection implements ThreadInterface, Runnable{
             delay(500);
             println("direction: " + direction);
             // independently notify the motorControl thread
-            // motorControl.notify(this,direction);
+            // motorControl.notify(this,motorControl.Forward());
+            motorControl.notify(this,0,motorControl.Forward2());
         }
     }
     
