@@ -40,18 +40,23 @@ public class MotorControl implements Mediator {
     }
     class ForwardHandler2 implements MotorHandler {
         float direction;
+        float motor_factor;
+        float m_f;
         ForwardHandler2(float d) {
             this.direction = d;
-            println("MotorControl: direction: " + direction);
+            println("MotorControl: direction: " + direction); 
         }
         @Override
         public void execute() {
+            this.motor_factor = m_f;
             if (direction >  0) {
                 println("MotorControl: Turning right");
-                antrieb.fahrt(0.6,0.2); 
+                //antrieb.fahrt(0.6,0.2); 
+                antrieb.fahrt((1-m_f)*0.7,m_f*0.7);
             } else if (direction < 0) {
                 println("MotorControl: Turning left");
-                antrieb.fahrt(0.2,0.6);
+                //antrieb.fahrt(0.2,0.6);
+                antrieb.fahrt((-1)*m_f*0.7,(1-(m_f))*0.7);
             } else
             { 
                 println("MotorControl: Going straight");

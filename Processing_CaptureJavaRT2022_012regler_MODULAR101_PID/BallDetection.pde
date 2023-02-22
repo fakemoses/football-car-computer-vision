@@ -49,6 +49,7 @@ public class BallDetection implements ThreadInterface, Runnable{
             double threshold = 15.0;
             boolean is_rect = false;
             float direction = 0;
+            float motor_factor = 0;
             
             // println("rect: ");
             if (rect != null) {
@@ -64,13 +65,17 @@ public class BallDetection implements ThreadInterface, Runnable{
                         idx = i;
                         println("ball detected");
                         direction = (rect[idx].x + rect[idx].width / 2) - (320 / 2);
+                        motor_factor = direction / (320/2);
                         break;
                     }
                 } 
-                if (direction > 0) {
+                if (direction > 0) {  
                     motorControl.start();
                     println("turn right");
-                } else {
+                } else if (direction == 0) {
+                    motorControl.start();
+                    println("go straight");
+                } else if (direction < 0) {
                     motorControl.start();
                     println("turn left");
                 }
@@ -80,6 +85,8 @@ public class BallDetection implements ThreadInterface, Runnable{
             println("direction: " + direction);
             // independently notify the motorControl thread
             motorControl.notify(this,direction);
+            motorControl.notify(this,motor_factor);
+            
         }
     }
     
