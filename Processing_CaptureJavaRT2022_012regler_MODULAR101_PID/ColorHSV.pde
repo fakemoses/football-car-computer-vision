@@ -7,20 +7,20 @@ public class ColorHSV extends PApplet {
     private int hsvRange[][];
     private PImage maskHS, maskHSV;
     private PImage H, S, V;
-    private HashMap<String, int[][]> hsvMap = new HashMap<String, int[][]>()
-        {
-    {
-            put("Red1", new int[][]{{0, 50, 50} , {10, 255, 255} });
-            put("Red2", new int[][]{{170, 50, 50} , {180, 255, 255} });
-            put("Yellow", new int[][]{{25, 50, 70} , {35, 255, 255} });
-            put("Green", new int[][]{{89, 255, 255} , {36, 50, 70} }); // not tested
-            put("Blue", new int[][]{{90, 50, 70} , {128, 255, 255} });
-        }
-    };
     
-    public ColorHSV(String type, PImage img) {
+    public ColorHSV(PImage img, int[][] hsvRange) {
         this.opencv = new OpenCV(this, img);
-        this.hsvRange = hsvMap.get(type);
+        this.hsvRange = hsvRange;
+    }
+    
+    public ColorHSV(int width, int height, int[][] hsvRange) {
+        this.opencv = new OpenCV(this, width, height);
+        this.hsvRange = hsvRange;
+    }
+    
+    public ColorHSV setHSVRange(int[][] hsvRange) {
+        this.hsvRange = hsvRange;
+        return this;
     }
     
     public PImage getMask(PImage img, boolean withColor) {

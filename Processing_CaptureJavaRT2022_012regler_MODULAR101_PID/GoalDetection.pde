@@ -50,8 +50,6 @@ public class GoalDetection implements ThreadInterface, Runnable{
             if (boundingBox!= null) {
                 int xCenter = getXPos(boundingBox);
                 float motorSignal = toMotorSignalLinear(xCenter);
-                // motorControl.notify(this,motorSignal);
-                println("xCenter: " + xCenter + " motorSignal: " + motorSignal);
                 motorControl.notify(this,motorControl.Forward(motorSignal));
             } else{
                 motorControl.notify(this,motorControl.Turn());

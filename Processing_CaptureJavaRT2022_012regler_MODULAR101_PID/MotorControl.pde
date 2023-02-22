@@ -23,6 +23,9 @@ public class MotorControl implements Mediator {
     // waiting Aaron
     class ForwardHandler implements MotorHandler {
         float direction;
+        float links;
+        float rechts;
+        float mult = 0.15;
         ForwardHandler(float d) {
             this.direction = d;
             println("MotorControl: direction: " + direction);
@@ -30,21 +33,39 @@ public class MotorControl implements Mediator {
         @Override
         public void execute() {
             if (direction <  0) {
-                println("MotorControl: Turning right");
-                antrieb.fahrt(1,0.5); 
-            } else if (direction > 0) {
-                println("MotorControl: Turning left");
-                antrieb.fahrt(0.5,1);
-            } else { 
-                println("MotorControl: Going straight");
-                antrieb.fahrt(1,1);
+                links = 1;
+                rechts = 1 + (direction * mult);
+            } else if (direction >= 0) {
+                links = 1 - (direction * mult);
+                rechts = 1;
             }
-            
-            // float links = 0.5 - (direction / 2);
-            // float rechts = 0.5 + (direction / 2);
-            // antrieb.fahrt(links, rechts);
+            antrieb.fahrt(links, rechts);
         }
     }
+    // class ForwardHandler implements MotorHandler {
+    //     float direction;
+    //     ForwardHandler(float d) {
+    //         this.direction = d;
+    //         println("MotorControl: direction: " + direction);
+    //     }
+    //     @Override
+    //     public void execute() {
+    //         if (direction <  0) {
+    //             println("MotorControl: Turning right");
+    //             antrieb.fahrt(1,0.85); 
+    //         } else if (direction > 0) {
+    //             println("MotorControl: Turning left");
+    //             antrieb.fahrt(0.85,1);
+    //         } else { 
+    //             println("MotorControl: Going straight");
+    //             antrieb.fahrt(1,1);
+    //         }
+    
+    //         // float links = 0.5 - (direction / 2);
+    //         // float rechts = 0.5 + (direction / 2);
+    //         // antrieb.fahrt(links, rechts);
+    //     }
+// }
     
     public ForwardHandler Forward(float d) {
         return new ForwardHandler(d);

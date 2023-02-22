@@ -45,7 +45,8 @@ String NACHRICHT = "";
 String IP = "192.168.178.48";
 int PORT = 6000;
 
-double antriebMultiplier = 0.75;
+double antriebMultiplier = 0.8;
+// double antriebMultiplier = 0.75;
 
 //UDP udp;  // define the UDP object
 UDPcomfort udpcomfort;  // define the UDP object
@@ -104,9 +105,9 @@ void setup() {
     cam.start();
     surface.setLocation( -5, 0);
     
-    oscP5 = new OscP5(this,12000); // Port that the client will listen to
-    myRemoteLocation = new NetAddress("192.168.178.43",12000); // IP and port of the server that the client will send to
-    comm = new Comm(oscP5,myRemoteLocation,isBall); // Unique id for the communication
+    // oscP5 = new OscP5(this,12000); // Port that the client will listen to
+    // myRemoteLocation = new NetAddress("192.168.178.43",12000); // IP and port of the server that the client will send to
+    // comm = new Comm(oscP5,myRemoteLocation,isBall); // Unique id for the communication
     
     win = new PWindow(cam, 320, 0, 320, 240, "Cascade Detection");
     // mainWin = new DrawWindow();
@@ -126,7 +127,7 @@ void setup() {
     
     carDetection = new CarDetection(motorControl, win, bildverarbeitung);
     
-    yellowCV = new ColorHSV("Yellow", redMask);
+    yellowCV = new ColorHSV(camWidth, camHeight, HsvColorRange.YELLOW.getRange());
     goalDetection = new GoalDetection(motorControl, bildverarbeitung, yellowCV);
     
     motorControl.register(lineDetection,1);
