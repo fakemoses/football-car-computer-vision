@@ -14,22 +14,18 @@ public class Boundary {
     private int greenCount = 0;
     
     public Boundary(PImage image) {
-        this.image = new PImage(image.width, image.height, RGB);
-        for (int i = 0; i < image.width; i++) {
-            for (int j = 0; j < image.height; j++) {
-                this.image.set(i, j, color(0, 255, 0));
-            }
-        }
-        this.maxPixelsCount = image.width * image.height;                 
+        this(image.width, image.height);              
     }
     
     public Boundary(int width, int height) {
         this.image = new PImage(width, height, RGB);
+        int[] pixels = this.image.loadPixels();
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                this.image.set(i, j, color(0, 255, 0));
+                pixels[i + j * image.width] = color(0, 255, 0);
             }
         }
+        this.image.updatePixels();
         this.maxPixelsCount = image.width * image.height;                 
     }
     
@@ -41,30 +37,34 @@ public class Boundary {
         }
         this.currentLine = l;
         if (prevLine.isDefined()) {
+            int[] pixels = image.loadPixels();
             for (int i = 0; i < image.width; i++) {
                 for (int j = 0; j < image.height; j++) {
                     int region = whereAmI(new Point(i, j));
                     if (region == 1) {
-                        image.set(i, j, color(0, 255, 0));
+                        pixels[i + j * image.width] = color(0, 255, 0);
                         greenCount++;
                     } else if (region == 2) {
-                        image.set(i, j, color(255, 0, 0));
+                        pixels[i + j * image.width] = color(255, 0, 0);
                     } else {
-                        image.set(i, j, color(0, 0, 255));
+                        pixels[i + j * image.width] = color(0, 0, 255);
                     }
                 }
             }
+            image.updatePixels();
         }
         prevLine = currentLine;
         return image;
     }
     
     public PImage allGood() {
+        int[] pixels = image.loadPixels();
         for (int i = 0; i < image.width; i++) {
             for (int j = 0; j < image.height; j++) {
-                image.set(i, j, color(0, 255, 0));
+                pixels[i + j * image.width] = color(0, 255, 0);
             }
         }
+        image.updatePixels();
         return image;
     }
     
