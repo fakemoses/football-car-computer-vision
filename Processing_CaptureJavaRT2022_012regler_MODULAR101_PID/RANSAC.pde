@@ -23,34 +23,25 @@ public class Ransac {
         this.imgHeight = imgHeight;
     }
     
-    public void run(ArrayList<Point> points) {       
-        if (points.size() < 400) {
-            // -> cannot early return ? -> thread spin
-            println("Not enough points to run Ransac " + points.size());
-            delay(100);
-            return; 
-        }
-        else{
-            // println("enuf");
-            best_inliers = 0;
-            for (int i = 0; i < numIterations; i++) {
-                Point p1 = points.get((int)(Math.random() * points.size()));
-                Point p2 = points.get((int)(Math.random() * points.size()));
-                Line line = new Line(p1, p2);
-                
-                ArrayList<Point> inliers = new ArrayList<Point>();
-                for (Point p : points) {
-                    if (Math.abs(line.distanceFromLine(p)) < threshold) {
-                        inliers.add(p);
-                    }
+    public void run(ArrayList<Point> points) { 
+        best_inliers = 0;
+        for (int i = 0; i < numIterations; i++) {
+            Point p1 = points.get((int)(Math.random() * points.size()));
+            Point p2 = points.get((int)(Math.random() * points.size()));
+            Line line = new Line(p1, p2);
+            
+            ArrayList<Point> inliers = new ArrayList<Point>();
+            for (Point p : points) {
+                if (Math.abs(line.distanceFromLine(p)) < threshold) {
+                    inliers.add(p);
                 }
-                
-                if (inliers.size() > best_inliers) {
-                    best_inliers = inliers.size();
-                    best_line = line;
-                }
-                confidence = (double)best_inliers / points.size();
-            } 
+            }
+            
+            if (inliers.size() > best_inliers) {
+                best_inliers = inliers.size();
+                best_line = line;
+            }
+            confidence = (double)best_inliers / points.size();
         }
     }
     
@@ -133,15 +124,13 @@ class Line {
         
         if (iLeft.y >= 0 && iLeft.y <= 240 - 1) {
             start = iLeft;
-        }
-        else {
+        } else {
             start = (iLeft.y < 0) ? iTop : iBottom;
         }
         
         if (iRight.y >= 0 && iRight.y <= 240 - 1) {
             end = iRight;
-        }
-        else {
+        } else {
             end = (iRight.y < 0) ? iTop : iBottom;
         }
         return new Point[] {start, end};
@@ -152,7 +141,7 @@ class Line {
     }
     
     public String toString() {
-        return "y = " + a + "x + " + b;
+        return a.toString() + " -> " + b.toString();
     }
     
     private Point intersectionPoint(Line l1, Line l2) {
@@ -172,6 +161,7 @@ class Line {
     }
     
     public double distanceFromLine(Point p) {
+        // src: https://www.cuemath.com/algebra/dot-product/
         return Math.abs((b.y - a.y) * p.x - (b.x - a.x) * p.y + b.x * a.y - b.y * a.x) / Math.sqrt(Math.pow(b.y - a.y, 2) + Math.pow(b.x - a.x, 2));
     }
     

@@ -6,7 +6,7 @@ public class GoalDetection implements ThreadInterface, Runnable{
     private Thread myThread = null;
     private boolean STARTED = false;
     private MotorControl motorControl;
-    Bildverarbeitung bv;
+    Bildverarbeitung bildverarbeitung;
     private ColorHSV yellowCV;  
     private ArrayList<Contour> contours;
     private final int MIN_WIDTH = 10;
@@ -18,9 +18,9 @@ public class GoalDetection implements ThreadInterface, Runnable{
     private PWindow window;
     
     
-    public GoalDetection(MotorControl motorControl , Bildverarbeitung bv, ColorHSV yellowCV) {
+    public GoalDetection(MotorControl motorControl , Bildverarbeitung bildverarbeitung, ColorHSV yellowCV) {
         this.motorControl = motorControl;
-        this.bv = bv;
+        this.bildverarbeitung = bildverarbeitung;
         this.yellowCV = yellowCV;
         
     }
@@ -44,7 +44,7 @@ public class GoalDetection implements ThreadInterface, Runnable{
     
     public void run() {
         while(STARTED) {
-            yellowMask = yellowCV.getMask(bv.getCameraImage(),false);
+            yellowMask = yellowCV.getMask(bildverarbeitung.getCameraImage(),false);
             contours = yellowCV.getContour();
             boundingBox = isValid();
             if (boundingBox!= null) {

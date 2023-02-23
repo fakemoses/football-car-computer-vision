@@ -6,15 +6,15 @@ public class BallDetection implements ThreadInterface, Runnable{
     private Thread myThread = null;
     private boolean STARTED = false;
     private MotorControl motorControl;
-    Bildverarbeitung bv;
+    Bildverarbeitung bildverarbeitung;
     
     private PWindow window;
     
     
-    public BallDetection(MotorControl motorControl, PWindow window, Bildverarbeitung bv) {
+    public BallDetection(MotorControl motorControl, Bildverarbeitung bildverarbeitung, PWindow window) {
         this.motorControl = motorControl;
+        this.bildverarbeitung = bildverarbeitung;
         this.window = window;
-        this.bv = bv;
     }
     
     public void startThread() {
@@ -36,46 +36,36 @@ public class BallDetection implements ThreadInterface, Runnable{
     
     public void run() {
         while(STARTED) {
-            // implementation here
-            /*
-            *
-            *
-            *
-            *
-            */
-            Rectangle[] rect = window.detectObject();
-            int[][] bild = bv.getRed();
-            PImage redmask = bv.getBlueMask();
+            Rectangle[] rect = null;
+            // Rectangle[] rect = window.detectObject();
+            int[][] bild = bildverarbeitung.getRed();
+            PImage redmask = bildverarbeitung.getBlueMask();
             double threshold = 15.0;
             boolean is_rect = false;
             float direction = 0;
             
-            // println("rect: ");
             if (rect != null) {
                 int idx = 0;
                 for (int i = 0; i < rect.length; i++) {
-                    // println(r.x + " " + r.y + " " + r.width + " " + r.height);
                     PImage sub = redmask.get(rect[i].x, rect[i].y, rect[i].width, rect[i].height);
                     Rectangle r = rect[i];
                     double white_percent = countWhitePixels(r.x, r.y, r.width, r.height, sub);
-                    println("white % : " + white_percent);
                     if (white_percent > threshold) {
                         is_rect = true;
                         idx = i;
-                        println("ball detected");
                         direction = (rect[idx].x + rect[idx].width / 2) - (320 / 2);
                         break;
                     }
                 } 
                 if (direction > 0) {
-                    println("turn right");
+                    // println("turn right");
                 } else {
-                    println("turn left");
+                    // println("turn left");
                 }
             }
             
             delay(500);
-            println("direction: " + direction);
+            // println("direction: " + direction);
             motorControl.notify(this,motorControl.Forward(0));
         }
     }
@@ -94,10 +84,10 @@ public class BallDetection implements ThreadInterface, Runnable{
             }
         }
         double area_white;
-        println("white count: " + white_count);
-        println("w: " + w + " h: " + h);
+        // println("white count: " + white_count);
+        // println("w: " + w + " h: " + h);
         area_white = ((double)white_count / (w * h)) * 100;
-        println("white % : " + area_white);
+        // println("white % : " + area_white);
         return area_white;
     }
     
@@ -112,9 +102,7 @@ public class BallDetection implements ThreadInterface, Runnable{
             }
         }
         double area_white;
-        println("white count: " + white_count);
         area_white = ((double)white_count / (w * h)) * 100;
-        // println("white % : " + area_white);
         return area_white;
     }
 }

@@ -1,34 +1,37 @@
-import gab.opencv.*;
-
-
-// todo: add HSV here?
 public class Bildverarbeitung
 {
-    int[][] bild = new int[240][320];
-    int[][] bildOut = new int[240][320];
-    int[][] bildR = new int[240][320];
-    int[][] bildG = new int[240][320];
-    int[][] bildB = new int[240][320];
-    int[][] bildY = new int[240][320];
-    int ANHEBUNG = 30;
+    int[][] bild;
+    int[][] bildR;
+    int[][] bildG;
+    int[][] bildB;
+    
+    PImage redMask;
+    PImage greenMask;
+    PImage blueMask;
+    final int ANHEBUNG = 30;
     
     private ArrayList<Point> redList = new ArrayList<Point>();
     
-    public Bildverarbeitung()
-        {
+    public Bildverarbeitung(int width, int height) {
+        bild = new int[height][width];
+        bildR = new int[height][width];
+        bildG = new int[height][width];
+        bildB = new int[height][width];
+        
+        redMask = new PImage(width, height, ALPHA);
+        greenMask = new PImage(width, height, ALPHA);
+        blueMask = new PImage(width, height, ALPHA);
     }
     
     private void computeColor(int[] pix) {
-        //println("OKAY");
+        redList.clear();
+        int[] redpix = redMask.pixels;
+        int[] bluepix = blueMask.pixels;
+        // int[] greenpix = greenMask.pixels;
+        
         int u = 0;
-        for (int i = 0; i < bild.length; i++)
-            for (int k = 0; k < bild[i].length; k++)
-                bild[i][k] = pix[u++];
-        u = 0;
-        for (int i = 0; i < bild.length; i++)
-            {
-            for (int k = 0; k < bild[i].length; k++)
-                {
+        for (int i = 0; i < bild.length; i++) {
+            for (int k = 0; k < bild[i].length; k++) {
                 int wert = pix[u];
                 
                 // Using"right shift" as a faster technique than red(), green(), and blue()
@@ -37,47 +40,49 @@ public class Bildverarbeitung
                 int BLAU = (wert >> 16) & 0xFF;
                 
                 bildR[i][k] = 2 * ROT - GRUEN - BLAU + ANHEBUNG;
-                if (bildR[i][k] < 0) bildR[i][k] =-  bildR[i][k];
-                else bildR[i][k] = 0;
-                bildG[i][k] = 2 * GRUEN - BLAU - ROT + ANHEBUNG;
-                if (bildG[i][k] < 0) bildG[i][k] =-  bildG[i][k];
-                else bildG[i][k] = 0;
-                bildB[i][k] = 2 * BLAU - ROT - GRUEN + 35;
-                if (bildB[i][k] < 0) bildB[i][k] =-  bildB[i][k];
-                else bildB[i][k] = 0;
+                if (bildR[i][k] < 0) {
+                    bildR[i][k] =-  bildR[i][k];
+                    redpix[u] = color(0xFF);
+                    redList.add(new Point(k, i));
+                } else {
+                    bildR[i][k] = 0;
+                    redpix[u] = color(0x00);
+                }
                 
-                // Yellow = 50% R and 50% G
-                int avg = (ROT + GRUEN) / 2;
-                bildY[i][k] = avg;
+                bildG[i][k] = 2 * GRUEN - BLAU - ROT + ANHEBUNG;
+                if (bildG[i][k] < 0) {
+                    bildG[i][k] =-  bildG[i][k];
+                    // greenpix[u] = color(0xFF);
+                } else {
+                    bildG[i][k] = 0;
+                    // greenpix[u] = color(0x00);
+                }
+                
+                bildB[i][k] = 2 * BLAU - ROT - GRUEN + 35;
+                if (bildB[i][k] < 0) {
+                    bildB[i][k] =-  bildB[i][k];
+                    bluepix[u] = color(0xFF);
+                } else {
+                    bildB[i][k] = 0;
+                    bluepix[u] = color(0x00);
+                }
                 
                 u++;
             }
         }
+        redMask.updatePixels();
+        blueMask.updatePixels();
+        // greenMask.updatePixels();
     }
     
-    //only when extracting non RGB
-    
-    public void extractColorRGB(IPCapture cam)
-        {
+    public void extractColorRGB(IPCapture cam) {
         if (cam.isAvailable()) {
             cam.read();
-            // image(cam,0,0);
             cam.updatePixels();
             int[] pix = cam.pixels;
-            if (pix!= null)
-                {
+            if (pix != null) {
                 computeColor(pix);
             }
-        }
-    }
-    
-    //HSV Method
-    public void extractColorHSV(PImage cam)
-        {
-        int[] pix = cam.pixels;
-        if (pix!= null)
-            {
-            computeColor(pix);
         }
     }
     
@@ -93,95 +98,22 @@ public class Bildverarbeitung
         return bildG;
     }
     
-    public int[][] getYellow() {
-        return bildY;
-    }
-    
-    // todo: clean up this mess
-    // temp
-    public PImage toPImage(int[][] b) {
-        PImage mask = new PImage(b[0].length, b.length);
-        int pixMask[] = mask.pixels;
-        int max = 0;
-        // int max = 20;
-        // convert back to PImage
-        int u = 0;
-        for (int i = 0; i < b.length; i++)
-        {
-            for (int k = 0; k < b[i].length; k++)
-            {
-                // set to max white if value is above threshold
-                if (b[i][k] > max) {
-                    b[i][k] = 255;
-                }
-                else{b[i][k] = 0;}
-                pixMask[u] = color(b[i][k], b[i][k], b[i][k]);
-                u++;
-            }
-        }
-        mask.updatePixels();
-        return mask;
-    }
-    
-    // temp
-    public PImage toPImage2(int[][] b) {
-        resetList();
-        PImage mask = new PImage(b[0].length, b.length);
-        int pixMask[] = mask.pixels;
-        int max = 0;
-        // int max = 20;
-        // convert back to PImage
-        int u = 0;
-        for (int i = 0; i < b.length; i++)
-        {
-            for (int k = 0; k < b[i].length; k++)
-            {
-                // set to max white if value is above threshold
-                if (b[i][k] > max) {
-                    b[i][k] = 255;
-                    redList.add(new Point(k, i));
-                    // redList.add(new Point(i, k));
-                }
-                else{b[i][k] = 0;}
-                pixMask[u] = color(b[i][k], b[i][k], b[i][k]);
-                u++;
-            }
-        }
-        mask.updatePixels();
-        return mask;
-    }
-    
-    //temp
     public PImage getCameraImage() {
         return cam;
     }
     
-    //temp
     public PImage getRedMask() {
-        return toPImage2(bildR);
+        return redMask;
     }
     
-    //temp
     public PImage getBlueMask() {
-        return toPImage(bildB);
+        return blueMask;
     }
     
-    //temp
     public PImage getGreenMask() {
-        return toPImage(bildG);
+        return greenMask;
     }
     
-    //temp
-    public PImage getYellowMask() {
-        return toPImage(bildY);
-    }
-    
-    //temp
-    private void resetList() {
-        redList = new ArrayList<Point>();
-    }
-    
-    //temp 
     public ArrayList<Point> getRedList() {
         return redList;
     }

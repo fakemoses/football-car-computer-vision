@@ -14,8 +14,10 @@ public class DrawWindow {
             
             yellowCV = new ColorHSV(camWidth, camHeight, HsvColorRange.YELLOW.getRange());
             out1 = maskYellow.getMask(cam, true);
-            bildverarbeitung.extractColorHSV(out1);
-            BILD = bildverarbeitung.getYellow();
+            // bildverarbeitung.extractColorHSV(out1);
+            // BILD = bildverarbeitung.getYellow();
+            BILD = bildverarbeitung.getRed();
+            
         }
         
         image(cam, 0, 0);

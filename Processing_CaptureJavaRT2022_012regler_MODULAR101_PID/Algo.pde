@@ -30,7 +30,7 @@ public class Algo {
     
     public void runColorExtraction() {
         bildverarbeitung.extractColorRGB(cam);
-        lineDetection.setPoints(bildverarbeitung.getRedList());
+        // lineDetection.setPoints(bildverarbeitung.getRedList());
         // then maybe pakai getter -> set semua RGB dekat sini
         // bolehpass RGB dekat Thread for calculation kalau nak
     }

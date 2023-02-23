@@ -5,19 +5,22 @@ public class LineDetection implements ThreadInterface, Runnable{
     //Basic
     private Thread myThread = null;
     private boolean STARTED = false;
-    private int evalValue;
-    private ArrayList<Point> points = new ArrayList<Point>();
+    private ArrayList<Point> points;
     private Line ransacLine;
-    PImage bimg = new PImage(320,240);
+    private int minPointsSize = 400;
+    PImage bimg = new PImage(camWidth,camHeight);
     
-    Ransac ransac;
-    Boundary boundary;
+    private Ransac ransac;
+    private Boundary boundary;
     private MotorControl motorControl;
+    private Bildverarbeitung bildverarbeitung;
     
-    public LineDetection(MotorControl motorControl, Ransac ransac, Boundary boundary) {
+    public LineDetection(MotorControl motorControl, Bildverarbeitung bildverarbeitung,Ransac ransac, Boundary boundary) {
         this.motorControl = motorControl;
+        this.bildverarbeitung = bildverarbeitung;
         this.ransac = ransac;
         this.boundary = boundary;
+        this.points = new ArrayList<Point>();
     }
     
     public void startThread() {
@@ -25,14 +28,11 @@ public class LineDetection implements ThreadInterface, Runnable{
             myThread = new Thread(this);
             myThread.start();
         }
-        
         STARTED = true;
     }
     
     public void stopThread() {
         STARTED = false;
-        
-        // todo maybe set back to initial value ?
     }
     
     public String getThreadName() {
@@ -41,17 +41,14 @@ public class LineDetection implements ThreadInterface, Runnable{
     
     public void run() {
         while(STARTED) {
-            if (points.size() < 400) {
-                delay(50);
+            points = (ArrayList<Point>)bildverarbeitung.getRedList().clone();
+            if (points.size() < minPointsSize) {
                 ransacLine = null;
-                continue;
+            } else {
+                ransac.run(points);
+                ransacLine = ransac.getBestLine();
             }
-            ransac.run(points);
-            ransacLine = ransac.getBestLine();
-            if (ransacLine != null) {
-                bimg = boundary.updateImage(ransacLine);
-                
-            }
+            bimg = boundary.updateImage(ransacLine);
             if (boundary.isHelpNeeded()) {
                 motorControl.notify(this, motorControl.Reverse(), 7);
             }
@@ -59,20 +56,11 @@ public class LineDetection implements ThreadInterface, Runnable{
         }
     }
     
-    public void setPoints(ArrayList<Point> points) {
-        this.points = points;
-    }
-    
-    // getters for evaluation for EVAL()
-    public int getEvalValue() { return evalValue;}
-    
-    public Point[] getIntersectionPoints() {
-        Line l = ransac.getBestLine();
-        if (l == null) return new Point[] {new Point(0,0), new Point(100,0)};
-        return  l.intersectionAtImageBorder();
-    }
-    
     public Line getRansacLine() {
         return ransacLine != null ? ransacLine : null;
+    }
+    
+    public void setMinPointsSize(int minPointsSize) {
+        this.minPointsSize = minPointsSize;
     }
 }

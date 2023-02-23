@@ -52,6 +52,8 @@ class PWindow extends PApplet {
     void draw() {
         this.cam.read();
         opencv.loadImage(this.cam);
+        
+        //! duplicate call ?
         Rectangle[] balls = this.detectObject();
         image(opencv.getInput(), 0, 0);
         noFill();
@@ -62,9 +64,6 @@ class PWindow extends PApplet {
                 rect(balls[i].x, balls[i].y, balls[i].width, balls[i].height);
             }
         }
-        stroke(255, 0, 0);
-        strokeWeight(3);
-        
         // todo: huh?
         run = true;
     };

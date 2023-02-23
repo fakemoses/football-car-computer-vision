@@ -31,11 +31,14 @@ public class Boundary {
             }
         }
         this.maxPixelsCount = image.width * image.height;                 
-        
     }
     
     public PImage updateImage(Line l) {
         greenCount = 0;
+        if (l == null) {
+            greenCount = maxPixelsCount;
+            return allGood();
+        }
         this.currentLine = l;
         if (prevLine.isDefined()) {
             for (int i = 0; i < image.width; i++) {
@@ -53,6 +56,15 @@ public class Boundary {
             }
         }
         prevLine = currentLine;
+        return image;
+    }
+    
+    public PImage allGood() {
+        for (int i = 0; i < image.width; i++) {
+            for (int j = 0; j < image.height; j++) {
+                image.set(i, j, color(0, 255, 0));
+            }
+        }
         return image;
     }
     

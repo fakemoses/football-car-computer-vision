@@ -28,7 +28,6 @@ public class MotorControl implements Mediator {
         float mult = 0.15;
         ForwardHandler(float d) {
             this.direction = d;
-            println("MotorControl: direction: " + direction);
         }
         @Override
         public void execute() {
@@ -42,30 +41,6 @@ public class MotorControl implements Mediator {
             antrieb.fahrt(links, rechts);
         }
     }
-    // class ForwardHandler implements MotorHandler {
-    //     float direction;
-    //     ForwardHandler(float d) {
-    //         this.direction = d;
-    //         println("MotorControl: direction: " + direction);
-    //     }
-    //     @Override
-    //     public void execute() {
-    //         if (direction <  0) {
-    //             println("MotorControl: Turning right");
-    //             antrieb.fahrt(1,0.85); 
-    //         } else if (direction > 0) {
-    //             println("MotorControl: Turning left");
-    //             antrieb.fahrt(0.85,1);
-    //         } else { 
-    //             println("MotorControl: Going straight");
-    //             antrieb.fahrt(1,1);
-    //         }
-    
-    //         // float links = 0.5 - (direction / 2);
-    //         // float rechts = 0.5 + (direction / 2);
-    //         // antrieb.fahrt(links, rechts);
-    //     }
-// }
     
     public ForwardHandler Forward(float d) {
         return new ForwardHandler(d);
@@ -95,7 +70,6 @@ public class MotorControl implements Mediator {
     }
     
     public void register(ThreadInterface instance, int priority) {
-        println("Registering: " + instance.getThreadName() + " --> priority: " + priority);
         tasks.add(new Task(instance, priority));
         if (tasks.size() > 1) {
             // just in case, if the registered task is not accordingly to priority
@@ -109,7 +83,6 @@ public class MotorControl implements Mediator {
     
     @Override
     public void notify(ThreadInterface sender, MotorHandler handler, int loopCount) {
-        println("Received notification from " + sender.getThreadName() + " --> direction : " + "not implements");
         tasks.updateTask(sender, handler, loopCount);
     }
     
@@ -120,10 +93,8 @@ public class MotorControl implements Mediator {
     
     public void run() {
         if (!MOTOR_RUNNING) {
-            // println("MotorControl : Motor is not running");
             return;
         }
-        println("MotorControl: Running");
         tasks.execute();
     }
 }
