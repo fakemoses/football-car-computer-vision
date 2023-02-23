@@ -131,11 +131,9 @@ public class Boundary {
     
     public boolean isHelpNeeded() {
         if (greenCount == 0) {
-            // println("No Green Pixels");
             return false;
         }
         double percentage = (double)greenCount / maxPixelsCount;
-        boolean result = percentage < threshhold;
         // println("Green Pixels: " + greenCount + " / " + maxPixelsCount + " = " + percentage + " < " + threshhold + " = " + result);
         return percentage < threshhold;
     }

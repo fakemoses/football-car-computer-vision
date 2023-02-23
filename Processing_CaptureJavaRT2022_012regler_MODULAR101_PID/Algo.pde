@@ -19,9 +19,10 @@ public class Algo {
     }
     
     public void startALL() {
-        /* should bileVerarbaitung also run on different thread?
-        Right now it is running on main Thread by runColorDetection();
-        bildverarbeitung.start(); */
+        /* 
+        * should bildVerarbaitung also run on different thread?
+        * Right now it is running on main Thread by runColorDetection();
+        */
         lineDetection.startThread();
         ballDetection.startThread();
         carDetection.startThread();
@@ -30,9 +31,6 @@ public class Algo {
     
     public void runColorExtraction() {
         bildverarbeitung.extractColorRGB(cam);
-        // lineDetection.setPoints(bildverarbeitung.getRedList());
-        // then maybe pakai getter -> set semua RGB dekat sini
-        // bolehpass RGB dekat Thread for calculation kalau nak
     }
     
     public PImage getGoalDetectionResult(int[]c, int thickness) {

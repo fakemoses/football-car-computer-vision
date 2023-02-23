@@ -93,18 +93,20 @@ class Line {
     }
     
     public Point[] intersectionAtImageBorder() {
-        // start is start point
-        // end is end point
+        /*
+        * start is start point
+        * end isend point
         
-        // start ideally would start on left image boundary
-        // if not it will located at top image boundary
-        // if not it will located at bottom image boundary
-        // start will NEVER be located at right image boundary
+        * start ideally would start on left image boundary
+        * if not it will located at top image boundary
+        * if not it will located at bottom image boundary
+        * start will NEVER be located at right image boundary
         
-        // end ideally would end on right image boundary
-        // if not it will located at bottom image boundary 
-        // if not it will located at top image boundary
-        // end will NEVER be located at left image boundary
+        * end ideally would end on right image boundary
+        * if not it willlocated at bottom image boundary
+        * if not it willlocated at top image boundary
+        * end will NEVERbe located at left image boundary
+        */
         
         // todo : set variable size from global ?
         Point start;
@@ -161,7 +163,7 @@ class Line {
     }
     
     public double distanceFromLine(Point p) {
-        // src: https://www.cuemath.com/algebra/dot-product/
+        // src: https://brilliant.org/wiki/dot-product-distance-between-point-and-a-line/
         return Math.abs((b.y - a.y) * p.x - (b.x - a.x) * p.y + b.x * a.y - b.y * a.x) / Math.sqrt(Math.pow(b.y - a.y, 2) + Math.pow(b.x - a.x, 2));
     }
     

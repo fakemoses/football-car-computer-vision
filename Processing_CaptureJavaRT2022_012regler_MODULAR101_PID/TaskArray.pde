@@ -22,9 +22,10 @@ class TaskArray<T extends TaskProperties> extends ArrayList<T> {
             if (task.getInstance() == sender) {
                 task.setLoopCount(loopCount);
                 task.setHandler(handler);
-                break;
+                return;
             }
         }
+        println("Error updating task");
     }
     
     public void execute() {
@@ -36,11 +37,13 @@ class TaskArray<T extends TaskProperties> extends ArrayList<T> {
         loopAll();
     }
     
+    /*
+    * Loop all tasks
+    * indicating that atleast one task has been executed
+    */
     private void loopAll() {
         for (T task : this) {
             task.loop();
         }
     }
-    
-    
 }

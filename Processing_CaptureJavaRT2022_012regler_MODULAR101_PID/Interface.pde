@@ -14,7 +14,6 @@ interface MotorHandler{
 }
 
 interface TaskProperties{
-    
     public abstract void setLoopCount(int count);
     public abstract int getLoopCount();
     
