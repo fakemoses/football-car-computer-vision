@@ -13,10 +13,7 @@ public class GoalDetection implements ThreadInterface, Runnable{
     private final int MIN_HEIGHT = 10;
     private final int MIN_AREA = 200;
     private Rectangle boundingBox;
-    PImage yellowMask;
-    
-    private PWindow window;
-    
+    PImage yellowMask;    
     
     public GoalDetection(MotorControl motorControl , Bildverarbeitung bildverarbeitung, ColorHSV yellowCV) {
         this.motorControl = motorControl;

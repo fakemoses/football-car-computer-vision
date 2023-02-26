@@ -46,27 +46,21 @@ String IP = "192.168.178.48";
 int PORT = 6000;
 
 double antriebMultiplier = 0.8;
-// double antriebMultiplier = 0.75;
 
-//UDP udp;  // define the UDP object
-UDPcomfort udpcomfort;  // define the UDP object
+UDPcomfort udpcomfort;  
 Antrieb antrieb;
 IPCapture cam;
 Bildverarbeitung bildverarbeitung;
-Regler regler;
 Algo algo;
 LineDetection lineDetection;
 BallDetection ballDetection;
 CarDetection carDetection;
 GoalDetection goalDetection;
-DrawWindow mainWin;
 MotorControl motorControl;
 Ransac ransac;
 Boundary boundary;
 ColorHSV yellowCV;
 CascadeDetection ballCascade;
-// Class for new window -> OpenCV Cascade
-PWindow win;
 OscP5 oscP5;
 NetAddress myRemoteLocation;
 Comm comm;
@@ -121,9 +115,7 @@ void setup() {
     
     bildverarbeitung = new Bildverarbeitung(camWidth, camHeight);
     udpcomfort = new UDPcomfort(IP, PORT);
-    antrieb = new Antrieb(udpcomfort, antriebMultiplier);
-    regler = new Regler(antrieb);
-    
+    antrieb = new Antrieb(udpcomfort, antriebMultiplier);    
     
     motorControl = new MotorControl(antrieb);
     
