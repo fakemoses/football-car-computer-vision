@@ -127,7 +127,7 @@ void setup() {
     boundary = new Boundary(camWidth,camHeight);
     lineDetection = new LineDetection(motorControl, bildverarbeitung, ransac, boundary);
     
-    ballCascade = new CascadeDetection();
+    ballCascade = new CascadeDetection(camWidth, camHeight);
     ballDetection = new BallDetection(motorControl, bildverarbeitung, ballCascade);
     
     carDetection = new CarDetection(motorControl, bildverarbeitung);

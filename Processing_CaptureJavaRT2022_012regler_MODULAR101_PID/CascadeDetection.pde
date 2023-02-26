@@ -1,5 +1,5 @@
 class CascadeDetection extends PApplet{
-    OpenCV ocv;
+    OpenCV opencv;
     private final String cf = "ball_detection4.xml";
     
     double scaleFactor = 1.25;
@@ -9,14 +9,14 @@ class CascadeDetection extends PApplet{
     int maxSize = 300;
     double MAX_THRESHOLD = 20;
     
-    CascadeDetection() {
-        ocv = new OpenCV(this, 320, 240);
-        ocv.loadCascade(cf);
+    CascadeDetection(int w, int h) {
+        opencv = new OpenCV(this, w, h);
+        opencv.loadCascade(cf);
     }
     
     public Rectangle[] detect(PImage img) {
-        ocv.loadImage(img);
-        return ocv.detect(scaleFactor, minNeighbors, flags, minSize, maxSize);
+        opencv.loadImage(img);
+        return opencv.detect(scaleFactor, minNeighbors, flags, minSize, maxSize);
     }
     
     public void setScaleFactor(double scaleFactor) {
