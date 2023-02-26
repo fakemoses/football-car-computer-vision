@@ -41,6 +41,12 @@ public class Algo {
     
     public PImage getLineDetectionResult(color c, int thickness) {
         Line line = lineDetection.getRansacLine();
+        if (line != null) {
+            println("Line detected: " + line.toString());
+        }
+        else{
+            println("No line detected");
+        }
         PImage image = bildverarbeitung.getCameraImage();
         return line != null ? drawLine(image, line, thickness,c) : image;
     }

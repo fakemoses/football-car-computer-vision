@@ -76,26 +76,26 @@ public class Boundary {
     * 3 = blue -> Border Change
     */
     private int whereAmI(Point p) {
-        if (currentLine.m == 123 && prevLine.m == 123) {
-            if (p.x < currentLine.c && p.x < prevLine.c) {
+        if (currentLine.isVertical() && prevLine.isVertical()) {
+            if (p.x < currentLine.yIntercept() && p.x < prevLine.yIntercept()) {
                 return 2;
-            } else if (p.x > currentLine.c && p.x > prevLine.c) {
+            } else if (p.x > currentLine.yIntercept() && p.x > prevLine.yIntercept()) {
                 return 1;
             } else {
                 return 3;  
             }
         }
         
-        if (currentLine.m == 123) {
-            if (p.x < currentLine.c) {
-                if (prevLine.m * p.x + prevLine.c > p.y) {
+        if (currentLine.isVertical()) {
+            if (p.x < currentLine.yIntercept()) {
+                if (prevLine.gradient() * p.x + prevLine.yIntercept() > p.y) {
                     return 1;
                 } else {
                     return 2;
                 }
             }
             else {
-                if (prevLine.m * p.x + prevLine.c > p.y) {
+                if (prevLine.gradient() * p.x + prevLine.yIntercept() > p.y) {
                     return 3;
                 } else {
                     return 2;
@@ -103,16 +103,16 @@ public class Boundary {
             }
         }
         
-        if (prevLine.m == 123) {
-            if (p.x < prevLine.c) {
-                if (currentLine.m * p.x + currentLine.c > p.y) {
+        if (prevLine.isVertical()) {
+            if (p.x < prevLine.yIntercept()) {
+                if (currentLine.gradient() * p.x + currentLine.yIntercept() > p.y) {
                     return 1;
                 } else {
                     return 2;
                 }
             }
             else {
-                if (currentLine.m * p.x + currentLine.c > p.y) {
+                if (currentLine.gradient() * p.x + currentLine.yIntercept() > p.y) {
                     return 3;
                 } else {
                     return 2;
@@ -120,9 +120,9 @@ public class Boundary {
             }
         }
         
-        if (p.y > currentLine.m * p.x + currentLine.c && p.y > prevLine.m * p.x + prevLine.c) {
+        if (p.y > currentLine.gradient() * p.x + currentLine.yIntercept() && p.y > prevLine.gradient() * p.x + prevLine.yIntercept()) {
             return 1;
-        } else if (p.y < currentLine.m * p.x + currentLine.c && p.y < prevLine.m * p.x + prevLine.c) {
+        } else if (p.y < currentLine.gradient() * p.x + currentLine.yIntercept() && p.y < prevLine.gradient() * p.x + prevLine.yIntercept()) {
             return 2;
         } else {
             return 3;

@@ -8,7 +8,7 @@ public class Bildverarbeitung
     PImage redMask;
     PImage greenMask;
     PImage blueMask;
-    final int ANHEBUNG = 70;
+    final int ANHEBUNG = 30;
     
     private ArrayList<Point> redList = new ArrayList<Point>();
     

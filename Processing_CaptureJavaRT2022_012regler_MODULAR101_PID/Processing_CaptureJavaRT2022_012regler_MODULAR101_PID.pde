@@ -171,6 +171,7 @@ void draw() {
     image(gd_result, camWidth * 3, 0);
     image(yellowMask, camWidth * 3, camHeight);
     image(greenMask, camWidth * 3, camHeight * 2);
+    
     motorControl.run();
     // mainWin.draw();    
 }

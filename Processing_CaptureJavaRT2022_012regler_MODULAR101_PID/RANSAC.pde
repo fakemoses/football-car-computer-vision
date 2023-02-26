@@ -63,6 +63,10 @@ class Point {
         this.y = y;
     }
     
+    public boolean isDefined() {
+        return x != -1 && y != -1;
+    }
+    
     public String toString() {
         return "(" + x + ", " + y + ")";
     }
@@ -73,8 +77,9 @@ class Point {
 class Line {
     Point a;
     Point b;
-    double m;
-    double c;
+    
+    private int w = 320;
+    private int h = 240;
     
     Line() {
         this(new Point(), new Point());
@@ -83,13 +88,35 @@ class Line {
     Line(Point a, Point b) {
         this.a = a;
         this.b = b;
-        if (a.x == b.x) {
-            this.m = 123;
-            this.c = a.x;
-            return;
-        }
-        this.m = (double)(b.y - a.y) / (b.x - a.x);
-        this.c = a.y - m * a.x; 
+    }
+    
+    public boolean isVertical() {
+        return a.x == b.x;
+    }
+    
+    public boolean isHorizontal() {
+        return a.y == b.y;
+    }
+    
+    public void setWidth(int w) {
+        this.w = w;
+    }
+    
+    public void setHeight(int h) {
+        this.h = h;
+    }
+    
+    public void setDimensions(int w, int h) {
+        this.w = w;
+        this.h = h;
+    }
+    
+    public double gradient() {
+        return(double)(b.y - a.y) / (b.x - a.x);
+    }
+    
+    public double yIntercept() {
+        return a.y - gradient() * a.x;
     }
     
     public Point[] intersectionAtImageBorder() {
@@ -105,32 +132,30 @@ class Line {
         * end ideally would end on right image boundary
         * if not it willlocated at bottom image boundary
         * if not it willlocated at top image boundary
-        * end will NEVERbe located at left image boundary
+        * end will NEVER be located at left image boundary
         */
         
-        // todo : set variable size from global ?
         Point start;
         Point end;
         
-        if (a.x == b.x) {
-            // vertical line
+        if (isVertical()) {
             start = new Point(a.x,0);
-            end = new Point(a.x,240);
+            end = new Point(a.x,h);
             return new Point[] {start, end};
         }
         
-        Point iLeft = intersectionPoint(new Line(new Point(0,0), new Point(0,240)), this);
-        Point iTop = intersectionPoint(new Line(new Point(0,0), new Point(320,0)), this);
-        Point iBottom = intersectionPoint(new Line(new Point(0,240), new Point(320,240)), this);
-        Point iRight = intersectionPoint(new Line(new Point(320,0), new Point(320,240)), this);
+        Point iLeft = intersectionPoint(new Line(new Point(0,0), new Point(0,h)), this);
+        Point iTop = intersectionPoint(new Line(new Point(0,0), new Point(w,0)), this);
+        Point iBottom = intersectionPoint(new Line(new Point(0,h), new Point(w,h)), this);
+        Point iRight = intersectionPoint(new Line(new Point(w,0), new Point(w,h)), this);
         
-        if (iLeft.y >= 0 && iLeft.y <= 240 - 1) {
+        if (iLeft.y >= 0 && iLeft.y <= h - 1) {
             start = iLeft;
         } else {
             start = (iLeft.y < 0) ? iTop : iBottom;
         }
         
-        if (iRight.y >= 0 && iRight.y <= 240 - 1) {
+        if (iRight.y >= 0 && iRight.y <= h - 1) {
             end = iRight;
         } else {
             end = (iRight.y < 0) ? iTop : iBottom;
@@ -172,6 +197,18 @@ class Line {
         Point[] intersectionPoints = intersectionAtImageBorder();
         Point start = intersectionPoints[0];
         Point end = intersectionPoints[1];
+        
+        if (isVertical()) {
+            for (int y = start.y; y <= end.y; y++) {
+                for (int i = ceil(start.x - thickness / 2); i <= floor(start.x + thickness / 2); i++) {
+                    points.add(new Point(i,y));
+                }
+            }
+            return points;
+        }
+        
+        double m = gradient();
+        double c = yIntercept();
         for (int x = start.x; x <= end.x; x++) {
             int y = (int)(m * x + c);
             for (int i = ceil(y - thickness / 2); i <= floor(y + thickness / 2); i++) {
