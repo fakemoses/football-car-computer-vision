@@ -70,6 +70,7 @@ public class Boundary {
     
     
     // !MAX SUS CODE -> MORE TESTING NEEDED
+    // TODO: Better Implementation
     /*
     * 1 = green -> Available
     * 2 = red -> Unavailable
