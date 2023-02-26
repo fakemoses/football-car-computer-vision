@@ -19,10 +19,10 @@ public class Boundary {
     
     public Boundary(int width, int height) {
         this.image = new PImage(width, height, RGB);
-        int[] pixels = this.image.loadPixels();
+        // int[] pixels = this.image.loadPixels;
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                pixels[i + j * image.width] = color(0, 255, 0);
+                this.image.pixels[i + j * image.width] = color(0, 255, 0);
             }
         }
         this.image.updatePixels();
@@ -37,17 +37,17 @@ public class Boundary {
         }
         this.currentLine = l;
         if (prevLine.isDefined()) {
-            int[] pixels = image.loadPixels();
+            // int[] pixels = image.loadPixels();
             for (int i = 0; i < image.width; i++) {
                 for (int j = 0; j < image.height; j++) {
                     int region = whereAmI(new Point(i, j));
                     if (region == 1) {
-                        pixels[i + j * image.width] = color(0, 255, 0);
+                        this.image.pixels[i + j * image.width] = color(0, 255, 0);
                         greenCount++;
                     } else if (region == 2) {
-                        pixels[i + j * image.width] = color(255, 0, 0);
+                        this.image.pixels[i + j * image.width] = color(255, 0, 0);
                     } else {
-                        pixels[i + j * image.width] = color(0, 0, 255);
+                        this.image.pixels[i + j * image.width] = color(0, 0, 255);
                     }
                 }
             }
@@ -58,10 +58,10 @@ public class Boundary {
     }
     
     public PImage allGood() {
-        int[] pixels = image.loadPixels();
+        // int[] pixels = image.loadPixels();
         for (int i = 0; i < image.width; i++) {
             for (int j = 0; j < image.height; j++) {
-                pixels[i + j * image.width] = color(0, 255, 0);
+                this.image.pixels[i + j * image.width] = color(0, 255, 0);
             }
         }
         image.updatePixels();

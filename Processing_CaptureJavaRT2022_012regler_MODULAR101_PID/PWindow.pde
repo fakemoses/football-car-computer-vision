@@ -1,5 +1,5 @@
 // This class serve as another window for Cascade Object Detection as it only detects when the window size is equal to the source size
-
+// ! @Deprecated
 import java.awt.Frame;
 import processing.awt.PSurfaceAWT;
 import processing.awt.PSurfaceAWT.SmoothCanvas;
@@ -50,9 +50,8 @@ class PWindow extends PApplet {
     };
     
     void draw() {
-        this.cam.read();
-        opencv.loadImage(this.cam);
-        
+        // this.cam.read();
+        // opencv.loadImage(this.cam);
         //! duplicate call ?
         Rectangle[] balls = this.detectObject();
         image(opencv.getInput(), 0, 0);
@@ -60,19 +59,33 @@ class PWindow extends PApplet {
         stroke(0, 255, 0);
         strokeWeight(3);
         if (balls != null) {
+            println("balls: " + balls.length);
             for (int i = 0; i < balls.length; i++) {
                 rect(balls[i].x, balls[i].y, balls[i].width, balls[i].height);
             }
         }
-        // todo: huh?
+        // todo:huh?
         run = true;
     };
+    
+    public void setImage(PImage img) {
+        opencv.loadImage(img);
+    }
     
     //get the bbox here
     public Rectangle[] detectObject() {
         if (run)
-        { Rectangle[] balls = opencv.detect(1.25, 4, 0, 30, 300);
+            { Rectangle[] balls = opencv.detect(1.25, 4, 0, 30, 300);
             return balls;}
         return null;
+    }
+    
+    
+    public Rectangle[] detectObject(PImage img) {
+        println("detecting");
+        opencv.loadImage(img.copy());
+        return opencv.detect(1.25, 4, 0, 30, 300);
+        // return opencv.detect(1.05, 1, 0, 0, 100);
+        // return opencv.detect();
     }
 };

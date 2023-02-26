@@ -64,6 +64,7 @@ MotorControl motorControl;
 Ransac ransac;
 Boundary boundary;
 ColorHSV yellowCV;
+CascadeDetection cascade;
 // Class for new window -> OpenCV Cascade
 PWindow win;
 OscP5 oscP5;
@@ -118,6 +119,8 @@ void setup() {
     antrieb = new Antrieb(udpcomfort, antriebMultiplier);
     regler = new Regler(antrieb);
     
+    cascade = new CascadeDetection();
+    
     motorControl = new MotorControl(antrieb);
     
     ransac = new Ransac(r_maxIteration,r_threshhold,camWidth,camHeight);
@@ -144,6 +147,8 @@ boolean AKTIV = false;
 
 void draw() {
     algo.runColorExtraction();
+    PImage cameraimage = cam.copy();
+    win.setImage(cameraimage);
     
     ld_result = algo.getLineDetectionResult(ld_color, ld_thickness);
     redMask = algo.bildverarbeitung.getRedMask();
@@ -152,10 +157,12 @@ void draw() {
     yellowMask = algo.goalDetection.getYellowMask();
     blueMask = algo.bildverarbeitung.getBlueMask();
     greenMask = algo.bildverarbeitung.getGreenMask();
-    // Rectangle[] rects = win.detectObject();
+    // Rectangle[] rects = new Rectangle[0];
+    Rectangle[] rects = cascade.detect(cameraimage);
+    // println(rects.length);
     // int[] rm = cam.RED_MASK;
     
-    image(cam, 0, 0);
+    image(cameraimage, 0, 0);
     image(ld_result, 0, camHeight);
     image(redMask, camWidth, camHeight);
     image(boundary_result, camWidth * 2, camHeight);
@@ -164,6 +171,11 @@ void draw() {
     image(blueMask, camWidth * 2, camHeight * 2);
     image(greenMask, camWidth * 3, camHeight * 2);
     
+    for (Rectangle rect : rects) {
+        stroke(0, 255, 0);
+        noFill();
+        rect(rect.x, rect.y, rect.width, rect.height);
+    }
     motorControl.run();
     // mainWin.draw();    
 }
