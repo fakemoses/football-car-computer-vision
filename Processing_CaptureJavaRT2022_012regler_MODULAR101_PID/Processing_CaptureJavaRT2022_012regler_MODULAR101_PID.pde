@@ -97,6 +97,9 @@ int ld_thickness = 2;
 int[] gd_color = {255, 255, 0};
 int gd_thickess = 2;
 
+int[] bd_color = {0, 0, 255};
+int bd_thickness = 2;
+
 void setup() {
     size(1280,720);
     frameRate(10);
@@ -135,9 +138,9 @@ void setup() {
     yellowCV = new ColorHSV(camWidth, camHeight, HsvColorRange.YELLOW.getRange());
     goalDetection = new GoalDetection(motorControl, bildverarbeitung, yellowCV);
     
-    motorControl.register(lineDetection,1);
-    motorControl.register(ballDetection,3);
-    motorControl.register(goalDetection,2);
+    motorControl.register(lineDetection,4);
+    motorControl.register(ballDetection,1);
+    motorControl.register(goalDetection,3);
     
     algo = new Algo(cam, bildverarbeitung, lineDetection, ballDetection, carDetection, goalDetection);
     algo.startALL();
@@ -152,20 +155,21 @@ void draw() {
     ld_result = algo.getLineDetectionResult(ld_color, ld_thickness);
     redMask = algo.bildverarbeitung.getRedMask();
     boundary_result = algo.lineDetection.bimg;
+    bd_result = algo.getBallDetectionResult(bd_color, bd_thickness);
+    blueMask = algo.bildverarbeitung.getBlueMask();
     gd_result = algo.getGoalDetectionResult(gd_color, gd_thickess);
     yellowMask = algo.goalDetection.getYellowMask();
-    blueMask = algo.bildverarbeitung.getBlueMask();
     greenMask = algo.bildverarbeitung.getGreenMask();
-    bd_result = algo.getBallDetectionResult(gd_color, gd_thickess);
     
     image(cam, 0, 0);
-    image(ld_result, 0, camHeight);
+    image(ld_result, camWidth, 0);
     image(redMask, camWidth, camHeight);
-    image(boundary_result, camWidth * 2, camHeight);
-    image(gd_result, 0, camHeight * 2);
-    image(yellowMask, camWidth, camHeight * 2);
-    image(blueMask, camWidth * 2, camHeight * 2);
-    image(bd_result, camWidth * 3, camHeight * 2);
+    image(boundary_result, camWidth, camHeight * 2);
+    image(bd_result, camWidth * 2, 0);
+    image(blueMask, camWidth * 2, camHeight);
+    image(gd_result, camWidth * 3, 0);
+    image(yellowMask, camWidth * 3, camHeight);
+    image(greenMask, camWidth * 3, camHeight * 2);
     motorControl.run();
     // mainWin.draw();    
 }

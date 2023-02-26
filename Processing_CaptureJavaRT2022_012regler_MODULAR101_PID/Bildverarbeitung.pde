@@ -44,7 +44,6 @@ public class Bildverarbeitung
                     bildR[i][k] =-  bildR[i][k];
                     redpix[u] = color(0xFF);
                     redList.add(new Point(k, i));
-                    // println("bildR[i][k] = " + bildR[i][k]);
                 } else {
                     bildR[i][k] = 0;
                     redpix[u] = color(0x00);
@@ -64,25 +63,27 @@ public class Bildverarbeitung
                 if (bildB[i][k] < 0) {
                     bildB[i][k] =-  bildB[i][k];
                     bluepix[u] = color(0xFF);
-                    if (bildR[i][k] > 0) {
-                        // println("bildB[i][k] = " + bildB[i][k]);
-                        bildR[i][k] = 0;
-                        redpix[u] = color(0x00);
-                        redList.remove(redList.size() - 1);
-                    }
-                    if (bildG[i][k] > 0) {
-                        bildB[i][k] = 0;
-                        bluepix[u] = color(0x00);
-                    }
                 } else {
                     bildB[i][k] = 0;
                     bluepix[u] = color(0x00);
                 }
                 
-                if (bildR[i][k] > 0 && bildG[i][k] > 0) {
-                    bildG[i][k] = 0;
-                    greenpix[u] = color(0x00);
-                }
+                
+                // if (bildR[i][k] > 0 && bildB[i][k] > 0) {
+                //     bildR[i][k] = 0;
+                //     redpix[u] = color(0x00);
+                //     redList.remove(redList.size() - 1);
+            // }
+                
+                // if (bildG[i][k] > 0 && bildB[i][k] > 0) {
+                //     bildB[i][k] = 0;
+                //     bluepix[u] = color(0x00);
+            // }
+                
+                // if (bildR[i][k] > 0 && bildG[i][k] > 0) {
+                //     bildG[i][k] = 0;
+                //     greenpix[u] = color(0x00);
+            // }
                 
                 u++;
             }

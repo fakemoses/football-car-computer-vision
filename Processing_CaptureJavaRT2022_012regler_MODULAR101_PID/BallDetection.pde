@@ -47,7 +47,7 @@ public class BallDetection implements ThreadInterface, Runnable{
             boundingBox = cascade.getValidRect(rects, blueMask);
             
             delay(100);
-            motorControl.notify(this,motorControl.Forward(0));
+            motorControl.notify(this,motorControl.Turn());
         }
     }
     
