@@ -64,7 +64,7 @@ MotorControl motorControl;
 Ransac ransac;
 Boundary boundary;
 ColorHSV yellowCV;
-CascadeDetection cascade;
+CascadeDetection ballCascade;
 // Class for new window -> OpenCV Cascade
 PWindow win;
 OscP5 oscP5;
@@ -79,6 +79,7 @@ PImage img, out1;
 PImage redMask, yellowMask, boundary_result, blueMask, greenMask;
 PImage gd_result;
 PImage ld_result;
+PImage bd_result;
 
 
 // camera Parameters
@@ -111,7 +112,7 @@ void setup() {
     // myRemoteLocation = new NetAddress("192.168.178.43",12000); // IP and port of the server that the client will send to
     // comm = new Comm(oscP5,myRemoteLocation,isBall); // Unique id for the communication
     
-    win = new PWindow(cam, 320, 0, 320, 240, "Cascade Detection");
+    // win = new PWindow(cam, 320, 0, 320, 240, "Cascade Detection");
     // mainWin = new DrawWindow();
     
     bildverarbeitung = new Bildverarbeitung(camWidth, camHeight);
@@ -119,7 +120,6 @@ void setup() {
     antrieb = new Antrieb(udpcomfort, antriebMultiplier);
     regler = new Regler(antrieb);
     
-    cascade = new CascadeDetection();
     
     motorControl = new MotorControl(antrieb);
     
@@ -127,9 +127,10 @@ void setup() {
     boundary = new Boundary(camWidth,camHeight);
     lineDetection = new LineDetection(motorControl, bildverarbeitung, ransac, boundary);
     
-    ballDetection = new BallDetection(motorControl, bildverarbeitung, win);
+    ballCascade = new CascadeDetection();
+    ballDetection = new BallDetection(motorControl, bildverarbeitung, ballCascade);
     
-    carDetection = new CarDetection(motorControl, bildverarbeitung, win);
+    carDetection = new CarDetection(motorControl, bildverarbeitung);
     
     yellowCV = new ColorHSV(camWidth, camHeight, HsvColorRange.YELLOW.getRange());
     goalDetection = new GoalDetection(motorControl, bildverarbeitung, yellowCV);
@@ -147,8 +148,6 @@ boolean AKTIV = false;
 
 void draw() {
     algo.runColorExtraction();
-    PImage cameraimage = cam.copy();
-    win.setImage(cameraimage);
     
     ld_result = algo.getLineDetectionResult(ld_color, ld_thickness);
     redMask = algo.bildverarbeitung.getRedMask();
@@ -157,25 +156,16 @@ void draw() {
     yellowMask = algo.goalDetection.getYellowMask();
     blueMask = algo.bildverarbeitung.getBlueMask();
     greenMask = algo.bildverarbeitung.getGreenMask();
-    // Rectangle[] rects = new Rectangle[0];
-    Rectangle[] rects = cascade.detect(cameraimage);
-    // println(rects.length);
-    // int[] rm = cam.RED_MASK;
+    bd_result = algo.getBallDetectionResult(gd_color, gd_thickess);
     
-    image(cameraimage, 0, 0);
+    image(cam, 0, 0);
     image(ld_result, 0, camHeight);
     image(redMask, camWidth, camHeight);
     image(boundary_result, camWidth * 2, camHeight);
     image(gd_result, 0, camHeight * 2);
     image(yellowMask, camWidth, camHeight * 2);
     image(blueMask, camWidth * 2, camHeight * 2);
-    image(greenMask, camWidth * 3, camHeight * 2);
-    
-    for (Rectangle rect : rects) {
-        stroke(0, 255, 0);
-        noFill();
-        rect(rect.x, rect.y, rect.width, rect.height);
-    }
+    image(bd_result, camWidth * 3, camHeight * 2);
     motorControl.run();
     // mainWin.draw();    
 }

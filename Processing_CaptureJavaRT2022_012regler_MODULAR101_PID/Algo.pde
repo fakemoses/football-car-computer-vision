@@ -24,7 +24,7 @@ public class Algo {
         * Right now it is running on main Thread by runColorDetection();
         */
         lineDetection.startThread();
-        // ballDetection.startThread();
+        ballDetection.startThread();
         carDetection.startThread();
         goalDetection.startThread();
     }
@@ -43,6 +43,12 @@ public class Algo {
         Line line = lineDetection.getRansacLine();
         PImage image = bildverarbeitung.getCameraImage();
         return line != null ? drawLine(image, line, thickness,c) : image;
+    }
+    
+    public PImage getBallDetectionResult(int[]c, int thickness) {
+        Rectangle rect = ballDetection.getBoundingBox();
+        PImage image = bildverarbeitung.getCameraImage();
+        return rect != null ? drawRect(image, rect, thickness,c) : image;
     }
     
     

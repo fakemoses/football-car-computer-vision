@@ -4,12 +4,9 @@ public class CarDetection implements ThreadInterface, Runnable {
     private MotorControl motorControl;
     Bildverarbeitung bildverarbeitung;
     
-    private PWindow window;
-    
-    public CarDetection(MotorControl motorControl, Bildverarbeitung bildverarbeitung, PWindow window) {
+    public CarDetection(MotorControl motorControl, Bildverarbeitung bildverarbeitung ) {
         this.motorControl = motorControl;
         this.bildverarbeitung = bildverarbeitung;
-        this.window = window;
     }
     
     public void startThread() {
