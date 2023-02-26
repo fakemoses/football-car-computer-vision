@@ -91,13 +91,14 @@ int r_maxIteration = 500;
 float r_threshhold = 0.2;
 
 // Image Draw Parameters
-int[] ld_color = {255, 0, 0};
+color ld_color = color(255, 0, 0);
 int ld_thickness = 2;
 
-int[] gd_color = {255, 255, 0};
+color gd_color = color(0, 255, 0);
 int gd_thickess = 2;
 
-int[] bd_color = {0, 0, 255};
+color bd_color = color(0, 0, 255);
+color bd_roi_color = color(255, 0, 0, 20);
 int bd_thickness = 2;
 
 void setup() {
@@ -155,7 +156,7 @@ void draw() {
     ld_result = algo.getLineDetectionResult(ld_color, ld_thickness);
     redMask = algo.bildverarbeitung.getRedMask();
     boundary_result = algo.lineDetection.bimg;
-    bd_result = algo.getBallDetectionResult(bd_color, bd_thickness);
+    bd_result = algo.getBallDetectionResult(bd_color, bd_roi_color ,bd_thickness);
     blueMask = algo.bildverarbeitung.getBlueMask();
     gd_result = algo.getGoalDetectionResult(gd_color, gd_thickess);
     yellowMask = algo.goalDetection.getYellowMask();

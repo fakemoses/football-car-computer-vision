@@ -8,10 +8,15 @@ public class BallDetection implements ThreadInterface, Runnable{
     private MotorControl motorControl;
     Bildverarbeitung bildverarbeitung;
     
+    PVector Start = new PVector(58,159);
+    PVector End = new PVector(299, 236);
+    Rectangle roi;
+    
     private CascadeDetection cascade;
     
     private Rectangle[] rects;
     private Rectangle boundingBox;
+    private boolean isBallWithinROI = false;
     
     
     public BallDetection(MotorControl motorControl, Bildverarbeitung bildverarbeitung, CascadeDetection cascade) {
@@ -19,6 +24,10 @@ public class BallDetection implements ThreadInterface, Runnable{
         this.bildverarbeitung = bildverarbeitung;
         this.cascade = cascade;
         this.cascade.setMaxThreshold(5);
+        
+        int w = (int)(End.x - Start.x);
+        int h = (int)(End.y - Start.y);
+        this.roi = new Rectangle((int) Start.x,(int) Start.y, w, h);
     }
     
     public void startThread() {
@@ -26,7 +35,6 @@ public class BallDetection implements ThreadInterface, Runnable{
             myThread = new Thread(this);
             myThread.start();
         }
-        
         STARTED = true;
     }
     
@@ -45,7 +53,15 @@ public class BallDetection implements ThreadInterface, Runnable{
             PImage blueMask = bildverarbeitung.getBlueMask();
             rects = cascade.detect(cameraImage);
             boundingBox = cascade.getValidRect(rects, blueMask);
-            
+            if (boundingBox != null) {
+                int midX = boundingBox.x + boundingBox.width / 2;
+                int midY = boundingBox.y + boundingBox.height / 2;
+                if (roi.contains(midX, midY)) {
+                    isBallWithinROI = true;
+                } else {
+                    isBallWithinROI = false;
+                }
+            }
             delay(100);
             motorControl.notify(this,motorControl.Turn());
         }
@@ -57,5 +73,13 @@ public class BallDetection implements ThreadInterface, Runnable{
     
     public Rectangle getBoundingBox() {
         return boundingBox;
+    }
+    
+    public Rectangle getROI() {
+        return roi;
+    }
+    
+    public boolean isBallWithinROI() {
+        return isBallWithinROI;
     }
 }
