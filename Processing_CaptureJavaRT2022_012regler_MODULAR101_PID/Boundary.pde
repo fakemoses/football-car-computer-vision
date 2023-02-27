@@ -14,76 +14,89 @@ public class Boundary {
     private int greenCount = 0;
     
     public Boundary(PImage image) {
-        this.image = new PImage(image.width, image.height, RGB);
-        for (int i = 0; i < image.width; i++) {
-            for (int j = 0; j < image.height; j++) {
-                this.image.set(i, j, color(0, 255, 0));
-            }
-        }
-        this.maxPixelsCount = image.width * image.height;                 
+        this(image.width, image.height);              
     }
     
     public Boundary(int width, int height) {
         this.image = new PImage(width, height, RGB);
+        // int[] pixels = this.image.loadPixels;
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                this.image.set(i, j, color(0, 255, 0));
+                this.image.pixels[i + j * image.width] = color(0, 255, 0);
             }
         }
+        this.image.updatePixels();
         this.maxPixelsCount = image.width * image.height;                 
-        
     }
     
     public PImage updateImage(Line l) {
         greenCount = 0;
+        if (l == null) {
+            greenCount = maxPixelsCount;
+            return allGood();
+        }
         this.currentLine = l;
         if (prevLine.isDefined()) {
+            // int[] pixels = image.loadPixels();
             for (int i = 0; i < image.width; i++) {
                 for (int j = 0; j < image.height; j++) {
                     int region = whereAmI(new Point(i, j));
                     if (region == 1) {
-                        image.set(i, j, color(0, 255, 0));
+                        this.image.pixels[i + j * image.width] = color(0, 255, 0);
                         greenCount++;
                     } else if (region == 2) {
-                        image.set(i, j, color(255, 0, 0));
+                        this.image.pixels[i + j * image.width] = color(255, 0, 0);
                     } else {
-                        image.set(i, j, color(0, 0, 255));
+                        this.image.pixels[i + j * image.width] = color(0, 0, 255);
                     }
                 }
             }
+            image.updatePixels();
         }
         prevLine = currentLine;
         return image;
     }
     
+    public PImage allGood() {
+        // int[] pixels = image.loadPixels();
+        for (int i = 0; i < image.width; i++) {
+            for (int j = 0; j < image.height; j++) {
+                this.image.pixels[i + j * image.width] = color(0, 255, 0);
+            }
+        }
+        image.updatePixels();
+        return image;
+    }
+    
     
     // !MAX SUS CODE -> MORE TESTING NEEDED
+    // TODO: Better Implementation
     /*
     * 1 = green -> Available
     * 2 = red -> Unavailable
     * 3 = blue -> Border Change
     */
     private int whereAmI(Point p) {
-        if (currentLine.m == 123 && prevLine.m == 123) {
-            if (p.x < currentLine.c && p.x < prevLine.c) {
+        if (currentLine.isVertical() && prevLine.isVertical()) {
+            if (p.x < currentLine.yIntercept() && p.x < prevLine.yIntercept()) {
                 return 2;
-            } else if (p.x > currentLine.c && p.x > prevLine.c) {
+            } else if (p.x > currentLine.yIntercept() && p.x > prevLine.yIntercept()) {
                 return 1;
             } else {
                 return 3;  
             }
         }
         
-        if (currentLine.m == 123) {
-            if (p.x < currentLine.c) {
-                if (prevLine.m * p.x + prevLine.c > p.y) {
+        if (currentLine.isVertical()) {
+            if (p.x < currentLine.yIntercept()) {
+                if (prevLine.gradient() * p.x + prevLine.yIntercept() > p.y) {
                     return 1;
                 } else {
                     return 2;
                 }
             }
             else {
-                if (prevLine.m * p.x + prevLine.c > p.y) {
+                if (prevLine.gradient() * p.x + prevLine.yIntercept() > p.y) {
                     return 3;
                 } else {
                     return 2;
@@ -91,16 +104,16 @@ public class Boundary {
             }
         }
         
-        if (prevLine.m == 123) {
-            if (p.x < prevLine.c) {
-                if (currentLine.m * p.x + currentLine.c > p.y) {
+        if (prevLine.isVertical()) {
+            if (p.x < prevLine.yIntercept()) {
+                if (currentLine.gradient() * p.x + currentLine.yIntercept() > p.y) {
                     return 1;
                 } else {
                     return 2;
                 }
             }
             else {
-                if (currentLine.m * p.x + currentLine.c > p.y) {
+                if (currentLine.gradient() * p.x + currentLine.yIntercept() > p.y) {
                     return 3;
                 } else {
                     return 2;
@@ -108,9 +121,9 @@ public class Boundary {
             }
         }
         
-        if (p.y > currentLine.m * p.x + currentLine.c && p.y > prevLine.m * p.x + prevLine.c) {
+        if (p.y > currentLine.gradient() * p.x + currentLine.yIntercept() && p.y > prevLine.gradient() * p.x + prevLine.yIntercept()) {
             return 1;
-        } else if (p.y < currentLine.m * p.x + currentLine.c && p.y < prevLine.m * p.x + prevLine.c) {
+        } else if (p.y < currentLine.gradient() * p.x + currentLine.yIntercept() && p.y < prevLine.gradient() * p.x + prevLine.yIntercept()) {
             return 2;
         } else {
             return 3;
@@ -119,11 +132,9 @@ public class Boundary {
     
     public boolean isHelpNeeded() {
         if (greenCount == 0) {
-            // println("No Green Pixels");
             return false;
         }
         double percentage = (double)greenCount / maxPixelsCount;
-        boolean result = percentage < threshhold;
         // println("Green Pixels: " + greenCount + " / " + maxPixelsCount + " = " + percentage + " < " + threshhold + " = " + result);
         return percentage < threshhold;
     }

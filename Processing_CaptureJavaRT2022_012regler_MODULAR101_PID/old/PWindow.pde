@@ -1,5 +1,5 @@
 // This class serve as another window for Cascade Object Detection as it only detects when the window size is equal to the source size
-
+// ! @Deprecated
 import java.awt.Frame;
 import processing.awt.PSurfaceAWT;
 import processing.awt.PSurfaceAWT.SmoothCanvas;
@@ -11,7 +11,7 @@ import processing.video.*;
 class PWindow extends PApplet {
     
     OpenCV opencv;
-    OpenCV opencv2;
+    // OpenCV opencv2;
     IPCapture cam;
     
     int x, y, w, h;
@@ -46,55 +46,46 @@ class PWindow extends PApplet {
         if (setTitle)surface.setTitle(title);
         //if(makeResizable)surface.setResizable(true);
         opencv = new OpenCV(this, this.cam);
-        opencv2 = new OpenCV(this, this.cam);
         opencv.loadCascade("ball_detection4.xml");
-        opencv2.loadCascade("ball_detection3.xml");
     };
     
     void draw() {
-        this.cam.read();
-        opencv.loadImage(this.cam);
-        opencv2.loadImage(this.cam);
+        // this.cam.read();
+        // opencv.loadImage(this.cam);
+        //! duplicate call ?
         Rectangle[] balls = this.detectObject();
-        Rectangle[] balls2 = this.detectObject2();
         image(opencv.getInput(), 0, 0);
         noFill();
         stroke(0, 255, 0);
         strokeWeight(3);
-        //println(balls.length);
         if (balls != null) {
+            println("balls: " + balls.length);
             for (int i = 0; i < balls.length; i++) {
-                //println(balls[i].x + "," + balls[i].y);
                 rect(balls[i].x, balls[i].y, balls[i].width, balls[i].height);
             }
         }
-        stroke(255, 0, 0);
-        strokeWeight(3);
-        
-        if (balls2 != null) {
-            for (int i = 0; i < balls2.length; i++) {
-                //println(balls[i].x + "," + balls[i].y);
-                rect(balls2[i].x, balls2[i].y, balls2[i].width, balls2[i].height);
-            }
-        }
-        
-        
-        
+        // todo:huh?
         run = true;
     };
+    
+    public void setImage(PImage img) {
+        opencv.loadImage(img);
+    }
     
     //get the bbox here
     public Rectangle[] detectObject() {
         if (run)
-        { Rectangle[] balls = opencv.detect(1.25, 4, 0, 30, 300);
+            { Rectangle[] balls = opencv.detect(1.25, 4, 0, 30, 300);
             return balls;}
         return null;
     }
     
-    public Rectangle[] detectObject2() {
-        if (run)
-        { Rectangle[] balls = opencv2.detect(1.01, 4, 0, 30, 300);
-            return balls;}
-        return null;
+    
+    public Rectangle[] detectObject(PImage img) {
+        println("detecting");
+        opencv.loadImage(img.copy());
+        return opencv.detect(1.25, 4, 0, 30, 300);
+        // return opencv.detect(1.05, 1, 0, 0, 100);
+        // return opencv.detect();
     }
 };

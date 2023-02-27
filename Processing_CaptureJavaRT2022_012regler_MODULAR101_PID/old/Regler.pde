@@ -18,7 +18,6 @@ public class Regler
     // but received spx calculated before as Parameter
     // does not do calculation here
     // only processes the spx value
-    // todo :but something sussy here
     // instead of spx, pakai prozent ?
     public boolean setMotorSignal(int spx, int[][] BILD)
     {
