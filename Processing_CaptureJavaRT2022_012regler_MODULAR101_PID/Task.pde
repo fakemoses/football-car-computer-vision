@@ -51,6 +51,7 @@ class Task implements Comparable<Task>, TaskProperties{
     }
     
     public void execute() {
+        println("Executing task: " + this.instance.getThreadName() + " handler name: " + this.handler.getHandlerName());
         handler.execute();
     }
     

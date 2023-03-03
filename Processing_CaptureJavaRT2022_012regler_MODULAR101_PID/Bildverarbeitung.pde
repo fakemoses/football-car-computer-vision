@@ -5,10 +5,14 @@ public class Bildverarbeitung
     int[][] bildG;
     int[][] bildB;
     
+    int[] redpix;
+    int[] bluepix;
+    int[] greenpix;
+    
     PImage redMask;
     PImage greenMask;
     PImage blueMask;
-    final int ANHEBUNG = 30;
+    final int ANHEBUNG = 50;
     
     private ArrayList<Point> redList = new ArrayList<Point>();
     
@@ -25,9 +29,9 @@ public class Bildverarbeitung
     
     private void computeColor(int[] pix) {
         redList.clear();
-        int[] redpix = redMask.pixels;
-        int[] bluepix = blueMask.pixels;
-        int[] greenpix = greenMask.pixels;
+        redpix = redMask.pixels;
+        bluepix = blueMask.pixels;
+        greenpix = greenMask.pixels;
         
         int u = 0;
         for (int i = 0; i < bild.length; i++) {
@@ -68,22 +72,7 @@ public class Bildverarbeitung
                     bluepix[u] = color(0x00);
                 }
                 
-                
-                // if (bildR[i][k] > 0 && bildB[i][k] > 0) {
-                //     bildR[i][k] = 0;
-                //     redpix[u] = color(0x00);
-                //     redList.remove(redList.size() - 1);
-            // }
-                
-                // if (bildG[i][k] > 0 && bildB[i][k] > 0) {
-                //     bildB[i][k] = 0;
-                //     bluepix[u] = color(0x00);
-            // }
-                
-                // if (bildR[i][k] > 0 && bildG[i][k] > 0) {
-                //     bildG[i][k] = 0;
-                //     greenpix[u] = color(0x00);
-            // }
+                // extra(i, k, u);
                 
                 u++;
             }
@@ -93,14 +82,41 @@ public class Bildverarbeitung
         greenMask.updatePixels();
     }
     
+    
+    // todo: remove this method
+    public void extra(int i, int k, int u) {
+        if (bildR[i][k] > 0 && bildB[i][k] > 0) {
+            bildR[i][k] = 0;
+            redpix[u] = color(0x00);
+            redList.remove(redList.size() - 1);
+        }
+        
+        if (bildG[i][k] > 0 && bildB[i][k] > 0) {
+            bildB[i][k] = 0;
+            bluepix[u] = color(0x00);
+        }
+        
+        if (bildR[i][k] > 0 && bildG[i][k] > 0) {
+            bildG[i][k] = 0;
+            greenpix[u] = color(0x00);
+        }
+    }
+    
     public void extractColorRGB(IPCapture cam) {
-        if (cam.isAvailable()) {
-            cam.read();
-            cam.updatePixels();
-            int[] pix = cam.pixels;
-            if (pix != null) {
-                computeColor(pix);
+        try {
+            if (cam.isAvailable()) {
+                cam.read();
+                cam.updatePixels();
+                int[] pix = cam.pixels;
+                if (pix != null) {
+                    computeColor(pix);
+                }
+            } else {
+                throw new RuntimeException("Camera not available");
             }
+        }
+        catch(Exception e) {
+            e.printStackTrace();
         }
     }
     

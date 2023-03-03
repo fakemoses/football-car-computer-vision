@@ -41,9 +41,8 @@ public class GoalDetection implements ThreadInterface, Runnable{
     
     public void run() {
         while(STARTED) {
-            yellowMask = yellowCV.getMask(bildverarbeitung.getCameraImage(),false);
-            contours = yellowCV.getContour();
-            boundingBox = isValid();
+            Rectangle res = yellowCV.detect(bildverarbeitung.getCameraImage());
+            boundingBox = isValid(res);
             if (boundingBox!= null) {
                 int xCenter = getXPos(boundingBox);
                 float motorSignal = toMotorSignalLinear(xCenter);
@@ -51,6 +50,7 @@ public class GoalDetection implements ThreadInterface, Runnable{
             } else{
                 motorControl.notify(this,motorControl.Turn());
             }
+            yellowMask = yellowCV.getMask();
             delay(50);
         }
     }
@@ -69,6 +69,20 @@ public class GoalDetection implements ThreadInterface, Runnable{
         }
         Contour biggestContour = contours.get(0);
         Rectangle r = biggestContour.getBoundingBox();
+        if (r.width < MIN_WIDTH ||  r.height < MIN_HEIGHT) {
+            return null;
+        }
+        
+        if (r.width * r.height < MIN_AREA) {
+            return null;
+        }
+        return r;
+    }
+    
+    public Rectangle isValid(Rectangle r) {
+        if (r == null) {
+            return null;
+        }
         if (r.width < MIN_WIDTH ||  r.height < MIN_HEIGHT) {
             return null;
         }

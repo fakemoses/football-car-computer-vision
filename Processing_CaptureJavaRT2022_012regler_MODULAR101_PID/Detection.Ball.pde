@@ -48,27 +48,32 @@ public class BallDetection implements ThreadInterface, Runnable{
     
     public void run() {
         while(STARTED) {
-            Rectangle[] rect = null;
             PImage cameraImage = bildverarbeitung.getCameraImage();
             PImage blueMask = bildverarbeitung.getBlueMask();
-            rects = cascade.detect(cameraImage);
-            boundingBox = cascade.getValidRect(rects, blueMask);
+            // rects = cascade.detect(cameraImage);
+            boundingBox = cascade.detect(cameraImage, blueMask);
             if (boundingBox != null) {
-                int midX = boundingBox.x + boundingBox.width / 2;
-                int midY = boundingBox.y + boundingBox.height / 2;
-                if (roi.contains(midX, midY)) {
+                PVector mid = midPoint(boundingBox);
+                if (roi.contains(mid.x, mid.y)) {
                     isBallWithinROI = true;
                 } else {
                     isBallWithinROI = false;
                 }
+                motorControl.notify(this,motorControl.Forward((toMotorSignalLinear((int)mid.x))));
+                delay(70);
+                continue;
             }
-            delay(100);
             motorControl.notify(this,motorControl.Turn());
+            delay(70);
         }
     }
     
     public Rectangle[] getRects() {
         return rects;
+    }
+    
+    public PVector midPoint(Rectangle r) {
+        return new PVector(r.x + r.width / 2, r.y + r.height / 2);   
     }
     
     public Rectangle getBoundingBox() {
@@ -77,6 +82,11 @@ public class BallDetection implements ThreadInterface, Runnable{
     
     public Rectangle getROI() {
         return roi;
+    }
+    
+    public float toMotorSignalLinear(int xCenter) {
+        int MAXWIDTH = 320; // todo: set variable 
+        return(float)(xCenter - (MAXWIDTH / 2)) / (MAXWIDTH / 2);
     }
     
     public boolean isBallWithinROI() {

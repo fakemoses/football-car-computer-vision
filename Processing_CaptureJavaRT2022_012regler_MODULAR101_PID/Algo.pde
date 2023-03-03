@@ -3,12 +3,12 @@ public class Algo {
     private IPCapture cam;
     Bildverarbeitung bildverarbeitung;
     LineDetection lineDetection;
-    BallDetection ballDetection;
+    BallDetection2 ballDetection;
     CarDetection carDetection;
     GoalDetection goalDetection;
     
     
-    public Algo(IPCapture cam, Bildverarbeitung bildverarbeitung, LineDetection lineDetection, BallDetection ballDetection, CarDetection carDetection, GoalDetection goalDetection) {
+    public Algo(IPCapture cam, Bildverarbeitung bildverarbeitung, LineDetection lineDetection, BallDetection2 ballDetection, CarDetection carDetection, GoalDetection goalDetection) {
         // in constructor -> start all thread
         this.cam = cam;
         this.bildverarbeitung = bildverarbeitung;
@@ -41,12 +41,6 @@ public class Algo {
     
     public PImage getLineDetectionResult(color c, int thickness) {
         Line line = lineDetection.getRansacLine();
-        if (line != null) {
-            println("Line detected: " + line.toString());
-        }
-        else{
-            println("No line detected");
-        }
         PImage image = bildverarbeitung.getCameraImage();
         return line != null ? drawLine(image, line, thickness,c) : image;
     }
@@ -63,7 +57,7 @@ public class Algo {
     
     private PImage drawRect(PImage image, Rectangle rect, int thickness, color c, boolean fill) { 
         PImage returnImage = image.copy();        
-        ArrayList<Point> points = new ArrayList<Point>();
+        PointArray<Point> points = new PointArray<Point>();
         
         if (thickness > 0) {
             for (int i = rect.x; i <= rect.x + rect.width; i++) {
@@ -91,6 +85,7 @@ public class Algo {
         
         returnImage.loadPixels();
         for (Point p : points) {
+            // println("p: " + p.toString());
             returnImage.pixels[p.x + p.y * returnImage.width] = c;
         }
         returnImage.updatePixels();

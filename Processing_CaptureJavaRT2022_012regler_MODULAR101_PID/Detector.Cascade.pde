@@ -1,4 +1,4 @@
-class CascadeDetection extends PApplet{
+class CascadeDetection extends PApplet implements ObjectDetector{
     OpenCV opencv;
     private final String cf = "ball_detection4.xml";
     
@@ -14,9 +14,18 @@ class CascadeDetection extends PApplet{
         opencv.loadCascade(cf);
     }
     
-    public Rectangle[] detect(PImage img) {
+    public Rectangle[] detectR(PImage img) {
         opencv.loadImage(img);
         return opencv.detect(scaleFactor, minNeighbors, flags, minSize, maxSize);
+    }
+    
+    public Rectangle detect(PImage img) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    public Rectangle detect(PImage img, PImage mask) {
+        Rectangle[] r = detectR(img);
+        return getValidRect(r, mask);
     }
     
     public void setScaleFactor(double scaleFactor) {

@@ -1,6 +1,6 @@
-class TaskArray<T extends TaskProperties> extends ArrayList<T> {
-    public T getHighestPriorityTask() {
-        for (T task : this) {
+class TaskArray<E extends TaskProperties> extends ArrayList<E> {
+    public E getHighestPriorityTask() {
+        for (E task : this) {
             if (task.getLoopCount() > 0) {
                 return task;
             }
@@ -9,7 +9,7 @@ class TaskArray<T extends TaskProperties> extends ArrayList<T> {
     }
     
     public boolean isTaskAvailable() {
-        for (T task : this) {
+        for (E task : this) {
             if (task.getLoopCount() > 0) {
                 return true;
             }
@@ -18,7 +18,7 @@ class TaskArray<T extends TaskProperties> extends ArrayList<T> {
     }
     
     public void updateTask(ThreadInterface sender, MotorHandler handler, int loopCount) {
-        for (T task : this) {
+        for (E task : this) {
             if (task.getInstance() == sender) {
                 task.setLoopCount(loopCount);
                 task.setHandler(handler);
@@ -29,8 +29,9 @@ class TaskArray<T extends TaskProperties> extends ArrayList<T> {
     }
     
     public void execute() {
-        T task = getHighestPriorityTask();
+        E task = getHighestPriorityTask();
         if (task == null) {
+            println("No task available");
             return;
         }
         task.execute();
@@ -42,7 +43,7 @@ class TaskArray<T extends TaskProperties> extends ArrayList<T> {
     * indicating that atleast one task has been executed
     */
     private void loopAll() {
-        for (T task : this) {
+        for (E task : this) {
             task.loop();
         }
     }

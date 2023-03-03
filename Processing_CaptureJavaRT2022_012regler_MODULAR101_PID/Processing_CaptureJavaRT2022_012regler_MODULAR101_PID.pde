@@ -45,7 +45,7 @@ String NACHRICHT = "";
 String IP = "192.168.178.48";
 int PORT = 6000;
 
-double antriebMultiplier = 0.8;
+double antriebMultiplier = 0.9;
 
 UDPcomfort udpcomfort;  
 Antrieb antrieb;
@@ -53,13 +53,14 @@ IPCapture cam;
 Bildverarbeitung bildverarbeitung;
 Algo algo;
 LineDetection lineDetection;
-BallDetection ballDetection;
+BallDetection2 ballDetection;
 CarDetection carDetection;
 GoalDetection goalDetection;
 MotorControl motorControl;
 Ransac ransac;
 Boundary boundary;
 ColorHSV yellowCV;
+ColorHSV blueCV;
 CascadeDetection ballCascade;
 OscP5 oscP5;
 NetAddress myRemoteLocation;
@@ -70,7 +71,7 @@ String isBall = "/isBall";
 boolean yellow = false;
 ColorHSV maskYellow;
 PImage img, out1;
-PImage redMask, yellowMask, boundary_result, blueMask, greenMask;
+PImage redMask, yellowMask, boundary_result, blueMask, blueMask2, greenMask;
 PImage gd_result;
 PImage ld_result;
 PImage bd_result;
@@ -97,7 +98,7 @@ int bd_thickness = 2;
 
 void setup() {
     size(1280,720);
-    frameRate(10);
+    frameRate(15);
     
     redMask = createImage(camWidth, camHeight, RGB);
     
@@ -124,15 +125,16 @@ void setup() {
     lineDetection = new LineDetection(motorControl, bildverarbeitung, ransac, boundary);
     
     ballCascade = new CascadeDetection(camWidth, camHeight);
-    ballDetection = new BallDetection(motorControl, bildverarbeitung, ballCascade);
+    blueCV = new ColorHSV(camWidth, camHeight, HsvColorRange.BLUE.getRange());
+    yellowCV = new ColorHSV(camWidth, camHeight, HsvColorRange.YELLOW.getRange());
+    ballDetection = new BallDetection2(motorControl, bildverarbeitung, yellowCV);
     
     carDetection = new CarDetection(motorControl, bildverarbeitung);
     
-    yellowCV = new ColorHSV(camWidth, camHeight, HsvColorRange.YELLOW.getRange());
-    goalDetection = new GoalDetection(motorControl, bildverarbeitung, yellowCV);
+    goalDetection = new GoalDetection(motorControl, bildverarbeitung, blueCV);
     
-    motorControl.register(lineDetection,4);
-    motorControl.register(ballDetection,1);
+    motorControl.register(lineDetection,1);
+    motorControl.register(ballDetection,2);
     motorControl.register(goalDetection,3);
     
     algo = new Algo(cam, bildverarbeitung, lineDetection, ballDetection, carDetection, goalDetection);
@@ -149,7 +151,8 @@ void draw() {
     redMask = algo.bildverarbeitung.getRedMask();
     boundary_result = algo.lineDetection.bimg;
     bd_result = algo.getBallDetectionResult(bd_color, bd_roi_color ,bd_thickness);
-    blueMask = algo.bildverarbeitung.getBlueMask();
+    blueMask = algo.ballDetection.getYellowMask();
+    blueMask2 = algo.bildverarbeitung.getBlueMask();
     gd_result = algo.getGoalDetectionResult(gd_color, gd_thickess);
     yellowMask = algo.goalDetection.getYellowMask();
     greenMask = algo.bildverarbeitung.getGreenMask();
@@ -159,7 +162,8 @@ void draw() {
     image(redMask, camWidth, camHeight);
     image(boundary_result, camWidth, camHeight * 2);
     image(bd_result, camWidth * 2, 0);
-    image(blueMask, camWidth * 2, camHeight);
+    // image(blueMask, camWidth * 2, camHeight);
+    image(blueMask2, camWidth * 2, camHeight * 2);
     image(gd_result, camWidth * 3, 0);
     image(yellowMask, camWidth * 3, camHeight);
     image(greenMask, camWidth * 3, camHeight * 2);
@@ -187,6 +191,7 @@ void keyPressed() {
         antrieb.fahrt(0.0, 0.0);
         motorControl.stop();
         NACHRICHT = "Fahrt gestoppt";
+        println("Fahrt gestoppt");
         AKTIV = false;
     } else if (key ==  '1') {//beide vor
         // antrieb.fahrt(1.0, 1.0);

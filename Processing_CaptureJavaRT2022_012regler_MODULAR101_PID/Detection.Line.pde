@@ -7,7 +7,7 @@ public class LineDetection implements ThreadInterface, Runnable{
     private boolean STARTED = false;
     private ArrayList<Point> points;
     private Line ransacLine;
-    private int minPointsSize = 400;
+    private int minPointsSize = 500;
     PImage bimg = new PImage(camWidth,camHeight);
     
     private Ransac ransac;
@@ -42,6 +42,7 @@ public class LineDetection implements ThreadInterface, Runnable{
     public void run() {
         while(STARTED) {
             points = (ArrayList<Point>)bildverarbeitung.getRedList().clone();
+            // println("LineDetection: " + points.size());
             if (points.size() < minPointsSize) {
                 ransacLine = null;
             } else {

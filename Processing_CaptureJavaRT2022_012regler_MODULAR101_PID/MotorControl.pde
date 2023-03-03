@@ -2,6 +2,7 @@ public class MotorControl implements Mediator {
     private Antrieb antrieb;
     private boolean MOTOR_RUNNING = false;
     private TaskArray<Task> tasks;
+    private boolean isBall = false;
     
     public MotorControl(Antrieb antrieb) {
         this.antrieb = antrieb;
@@ -13,6 +14,10 @@ public class MotorControl implements Mediator {
         @Override
         public void execute() {
             antrieb.fahrt( -1, -1);
+        }
+        
+        public String getHandlerName() {
+            return "ReverseHandler";
         }
     }
     
@@ -31,14 +36,25 @@ public class MotorControl implements Mediator {
         }
         @Override
         public void execute() {
-            if (direction <  0) {
-                links = 1;
-                rechts = 1 + (direction * mult);
-            } else if (direction >= 0) {
-                links = 1 - (direction * mult);
-                rechts = 1;
+            // rechts = 0.2f * direction + 0.8f;
+            // links = -0.2f * direction + 0.8f;
+            if (direction > 0) {
+                rechts = 0.8f;
+                links = 0.6f;
+            } else if (direction < 0) {
+                rechts = 0.6f;
+                links = 0.8f;
+            } else {
+                rechts = 0.8f;
+                links = 0.8f;
             }
+            
+            println("directon: " + direction + "  links: " + links + " rechts: " + rechts);
             antrieb.fahrt(links, rechts);
+        }
+        
+        public String getHandlerName() {
+            return "ForwardHandler";
         }
     }
     
@@ -49,7 +65,11 @@ public class MotorControl implements Mediator {
     class TurnHandler implements MotorHandler {
         @Override
         public void execute() {
-            antrieb.fahrt(0, 1);
+            antrieb.fahrt(0, 0.85);
+        }
+        
+        public String getHandlerName() {
+            return "TurnHandler";
         }
     }
     
@@ -69,10 +89,23 @@ public class MotorControl implements Mediator {
         }
     }
     
+    public void disableBallNoti() {
+        if (!isBall) {
+            println("DISABLE Notification from Ball Detection");
+            isBall = true;
+        }
+    }
+    
+    public void enableBallNoti() {
+        if (isBall) {
+            println("ENABLE Notification from Ball Detection");
+            isBall = false;
+        }
+    }
+    
     public void register(ThreadInterface instance, int priority) {
         tasks.add(new Task(instance, priority));
         if (tasks.size() > 1) {
-            // just in case, if the registered task is not accordingly to priority
             sortTasks();
         }
     }
@@ -83,6 +116,9 @@ public class MotorControl implements Mediator {
     
     @Override
     public void notify(ThreadInterface sender, MotorHandler handler, int loopCount) {
+        if (isBall && sender instanceof BallDetection2) {
+            return;
+        }
         tasks.updateTask(sender, handler, loopCount);
     }
     

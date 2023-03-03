@@ -11,6 +11,7 @@ interface Mediator {
 
 interface MotorHandler{
     public abstract void execute();
+    public abstract String getHandlerName();
 }
 
 interface TaskProperties{
@@ -23,4 +24,10 @@ interface TaskProperties{
     
     public abstract void loop();
     public abstract void execute();
+}
+
+interface ObjectDetector{
+    public abstract Rectangle detect(PImage image, PImage mask);
+    public abstract Rectangle detect(PImage image);
+    // public abstract PImage getMask();
 }
