@@ -1,4 +1,4 @@
-class CascadeDetection extends PApplet implements ObjectDetector{
+class CascadeDetection extends PApplet{
     OpenCV opencv;
     private final String cf = "ball_detection4.xml";
     

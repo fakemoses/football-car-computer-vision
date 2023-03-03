@@ -1,7 +1,7 @@
 // only for yellow color detection
 // but also useable for other colors which can be expanded
 
-public class ColorHSV extends PApplet implements ObjectDetector {
+public class ColorHSV extends PApplet {
     
     private OpenCV opencv;
     private int hsvRange[][];

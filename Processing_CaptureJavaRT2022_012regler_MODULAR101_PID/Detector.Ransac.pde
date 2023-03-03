@@ -192,8 +192,8 @@ class Line {
         return Math.abs((b.y - a.y) * p.x - (b.x - a.x) * p.y + b.x * a.y - b.y * a.x) / Math.sqrt(Math.pow(b.y - a.y, 2) + Math.pow(b.x - a.x, 2));
     }
     
-    public ArrayList<Point> getPoints(int thickness) {
-        ArrayList<Point> points = new ArrayList<Point>();
+    public PointArray<Point> getPoints(int thickness) {
+        PointArray<Point> points = new PointArray<Point>();
         Point[] intersectionPoints = intersectionAtImageBorder();
         Point start = intersectionPoints[0];
         Point end = intersectionPoints[1];

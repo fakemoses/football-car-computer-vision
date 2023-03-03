@@ -7,6 +7,8 @@ import java.awt.Frame;
 import processing.awt.PSurfaceAWT;
 import processing.awt.PSurfaceAWT.SmoothCanvas;
 import java.util.Collections;
+import java.util.Arrays;
+import java.util.Comparator;
 
 //Herausgezogene wichtige Parameter des Systems
 boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = false;
@@ -56,11 +58,19 @@ LineDetection lineDetection;
 BallDetection2 ballDetection;
 CarDetection carDetection;
 GoalDetection goalDetection;
+DetectionThread goalDetection2;
 MotorControl motorControl;
 Ransac ransac;
 Boundary boundary;
 ColorHSV yellowCV;
 ColorHSV blueCV;
+
+ColorFilter blueHSV;
+ColorFilter redHSV;
+ObjectDetector goalDetector;
+LineDetector lineDetector;
+Boundary2 boundary2;
+DetectionThread lineDetection2;
 CascadeDetection ballCascade;
 OscP5 oscP5;
 NetAddress myRemoteLocation;
@@ -133,11 +143,20 @@ void setup() {
     
     goalDetection = new GoalDetection(motorControl, bildverarbeitung, blueCV);
     
+    blueHSV = new HSVFilter(HSVColorRangeR.YELLOW);
+    goalDetector = new ContourDetector(camWidth, camHeight);
+    goalDetection2 = new GoalDetection2(motorControl, blueHSV, goalDetector);
+    
+    redHSV = new HSVFilter(HSVColorRangeR.combine(HSVColorRangeR.RED1, HSVColorRangeR.RED2));
+    lineDetector = new RansacDetector(r_maxIteration,r_threshhold, 400,camWidth,camHeight);
+    boundary2 = new Boundary2(camWidth,camHeight);
+    lineDetection2 = new LineDetection2(motorControl, redHSV, lineDetector, boundary2);
     motorControl.register(lineDetection,1);
     motorControl.register(ballDetection,2);
     motorControl.register(goalDetection,3);
     
-    algo = new Algo(cam, bildverarbeitung, lineDetection, ballDetection, carDetection, goalDetection);
+    DetectionThread[] tis = {goalDetection2, lineDetection2};
+    algo = new Algo(cam, bildverarbeitung, lineDetection, ballDetection, carDetection, goalDetection, tis);
     algo.startALL();
 }
 
@@ -162,11 +181,18 @@ void draw() {
     image(redMask, camWidth, camHeight);
     image(boundary_result, camWidth, camHeight * 2);
     image(bd_result, camWidth * 2, 0);
-    // image(blueMask, camWidth * 2, camHeight);
+    image(blueMask, camWidth * 2, camHeight);
     image(blueMask2, camWidth * 2, camHeight * 2);
     image(gd_result, camWidth * 3, 0);
     image(yellowMask, camWidth * 3, camHeight);
     image(greenMask, camWidth * 3, camHeight * 2);
+    
+    PImage[] res = algo.getTIResult();
+    if (res!= null) {
+        for (int i = 0; i < res.length; i++) {
+            image(res[i], 0, camHeight * (i));
+        }
+    }
     
     motorControl.run();
     // mainWin.draw();    

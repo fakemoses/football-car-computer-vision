@@ -7,8 +7,10 @@ public class Algo {
     CarDetection carDetection;
     GoalDetection goalDetection;
     
+    DetectionThread[] tis;
     
-    public Algo(IPCapture cam, Bildverarbeitung bildverarbeitung, LineDetection lineDetection, BallDetection2 ballDetection, CarDetection carDetection, GoalDetection goalDetection) {
+    
+    public Algo(IPCapture cam, Bildverarbeitung bildverarbeitung, LineDetection lineDetection, BallDetection2 ballDetection, CarDetection carDetection, GoalDetection goalDetection,DetectionThread[] threads) {
         // in constructor -> start all thread
         this.cam = cam;
         this.bildverarbeitung = bildverarbeitung;
@@ -16,6 +18,7 @@ public class Algo {
         this.ballDetection = ballDetection;
         this.carDetection = carDetection;
         this.goalDetection = goalDetection;
+        this.tis = threads;
     }
     
     public void startALL() {
@@ -27,10 +30,18 @@ public class Algo {
         ballDetection.startThread();
         carDetection.startThread();
         goalDetection.startThread();
+        
+        for (DetectionThread ti : tis) {
+            ti.startThread();
+        }
     }
     
     public void runColorExtraction() {
         bildverarbeitung.extractColorRGB(cam);
+        
+        for (DetectionThread ti : tis) {
+            ti.setImage(bildverarbeitung.getCameraImage());
+        }
     }
     
     public PImage getGoalDetectionResult(color c, int thickness) {
@@ -102,6 +113,11 @@ public class Algo {
         }
         
         return returnImage;
+    }
+    
+    public PImage[] getTIResult() {
+        DetectionThread ti = tis[1];
+        return ti.getResults();
     }
 }
 
