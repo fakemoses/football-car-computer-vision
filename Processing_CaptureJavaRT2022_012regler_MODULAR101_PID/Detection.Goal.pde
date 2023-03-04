@@ -9,6 +9,9 @@ public class GoalDetection extends DetectionThread{
     private final int MIN_HEIGHT = 10;
     private final int MIN_AREA = 200; 
     
+    private final color boxColor = color(0, 255, 0);
+    private final int boxThickness = 2;
+    
     public GoalDetection(MotorControl motorControl, ColorFilter colorFilter, Detector<Rectangle> objectDetector) {
         super(motorControl, colorFilter);
         this.objectDetector = objectDetector;
@@ -66,7 +69,7 @@ public class GoalDetection extends DetectionThread{
             return null;
         }
         PImage[] results = new PImage[2];
-        results[0] = boundingBox == null ? image : drawRect(image, boundingBox, 2, color(0, 255, 0), false);
+        results[0] = boundingBox == null ? image : drawRect(image, boundingBox, boxThickness, boxColor, false);
         results[1] = mask;
         return results;
     }

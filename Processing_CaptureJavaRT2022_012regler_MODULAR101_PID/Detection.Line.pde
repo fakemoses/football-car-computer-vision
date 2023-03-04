@@ -7,6 +7,9 @@ public class LineDetection extends DetectionThread{
     private Boundary boundary;
     private  PImage boundaryResult;
     
+    private final color lineColor = color(255, 0, 0);
+    private final int lineThickness = 2;
+    
     public LineDetection(MotorControl motorControl, ColorFilter colorFilter, Detector<Line> lineDetector, Boundary boundary) {
         super(motorControl, colorFilter);
         this.lineDetector = lineDetector;
@@ -40,7 +43,7 @@ public class LineDetection extends DetectionThread{
         }
         PImage[] results = new PImage[3];
         
-        results[0] = detectedLine == null ? image : drawLine(image, detectedLine, 2, color(255, 0, 0));
+        results[0] = detectedLine == null ? image : drawLine(image, detectedLine, lineThickness, lineColor);
         results[1] = mask;
         results[2] = boundary.getBoundaryResult();
         return results;

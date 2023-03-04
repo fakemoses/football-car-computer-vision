@@ -48,7 +48,7 @@ public class RansacDetector implements Detector<Line> {
             }
         }
         confidence = (double)best_inliers / points.size();
-        return new ArrayList<Line>(Arrays.asList(best_line));
+        return new ArrayList<Line>(Arrays.asList(best_line.intersectionAtImageBorder()));
     }
     
     private ArrayList<Point> maskToPoints(PImage mask) {

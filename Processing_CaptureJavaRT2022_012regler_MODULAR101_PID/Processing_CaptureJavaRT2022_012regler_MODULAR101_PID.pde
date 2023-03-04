@@ -57,12 +57,13 @@ double antriebMultiplier = 0.9;
 UDPcomfort udpcomfort;  
 Antrieb antrieb;
 IPCapture cam;
-Bildverarbeitung bildverarbeitung;
+
 Algo algo;
 MotorControl motorControl;
 
 ColorFilter blueHSV;
 ColorFilter redHSV;
+ColorFilter redRGB;
 ColorFilter yellowHSV;
 Detector<Rectangle> goalDetector;
 Detector<Rectangle> ballDetector;
@@ -76,11 +77,6 @@ OscP5 oscP5;
 NetAddress myRemoteLocation;
 Comm comm;
 String isBall = "/isBall";
-PImage img, out1;
-PImage redMask, yellowMask, boundary_result, blueMask, blueMask2, greenMask;
-PImage gd_result;
-PImage ld_result;
-PImage bd_result;
 
 
 // camera Parameters
@@ -91,22 +87,9 @@ int camHeight = 240;
 int r_maxIteration = 500;
 float r_threshhold = 0.2;
 
-// Image Draw Parameters
-color ld_color = color(255, 0, 0);
-int ld_thickness = 2;
-
-color gd_color = color(0, 255, 0);
-int gd_thickess = 2;
-
-color bd_color = color(0, 0, 255);
-color bd_roi_color = color(255, 0, 0, 20);
-int bd_thickness = 2;
-
 void setup() {
     size(1280,720);
     frameRate(15);
-    
-    redMask = createImage(camWidth, camHeight, RGB);
     
     cam = new IPCapture(this, "http://" + IP + ":81/stream", "", "");
     cam.start();
@@ -120,7 +103,6 @@ void setup() {
     // win = new PWindow(cam, 320, 0, 320, 240, "Cascade Detection");
     // mainWin = new DrawWindow();
     
-    bildverarbeitung = new Bildverarbeitung(camWidth, camHeight);
     udpcomfort = new UDPcomfort(IP, PORT);
     antrieb = new Antrieb(udpcomfort, antriebMultiplier);    
     
@@ -131,9 +113,10 @@ void setup() {
     goalDetection = new GoalDetection(motorControl, blueHSV, goalDetector);
     
     redHSV = new HSVFilter(HSVColorRangeR.combine(HSVColorRangeR.RED1, HSVColorRangeR.RED2));
+    redRGB = new RGBFilter(RGBType.RED, 30);
     lineDetector = new RansacDetector(r_maxIteration,r_threshhold, 400,camWidth,camHeight);
     boundary = new Boundary(camWidth,camHeight);
-    lineDetection = new LineDetection(motorControl, redHSV, lineDetector, boundary);
+    lineDetection = new LineDetection(motorControl, redRGB, lineDetector, boundary);
     
     yellowHSV = new HSVFilter(HSVColorRangeR.YELLOW);
     ballDetector = new ContourDetector(camWidth, camHeight);
@@ -143,8 +126,7 @@ void setup() {
     motorControl.register(ballDetection,2);
     motorControl.register(goalDetection,3);
     
-    DetectionThread[] tis = {goalDetection, lineDetection, ballDetection};
-    algo = new Algo(tis);
+    algo = new Algo(lineDetection, ballDetection, goalDetection);
     algo.startALL();
 }
 

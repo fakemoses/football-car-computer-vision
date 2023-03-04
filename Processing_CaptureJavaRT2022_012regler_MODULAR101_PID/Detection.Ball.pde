@@ -9,6 +9,12 @@ public class BallDetection extends DetectionThread {
     private final int MIN_HEIGHT = 10;
     private final int MIN_AREA = 100;
     
+    private final color boxColor = color(0, 255, 0);
+    private final int boxThickness = 2;
+    
+    private final color roiColor = color(255, 0, 0);
+    private final int roiThickness = 2;
+    
     PVector Start = new PVector(58,159);
     PVector End = new PVector(299, 236);
     Rectangle roi;
@@ -62,10 +68,6 @@ public class BallDetection extends DetectionThread {
         return boundingBox;
     }
     
-    public PImage getYellowMask() {
-        return yellowMask;
-    }
-    
     public Rectangle isValid(ArrayList<Rectangle> rects) {
         if (rects == null) {
             return null;
@@ -104,8 +106,8 @@ public class BallDetection extends DetectionThread {
             return null;
         }
         PImage[] results = new PImage[2];
-        PImage retImage = drawRect(image, roi, 2, color(255, 0, 0), false);
-        results[0] = boundingBox == null ? retImage : drawRect(retImage, boundingBox, 2, color(0, 255, 0), false);
+        PImage retImage = drawRect(image, roi, roiThickness, roiColor, false);
+        results[0] = boundingBox == null ? retImage : drawRect(retImage, boundingBox, boxColor, boxThickness, false);
         results[1] = mask;
         return results;
     }
