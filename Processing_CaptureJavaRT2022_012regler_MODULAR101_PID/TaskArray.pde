@@ -1,4 +1,4 @@
-class TaskArray<E extends TaskProperties> extends ArrayList<E> {
+class TaskArray<E extends ITask> extends ArrayList<E> {
     public E getHighestPriorityTask() {
         for (E task : this) {
             if (task.getLoopCount() > 0) {
@@ -17,7 +17,7 @@ class TaskArray<E extends TaskProperties> extends ArrayList<E> {
         return false;
     }
     
-    public void updateTask(ThreadInterface sender, MotorHandler handler, int loopCount) {
+    public void updateTask(DetectionThread sender, MotorHandler handler, int loopCount) {
         for (E task : this) {
             if (task.getInstance() == sender) {
                 task.setLoopCount(loopCount);

@@ -1,45 +1,32 @@
 // Example implementation of a thread
 
-public class BallDetection implements ThreadInterface, Runnable{
+public class BallDetection extends DetectionThread {
     
-    //Basic
-    private Thread myThread = null;
-    private boolean STARTED = false;
-    private MotorControl motorControl;
-    Bildverarbeitung bildverarbeitung;
+    private ArrayList<Rectangle> rects;
+    private Rectangle boundingBox;
+    
+    Detector<Rectangle> objectDetector;
+    
+    private final int MIN_WIDTH = 10;
+    private final int MIN_HEIGHT = 10;
+    private final int MIN_AREA = 100;
     
     PVector Start = new PVector(58,159);
     PVector End = new PVector(299, 236);
     Rectangle roi;
     
-    private CascadeDetection cascade;
-    
-    private Rectangle[] rects;
-    private Rectangle boundingBox;
     private boolean isBallWithinROI = false;
+    private float IDEAL_RATIO = 0.85f;
+    private final float IDEAL_RATIO_TOLERANCE = 0.25f;
     
     
-    public BallDetection(MotorControl motorControl, Bildverarbeitung bildverarbeitung, CascadeDetection cascade) {
-        this.motorControl = motorControl;
-        this.bildverarbeitung = bildverarbeitung;
-        this.cascade = cascade;
-        this.cascade.setMaxThreshold(5);
+    public BallDetection(MotorControl motorControl , ColorFilter colorFilter, Detector<Rectangle> objectDetector) {
+        super(motorControl, colorFilter);
+        this.objectDetector = objectDetector;
         
         int w = (int)(End.x - Start.x);
         int h = (int)(End.y - Start.y);
         this.roi = new Rectangle((int) Start.x,(int) Start.y, w, h);
-    }
-    
-    public void startThread() {
-        if (myThread == null) {
-            myThread = new Thread(this);
-            myThread.start();
-        }
-        STARTED = true;
-    }
-    
-    public void stopThread() {
-        STARTED = false;
     }
     
     public String getThreadName() {
@@ -48,41 +35,83 @@ public class BallDetection implements ThreadInterface, Runnable{
     
     public void run() {
         while(STARTED) {
-            PImage cameraImage = bildverarbeitung.getCameraImage();
-            PImage blueMask = bildverarbeitung.getBlueMask();
-            // rects = cascade.detect(cameraImage);
-            boundingBox = cascade.detect(cameraImage, blueMask);
-            if (boundingBox != null) {
-                PVector mid = midPoint(boundingBox);
-                if (roi.contains(mid.x, mid.y)) {
-                    isBallWithinROI = true;
-                } else {
-                    isBallWithinROI = false;
-                }
-                motorControl.notify(this,motorControl.Forward((toMotorSignalLinear((int)mid.x))));
-                delay(70);
+            if (image == null) {
+                delay(50);
                 continue;
             }
-            motorControl.notify(this,motorControl.Turn());
-            delay(70);
+            mask = colorFilter.filter(image);
+            rects = objectDetector.detect(image, mask);
+            boundingBox = isValid(rects);
+            if (boundingBox != null) {
+                if (roi.contains(boundingBox.getCenterX(), boundingBox.getCenterY())) {
+                    isBallWithinROI = true;
+                    motorControl.disableBallNoti();
+                } else {
+                    isBallWithinROI = false;
+                    motorControl.enableBallNoti();
+                }
+                // motorControl.notify(this,motorControl.Forward((toMotorSignalLinear((int)mid.x))));
+                // delay(70);
+                // continue;
+            } else {    
+                // motorControl.notify(this,motorControl.Turn());
+            }
+            delay(40);
         }
-    }
-    
-    public Rectangle[] getRects() {
-        return rects;
-    }
-    
-    public PVector midPoint(Rectangle r) {
-        return new PVector(r.x + r.width / 2, r.y + r.height / 2);   
     }
     
     public Rectangle getBoundingBox() {
         return boundingBox;
     }
     
+    public PImage getYellowMask() {
+        return yellowMask;
+    }
+    
+    public Rectangle isValid(ArrayList<Rectangle> rects) {
+        if (rects == null) {
+            return null;
+        }
+        for (Rectangle r : rects) {
+            if (r == null) {
+                continue;
+            }
+            float calc = abs(((float)r.width / (float)r.height) - IDEAL_RATIO);
+            if (calc > IDEAL_RATIO_TOLERANCE) {
+                continue;
+            }
+            if (r.width < MIN_WIDTH ||  r.height < MIN_HEIGHT) {
+                continue;
+            }
+            
+            if (r.width * r.height < MIN_AREA) {
+                continue;
+            }
+            return r;
+        }
+        return null;
+    }
+    
+    public int getXPos(Rectangle r) {
+        return r.x + r.width / 2;
+        
+    }
+    
     public Rectangle getROI() {
         return roi;
     }
+    
+    public PImage[] getResults() {
+        if (image == null || mask == null) {
+            return null;
+        }
+        PImage[] results = new PImage[2];
+        PImage retImage = drawRect(image, roi, 2, color(255, 0, 0), false);
+        results[0] = boundingBox == null ? retImage : drawRect(retImage, boundingBox, 2, color(0, 255, 0), false);
+        results[1] = mask;
+        return results;
+    }
+    
     
     public float toMotorSignalLinear(int xCenter) {
         int MAXWIDTH = 320; // todo: set variable 
@@ -92,4 +121,5 @@ public class BallDetection implements ThreadInterface, Runnable{
     public boolean isBallWithinROI() {
         return isBallWithinROI;
     }
+    
 }

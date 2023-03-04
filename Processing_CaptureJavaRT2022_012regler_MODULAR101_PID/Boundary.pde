@@ -6,66 +6,66 @@
 */
 
 public class Boundary {
-    private PImage image;
-    private Line currentLine;
-    private Line prevLine = new Line();
+    
+    private Line prevLine = null;
+    private Line currentLine = null;
+    
     private final int maxPixelsCount;
     private double threshhold = 0.3;
     private int greenCount = 0;
+    private PImage greenImage;
+    private PImage boundaryResult;
     
     public Boundary(PImage image) {
         this(image.width, image.height);              
     }
     
-    public Boundary(int width, int height) {
-        this.image = new PImage(width, height, RGB);
-        // int[] pixels = this.image.loadPixels;
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                this.image.pixels[i + j * image.width] = color(0, 255, 0);
-            }
+    public Boundary(int w, int h) {
+        this.greenImage = new PImage(w, h, RGB);
+        int[] pixels = greenImage.pixels;
+        for (int i = 0; i < pixels.length; i++) {
+            pixels[i] = color(0, 255, 0);
         }
-        this.image.updatePixels();
-        this.maxPixelsCount = image.width * image.height;                 
+        maxPixelsCount = pixels.length;
+        boundaryResult = greenImage.copy();
     }
     
-    public PImage updateImage(Line l) {
-        greenCount = 0;
+    public boolean isHelpNeeded(Line l) {
+        boundaryResult = greenImage.copy();
         if (l == null) {
             greenCount = maxPixelsCount;
-            return allGood();
-        }
-        this.currentLine = l;
-        if (prevLine.isDefined()) {
-            // int[] pixels = image.loadPixels();
-            for (int i = 0; i < image.width; i++) {
-                for (int j = 0; j < image.height; j++) {
-                    int region = whereAmI(new Point(i, j));
-                    if (region == 1) {
-                        this.image.pixels[i + j * image.width] = color(0, 255, 0);
-                        greenCount++;
-                    } else if (region == 2) {
-                        this.image.pixels[i + j * image.width] = color(255, 0, 0);
-                    } else {
-                        this.image.pixels[i + j * image.width] = color(0, 0, 255);
-                    }
-                }
-            }
-            image.updatePixels();
-        }
-        prevLine = currentLine;
-        return image;
+            return false;
+        }   
+        updateImage(l);
+        double percentage = (double)greenCount / maxPixelsCount;
+        return percentage < threshhold;
     }
     
-    public PImage allGood() {
-        // int[] pixels = image.loadPixels();
-        for (int i = 0; i < image.width; i++) {
-            for (int j = 0; j < image.height; j++) {
-                this.image.pixels[i + j * image.width] = color(0, 255, 0);
+    private void updateImage(Line l) {
+        currentLine = l;
+        if (prevLine == null) {
+            prevLine = l;
+            return;
+        }
+        greenCount = 0;
+        int[] pixels = boundaryResult.pixels;
+        for (int i = 0; i < boundaryResult.width; i++) {
+            for (int j = 0; j < boundaryResult.height; j++) {
+                int region = whereAmI(new Point(i, j));
+                if (region == 1) {
+                    greenCount++;
+                } else if (region == 2) {
+                    pixels[i + j * boundaryResult.width] = color(255, 0, 0);
+                } else {
+                    pixels[i + j * boundaryResult.width] = color(0, 0, 255);
+                }
             }
         }
-        image.updatePixels();
-        return image;
+        prevLine = currentLine;
+    }
+    
+    public PImage getBoundaryResult() {
+        return boundaryResult;
     }
     
     
@@ -128,14 +128,5 @@ public class Boundary {
         } else {
             return 3;
         } 
-    }
-    
-    public boolean isHelpNeeded() {
-        if (greenCount == 0) {
-            return false;
-        }
-        double percentage = (double)greenCount / maxPixelsCount;
-        // println("Green Pixels: " + greenCount + " / " + maxPixelsCount + " = " + percentage + " < " + threshhold + " = " + result);
-        return percentage < threshhold;
     }
 }

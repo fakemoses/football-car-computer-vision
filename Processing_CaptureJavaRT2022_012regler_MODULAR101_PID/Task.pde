@@ -1,6 +1,6 @@
-class Task implements Comparable<Task>, TaskProperties{
+class Task implements Comparable<Task>, ITask{
     private final int priority;
-    private final ThreadInterface instance;
+    private final DetectionThread instance;
     
     /*
     * loopCount indicate that task is available for execution
@@ -12,7 +12,7 @@ class Task implements Comparable<Task>, TaskProperties{
     
     private MotorHandler handler;
     
-    public Task(ThreadInterface instance, int priority) {
+    public Task(DetectionThread instance, int priority) {
         this.instance = instance;
         this.priority = priority;	
         this.loopCount = 0;
@@ -31,7 +31,7 @@ class Task implements Comparable<Task>, TaskProperties{
         this.loopCount = count;
     }
     
-    public ThreadInterface getInstance() {
+    public DetectionThread getInstance() {
         return this.instance;
     }
     

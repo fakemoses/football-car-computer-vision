@@ -1,16 +1,3 @@
-public interface ThreadInterface {
-    public abstract void startThread();
-    public abstract void stopThread();
-    public abstract String getThreadName();
-}
-public interface ThreadInterface2 {
-    public abstract void startThread();
-    public abstract void stopThread();
-    public abstract String getThreadName();
-    public abstract void setImage(PImage image);
-    public abstract PImage[] getResults();
-}
-
 public interface IDetectionThread {
     public abstract void startThread();
     public abstract void stopThread();
@@ -20,8 +7,8 @@ public interface IDetectionThread {
 }
 
 interface Mediator {
-    public abstract void notify(ThreadInterface sender, MotorHandler handler, int loopCount);
-    public abstract void notify(ThreadInterface sender, MotorHandler handler);
+    public abstract void notify(DetectionThread sender, MotorHandler handler, int loopCount);
+    public abstract void notify(DetectionThread sender, MotorHandler handler);
 }
 
 interface MotorHandler{
@@ -29,11 +16,11 @@ interface MotorHandler{
     public abstract String getHandlerName();
 }
 
-interface TaskProperties{
+interface ITask{
     public abstract void setLoopCount(int count);
     public abstract int getLoopCount();
     
-    public abstract ThreadInterface getInstance();
+    public abstract DetectionThread getInstance();
     public abstract MotorHandler getHandler();
     public abstract void setHandler(MotorHandler handler);
     
@@ -41,16 +28,10 @@ interface TaskProperties{
     public abstract void execute();
 }
 
-interface ObjectDetector{
-    public abstract ArrayList<Rectangle> detect(PImage image, PImage mask);
-    // public abstract Rectangle detect(PImage image);
-    // public abstract PImage getMask();
-}
-
-interface LineDetector{
-    public abstract Line detect(PImage image, PImage mask);
-}
-
 interface ColorFilter {
     public abstract PImage filter(PImage image);
+}
+
+interface Detector<T extends Shape>{
+    public abstract ArrayList<T> detect(PImage image, PImage mask);
 }

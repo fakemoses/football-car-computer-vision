@@ -1,14 +1,19 @@
 import ipcapture.*;
 import hypermedia.net.*;
-import java.awt.*;
-import processing.video.*;
 import gab.opencv.*;
-import java.awt.Frame;
+import processing.video.*;
 import processing.awt.PSurfaceAWT;
 import processing.awt.PSurfaceAWT.SmoothCanvas;
+import java.awt.*;
+import java.awt.Frame;
 import java.util.Collections;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.Shape;
+import java.awt.Point;
 
 //Herausgezogene wichtige Parameter des Systems
 boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = false;
@@ -54,32 +59,23 @@ Antrieb antrieb;
 IPCapture cam;
 Bildverarbeitung bildverarbeitung;
 Algo algo;
-LineDetection lineDetection;
-BallDetection2 ballDetection;
-CarDetection carDetection;
-GoalDetection goalDetection;
-DetectionThread goalDetection2;
 MotorControl motorControl;
-Ransac ransac;
-Boundary boundary;
-ColorHSV yellowCV;
-ColorHSV blueCV;
 
 ColorFilter blueHSV;
 ColorFilter redHSV;
-ObjectDetector goalDetector;
-LineDetector lineDetector;
-Boundary2 boundary2;
-DetectionThread lineDetection2;
-CascadeDetection ballCascade;
+ColorFilter yellowHSV;
+Detector<Rectangle> goalDetector;
+Detector<Rectangle> ballDetector;
+Detector<Line> lineDetector;
+Boundary boundary;
+DetectionThread lineDetection;
+DetectionThread goalDetection;
+DetectionThread ballDetection;
+
 OscP5 oscP5;
 NetAddress myRemoteLocation;
 Comm comm;
 String isBall = "/isBall";
-
-// HSV Color Extraction
-boolean yellow = false;
-ColorHSV maskYellow;
 PImage img, out1;
 PImage redMask, yellowMask, boundary_result, blueMask, blueMask2, greenMask;
 PImage gd_result;
@@ -130,33 +126,25 @@ void setup() {
     
     motorControl = new MotorControl(antrieb);
     
-    ransac = new Ransac(r_maxIteration,r_threshhold,camWidth,camHeight);
-    boundary = new Boundary(camWidth,camHeight);
-    lineDetection = new LineDetection(motorControl, bildverarbeitung, ransac, boundary);
-    
-    ballCascade = new CascadeDetection(camWidth, camHeight);
-    blueCV = new ColorHSV(camWidth, camHeight, HsvColorRange.BLUE.getRange());
-    yellowCV = new ColorHSV(camWidth, camHeight, HsvColorRange.YELLOW.getRange());
-    ballDetection = new BallDetection2(motorControl, bildverarbeitung, yellowCV);
-    
-    carDetection = new CarDetection(motorControl, bildverarbeitung);
-    
-    goalDetection = new GoalDetection(motorControl, bildverarbeitung, blueCV);
-    
     blueHSV = new HSVFilter(HSVColorRangeR.YELLOW);
     goalDetector = new ContourDetector(camWidth, camHeight);
-    goalDetection2 = new GoalDetection2(motorControl, blueHSV, goalDetector);
+    goalDetection = new GoalDetection(motorControl, blueHSV, goalDetector);
     
     redHSV = new HSVFilter(HSVColorRangeR.combine(HSVColorRangeR.RED1, HSVColorRangeR.RED2));
     lineDetector = new RansacDetector(r_maxIteration,r_threshhold, 400,camWidth,camHeight);
-    boundary2 = new Boundary2(camWidth,camHeight);
-    lineDetection2 = new LineDetection2(motorControl, redHSV, lineDetector, boundary2);
+    boundary = new Boundary(camWidth,camHeight);
+    lineDetection = new LineDetection(motorControl, redHSV, lineDetector, boundary);
+    
+    yellowHSV = new HSVFilter(HSVColorRangeR.YELLOW);
+    ballDetector = new ContourDetector(camWidth, camHeight);
+    ballDetection = new BallDetection(motorControl, yellowHSV, ballDetector);
+    
     motorControl.register(lineDetection,1);
     motorControl.register(ballDetection,2);
     motorControl.register(goalDetection,3);
     
-    DetectionThread[] tis = {goalDetection2, lineDetection2};
-    algo = new Algo(cam, bildverarbeitung, lineDetection, ballDetection, carDetection, goalDetection, tis);
+    DetectionThread[] tis = {goalDetection, lineDetection, ballDetection};
+    algo = new Algo(bildverarbeitung,tis);
     algo.startALL();
 }
 
@@ -166,31 +154,31 @@ boolean AKTIV = false;
 void draw() {
     algo.runColorExtraction();
     
-    ld_result = algo.getLineDetectionResult(ld_color, ld_thickness);
-    redMask = algo.bildverarbeitung.getRedMask();
-    boundary_result = algo.lineDetection.bimg;
-    bd_result = algo.getBallDetectionResult(bd_color, bd_roi_color ,bd_thickness);
-    blueMask = algo.ballDetection.getYellowMask();
-    blueMask2 = algo.bildverarbeitung.getBlueMask();
-    gd_result = algo.getGoalDetectionResult(gd_color, gd_thickess);
-    yellowMask = algo.goalDetection.getYellowMask();
-    greenMask = algo.bildverarbeitung.getGreenMask();
+    // ld_result = algo.getLineDetectionResult(ld_color, ld_thickness);
+    // redMask = algo.bildverarbeitung.getRedMask();
+    // boundary_result = algo.lineDetection.bimg;
+    // bd_result = algo.getBallDetectionResult(bd_color, bd_roi_color ,bd_thickness);
+    // blueMask = algo.ballDetection.getYellowMask();
+    // blueMask2 = algo.bildverarbeitung.getBlueMask();
+    // gd_result = algo.getGoalDetectionResult(gd_color, gd_thickess);
+    // yellowMask = algo.goalDetection.getYellowMask();
+    // greenMask = algo.bildverarbeitung.getGreenMask();
     
-    image(cam, 0, 0);
-    image(ld_result, camWidth, 0);
-    image(redMask, camWidth, camHeight);
-    image(boundary_result, camWidth, camHeight * 2);
-    image(bd_result, camWidth * 2, 0);
-    image(blueMask, camWidth * 2, camHeight);
-    image(blueMask2, camWidth * 2, camHeight * 2);
-    image(gd_result, camWidth * 3, 0);
-    image(yellowMask, camWidth * 3, camHeight);
-    image(greenMask, camWidth * 3, camHeight * 2);
+    // image(cam, 0, 0);
+    // image(ld_result, camWidth, 0);
+    // image(redMask, camWidth, camHeight);
+    // image(boundary_result, camWidth, camHeight * 2);
+    // image(bd_result, camWidth * 2, 0);
+    // image(blueMask, camWidth * 2, camHeight);
+    // image(blueMask2, camWidth * 2, camHeight * 2);
+    // image(gd_result, camWidth * 3, 0);
+    // image(yellowMask, camWidth * 3, camHeight);
+    // image(greenMask, camWidth * 3, camHeight * 2);
     
-    PImage[] res = algo.getTIResult();
-    if (res!= null) {
-        for (int i = 0; i < res.length; i++) {
-            image(res[i], 0, camHeight * (i));
+    PImage[][] res = algo.getTIResult();
+    for (int i = 0; i < res.length; i++) {
+        for (int j = 0; j < res[i].length; j++) {
+            image(res[i][j], camWidth * i, camHeight * j);
         }
     }
     

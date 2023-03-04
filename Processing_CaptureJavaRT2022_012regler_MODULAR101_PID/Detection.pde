@@ -4,12 +4,11 @@ abstract class DetectionThread implements IDetectionThread, Runnable {
     
     protected MotorControl motorControl;
     protected ColorFilter colorFilter;
-    // protected ObjectDetector objectDetector;
     
     PImage image;
     PImage mask;   
     
-    // public DetectionThread(MotorControl motorControl, ColorFilter colorFilter, ObjectDetector objectDetector) {
+    // public DetectionThread(MotorControl motorControl, ColorFilter colorFilter) {
     public DetectionThread(MotorControl motorControl, ColorFilter colorFilter) {
         this.motorControl = motorControl;
         this.colorFilter = colorFilter;

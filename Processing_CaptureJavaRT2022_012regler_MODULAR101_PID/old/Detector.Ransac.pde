@@ -1,42 +1,38 @@
-public class RansacDetector implements LineDetector {
+public class Ransac {
     
     private final int numIterations;
     private final double threshold;
     
     private int best_inliers;
     private double confidence;
-    private int min_point;
     
     private final int imgWidth;
     private final int imgHeight;
     
-    public RansacDetector(int numIterations, double threshold, int min_point, PImage image) {
-        this(numIterations, threshold, min_point, image.width, image.height);
+    private Line best_line;
+    private int temp = 0;
+    
+    public Ransac(int numIterations, double threshold, PImage image) {
+        this(numIterations, threshold, image.width, image.height);
     }
     
-    public RansacDetector(int numIterations, double threshold, int min_point, int imgWidth, int imgHeight) {
+    public Ransac(int numIterations, double threshold, int imgWidth, int imgHeight) {
         this.numIterations = numIterations;
         this.threshold = threshold;
         this.imgWidth = imgWidth;
         this.imgHeight = imgHeight;
-        this.min_point = min_point;
     }
     
-    public Line detect(PImage image, PImage mask) { 
-        ArrayList<Point> points = maskToPoints(mask);
-        Line best_line = null;
-        if (points.size() < min_point) {
-            return null;
-        }
+    public void run(ArrayList<Point> points) { 
         best_inliers = 0;
         for (int i = 0; i < numIterations; i++) {
-            Point p1 = points.get((int)(Math.random() * points.size()));
-            Point p2 = points.get((int)(Math.random() * points.size()));
+            Point2D p1 = points.get((int)(Math.random() * points.size()));
+            Point2D p2 = points.get((int)(Math.random() * points.size()));
             Line line = new Line(p1, p2);
             
-            ArrayList<Point> inliers = new ArrayList<Point>();
-            for (Point p : points) {
-                if (Math.abs(line.distanceFromLine(p)) < threshold) {
+            ArrayList<Point2D> inliers = new ArrayList<Point2D>();
+            for (Point2D p : points) {
+                if (line.ptLineDistSq(p) < threshold) {
                     inliers.add(p);
                 }
             }
@@ -45,21 +41,12 @@ public class RansacDetector implements LineDetector {
                 best_inliers = inliers.size();
                 best_line = line;
             }
-            confidence = (double)best_inliers / points.size();
         }
-        return best_line;
+        confidence = (double)best_inliers / points.size();
     }
     
-    private ArrayList<Point> maskToPoints(PImage mask) {
-        ArrayList<Point> points = new ArrayList<Point>();
-        for (int x = 0; x < mask.width; x++) {
-            for (int y = 0; y < mask.height; y++) {
-                if (mask.get(x, y) == 0xFFFFFFFF) {
-                    points.add(new Point(x, y));
-                }
-            }
-        }        
-        return points;
+    public Line getBestLine() {
+        return best_line;
     }
 }
 
@@ -205,8 +192,8 @@ public class RansacDetector implements LineDetector {
 //         return Math.abs((b.y - a.y) * p.x - (b.x - a.x) * p.y + b.x * a.y - b.y * a.x) / Math.sqrt(Math.pow(b.y - a.y, 2) + Math.pow(b.x - a.x, 2));
 //     }
 
-//     public ArrayList<Point> getPoints(int thickness) {
-//         ArrayList<Point> points = new ArrayList<Point>();
+//     public PointArray<Point> getPoints(int thickness) {
+//         PointArray<Point> points = new PointArray<Point>();
 //         Point[] intersectionPoints = intersectionAtImageBorder();
 //         Point start = intersectionPoints[0];
 //         Point end = intersectionPoints[1];

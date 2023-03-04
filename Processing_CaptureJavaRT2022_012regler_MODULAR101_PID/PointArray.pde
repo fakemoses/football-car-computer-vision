@@ -1,4 +1,4 @@
-class PointArray<E> extends ArrayList<E> {
+class PointArray<E extends Point2D> extends ArrayList<E> {
     private final int MAX_WIDTH;
     private final int MAX_HEIGHT;
     
@@ -13,12 +13,8 @@ class PointArray<E> extends ArrayList<E> {
     
     @Override
     public boolean add(E e) {
-        if (e instanceof Point) {
-            Point p = (Point) e;
-            if (p.x < 0 || p.x >= MAX_WIDTH || p.y < 0 || p.y >= MAX_HEIGHT) {
-                // println("Point out of bounds: " + p.toString());
-                return false;
-            }
+        if (e.getX() < 0 || e.getX() >= MAX_WIDTH || e.getY() < 0 || e.getY() >= MAX_HEIGHT) {
+            return false;
         }
         return super.add(e);
     }

@@ -1,25 +1,10 @@
-public class CarDetection implements ThreadInterface, Runnable {
-    private Thread myThread = null;
-    private boolean STARTED = false;
-    private MotorControl motorControl;
-    Bildverarbeitung bildverarbeitung;
+public class CarDetection extends DetectionThread {
     
-    public CarDetection(MotorControl motorControl, Bildverarbeitung bildverarbeitung ) {
-        this.motorControl = motorControl;
-        this.bildverarbeitung = bildverarbeitung;
-    }
+    Detector<Rectangle> objectDetector;
     
-    public void startThread() {
-        if (myThread == null) {
-            myThread = new Thread(this);
-            myThread.start();
-        }
-        
-        STARTED = true;
-    }
-    
-    public void stopThread() {
-        STARTED = false;
+    public CarDetection(MotorControl motorControl, ColorFilter colorFilter, Detector<Rectangle> objectDetector) {
+        super(motorControl, colorFilter);
+        this.objectDetector = objectDetector;
     }
     
     public String getThreadName() {
@@ -27,30 +12,10 @@ public class CarDetection implements ThreadInterface, Runnable {
     }
     
     public void run() {
-        // currently only known rectangle
-        // Rectangle[] rect = window.detectObject();
-        Rectangle[] rect = null;
-        int direction = 0;
-        if (rect != null) {
-            // since no color, how to move to object?
-            // assuming that the cascade returns one rectangle
-            
-            // calculate coord center of rectangle
-            int x = rect[0].x + rect[0].width / 2;
-            
-            if (x > width / 2 - 10 && x < width / 2 + 10) {
-                direction = 0;
-            }
-            else if (x < width / 2 - 10) {
-                direction = -1;
-            }
-            else if (x > width / 2 + 10) {
-                direction = 1;
-            }
-        }
-        
-        delay(500);
-        // motorControl.notify(this,direction);
-        
+        throw new UnsupportedOperationException("Method not implemented yet.");
+    }
+    
+    public PImage[] getResults() {
+        throw new UnsupportedOperationException("Method not implemented yet.");
     }
 }

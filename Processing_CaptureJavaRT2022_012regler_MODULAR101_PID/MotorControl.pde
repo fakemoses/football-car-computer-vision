@@ -103,7 +103,7 @@ public class MotorControl implements Mediator {
         }
     }
     
-    public void register(ThreadInterface instance, int priority) {
+    public void register(DetectionThread instance, int priority) {
         tasks.add(new Task(instance, priority));
         if (tasks.size() > 1) {
             sortTasks();
@@ -115,15 +115,15 @@ public class MotorControl implements Mediator {
     }
     
     @Override
-    public void notify(ThreadInterface sender, MotorHandler handler, int loopCount) {
-        if (isBall && sender instanceof BallDetection2) {
+    public void notify(DetectionThread sender, MotorHandler handler, int loopCount) {
+        if (isBall && sender instanceof BallDetection) {
             return;
         }
         tasks.updateTask(sender, handler, loopCount);
     }
     
     @Override
-    public void notify(ThreadInterface sender, MotorHandler handler) {
+    public void notify(DetectionThread sender, MotorHandler handler) {
         notify(sender, handler, 1);
     }
     
