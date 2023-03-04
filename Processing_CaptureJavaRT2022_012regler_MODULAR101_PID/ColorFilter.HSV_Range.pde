@@ -1,4 +1,4 @@
-public enum HSVColorRangeR{
+public enum HSVColorRange{
     RED1(new HSVRange(0, 10, 50, 255, 50, 255)),
         RED2(new HSVRange(170, 180, 50, 255, 50, 255)),
         YELLOW(new HSVRange(25, 35, 50, 255, 70, 255)),
@@ -7,15 +7,15 @@ public enum HSVColorRangeR{
     
     private HSVRange hsvRange;
     
-    private static final HashMap<HSVColorRangeR, HSVRange> hsvRangeMap = new HashMap<HSVColorRangeR, HSVRange>();
+    private static final HashMap<HSVColorRange, HSVRange> hsvRangeMap = new HashMap<HSVColorRange, HSVRange>();
     
     static {
-        for (HSVColorRangeR hsvEnumRange : HSVColorRangeR.values()) {
+        for (HSVColorRange hsvEnumRange : HSVColorRange.values()) {
             hsvRangeMap.put(hsvEnumRange, hsvEnumRange.getHSVRange());
         }
     }
     
-    HSVColorRangeR(HSVRange hsvRange) {
+    HSVColorRange(HSVRange hsvRange) {
         this.hsvRange = hsvRange;
     }
     
@@ -27,9 +27,9 @@ public enum HSVColorRangeR{
         println("hooha");
     }
     
-    static ArrayList<HSVRange> combine(HSVColorRangeR...hsvColorRanges) {
+    static ArrayList<HSVRange> combine(HSVColorRange...hsvColorRanges) {
         ArrayList<HSVRange> hsvRanges = new ArrayList<HSVRange>();
-        for (HSVColorRangeR hsvColorRange : hsvColorRanges) {
+        for (HSVColorRange hsvColorRange : hsvColorRanges) {
             hsvRanges.add(hsvRangeMap.get(hsvColorRange));
         }
         return hsvRanges;

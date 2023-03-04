@@ -100,25 +100,23 @@ void setup() {
     // myRemoteLocation = new NetAddress("192.168.178.43",12000); // IP and port of the server that the client will send to
     // comm = new Comm(oscP5,myRemoteLocation,isBall); // Unique id for the communication
     
-    // win = new PWindow(cam, 320, 0, 320, 240, "Cascade Detection");
-    // mainWin = new DrawWindow();
-    
     udpcomfort = new UDPcomfort(IP, PORT);
     antrieb = new Antrieb(udpcomfort, antriebMultiplier);    
     
     motorControl = new MotorControl(antrieb);
     
-    blueHSV = new HSVFilter(HSVColorRangeR.YELLOW);
+    
+    redHSV = new HSVFilter(HSVColorRange.combine(HSVColorRange.RED1, HSVColorRange.RED2));
+    redRGB = new RGBFilter(RGBType.RED, 30);
+    boundary = new Boundary(camWidth,camHeight);
+    lineDetector = new RansacDetector(r_maxIteration,r_threshhold, 400,camWidth,camHeight);
+    lineDetection = new LineDetection(motorControl, redRGB, lineDetector, boundary);
+    
+    blueHSV = new HSVFilter(HSVColorRange.YELLOW);
     goalDetector = new ContourDetector(camWidth, camHeight);
     goalDetection = new GoalDetection(motorControl, blueHSV, goalDetector);
     
-    redHSV = new HSVFilter(HSVColorRangeR.combine(HSVColorRangeR.RED1, HSVColorRangeR.RED2));
-    redRGB = new RGBFilter(RGBType.RED, 30);
-    lineDetector = new RansacDetector(r_maxIteration,r_threshhold, 400,camWidth,camHeight);
-    boundary = new Boundary(camWidth,camHeight);
-    lineDetection = new LineDetection(motorControl, redRGB, lineDetector, boundary);
-    
-    yellowHSV = new HSVFilter(HSVColorRangeR.YELLOW);
+    yellowHSV = new HSVFilter(HSVColorRange.YELLOW);
     ballDetector = new ContourDetector(camWidth, camHeight);
     ballDetection = new BallDetection(motorControl, yellowHSV, ballDetector);
     
@@ -148,27 +146,6 @@ void draw() {
         e.printStackTrace();
     }
     
-    // ld_result = algo.getLineDetectionResult(ld_color, ld_thickness);
-    // redMask = algo.bildverarbeitung.getRedMask();
-    // boundary_result = algo.lineDetection.bimg;
-    // bd_result = algo.getBallDetectionResult(bd_color, bd_roi_color ,bd_thickness);
-    // blueMask = algo.ballDetection.getYellowMask();
-    // blueMask2 = algo.bildverarbeitung.getBlueMask();
-    // gd_result = algo.getGoalDetectionResult(gd_color, gd_thickess);
-    // yellowMask = algo.goalDetection.getYellowMask();
-    // greenMask = algo.bildverarbeitung.getGreenMask();
-    
-    // image(cam, 0, 0);
-    // image(ld_result, camWidth, 0);
-    // image(redMask, camWidth, camHeight);
-    // image(boundary_result, camWidth, camHeight * 2);
-    // image(bd_result, camWidth * 2, 0);
-    // image(blueMask, camWidth * 2, camHeight);
-    // image(blueMask2, camWidth * 2, camHeight * 2);
-    // image(gd_result, camWidth * 3, 0);
-    // image(yellowMask, camWidth * 3, camHeight);
-    // image(greenMask, camWidth * 3, camHeight * 2);
-    
     PImage[][] res = algo.getTIResult();
     for (int i = 0; i < res.length; i++) {
         for (int j = 0; j < res[i].length; j++) {
@@ -177,7 +154,6 @@ void draw() {
     }
     
     motorControl.run();
-    // mainWin.draw();    
 }
 
 //event handler for OSC messages

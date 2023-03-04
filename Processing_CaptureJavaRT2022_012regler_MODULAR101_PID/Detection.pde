@@ -66,9 +66,7 @@ abstract class DetectionThread implements IDetectionThread, Runnable {
     protected PImage drawPoint(PImage image, PointArray<Point> points ,color c) { 
         PImage returnImage = image.copy();
         int[] pixels = returnImage.pixels;        
-        // println("Drawing " + points.size() + " points");
         for (Point p : points) {
-            // println("Drawing point " + p.x + ", " + p.y);
             pixels[p.x + p.y * returnImage.width] = c;
         }
         return returnImage;

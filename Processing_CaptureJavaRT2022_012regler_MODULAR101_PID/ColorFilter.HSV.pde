@@ -19,7 +19,7 @@ public class HSVFilter implements ColorFilter {
         } });
     }
     
-    public HSVFilter(HSVColorRangeR range) {
+    public HSVFilter(HSVColorRange range) {
         this(range.getHSVRange());
     }
     

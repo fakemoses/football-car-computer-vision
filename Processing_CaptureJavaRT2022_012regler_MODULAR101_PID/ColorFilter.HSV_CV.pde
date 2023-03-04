@@ -13,7 +13,7 @@ public class HSVFilterCV extends PApplet implements ColorFilter {
         } });
     }
     
-    public HSVFilterCV(HSVColorRangeR range) {
+    public HSVFilterCV(HSVColorRange range) {
         this(range.getHSVRange());
     }
     
