@@ -1,5 +1,4 @@
-public class RansacDetector implements Detector<Line> {
-    
+public class RansacDetector implements Detector<Line> {   
     private final int numIterations;
     private final double threshold;
     

@@ -1,5 +1,3 @@
-// Example implementation of a thread
-
 public class LineDetection extends DetectionThread{
     
     private Line detectedLine;

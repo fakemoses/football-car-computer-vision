@@ -1,6 +1,3 @@
-// only for yellow color detection
-// but also useable for other colors which can be expanded
-
 public class ContourDetector extends PApplet implements Detector<Rectangle> {
     private OpenCV opencv;
     private int max_rects = 10;

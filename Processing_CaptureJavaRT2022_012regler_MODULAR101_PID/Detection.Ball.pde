@@ -1,5 +1,3 @@
-// Example implementation of a thread
-
 public class BallDetection extends DetectionThread {
     
     private ArrayList<Rectangle> rects;

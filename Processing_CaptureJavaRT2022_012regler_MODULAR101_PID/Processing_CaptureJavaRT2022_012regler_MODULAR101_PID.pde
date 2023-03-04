@@ -144,7 +144,7 @@ void setup() {
     motorControl.register(goalDetection,3);
     
     DetectionThread[] tis = {goalDetection, lineDetection, ballDetection};
-    algo = new Algo(bildverarbeitung,tis);
+    algo = new Algo(tis);
     algo.startALL();
 }
 
@@ -152,7 +152,19 @@ void setup() {
 boolean AKTIV = false;
 
 void draw() {
-    algo.runColorExtraction();
+    
+    try {
+        if (cam.isAvailable()) {
+            cam.read();
+            cam.updatePixels();
+            algo.updateImage(cam);
+        } else {
+            throw new RuntimeException("Camera not available");
+        }
+    }
+    catch(Exception e) {
+        e.printStackTrace();
+    }
     
     // ld_result = algo.getLineDetectionResult(ld_color, ld_thickness);
     // redMask = algo.bildverarbeitung.getRedMask();
