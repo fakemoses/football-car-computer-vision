@@ -9,7 +9,8 @@ public class BallDetection extends DetectionThread {
     private final int MIN_HEIGHT = 10;
     private final int MIN_AREA = 100;
     
-    private final color boxColor = color(0, 255, 0);
+    private final color boxColorOut = color(0, 0, 255);
+    private final color boxColorIn = color(0, 255, 0);
     private final int boxThickness = 2;
     
     private final color roiColor = color(255, 0, 0);
@@ -77,17 +78,17 @@ public class BallDetection extends DetectionThread {
             if (r == null) {
                 continue;
             }
-            // float calc = abs(((float)r.width / (float)r.height) - IDEAL_RATIO);
-            // if (calc > IDEAL_RATIO_TOLERANCE) {
-            //     continue;
-        // }
-            // if (r.width < MIN_WIDTH ||  r.height < MIN_HEIGHT) {
-            //     continue;
-        // }
+            float calc = abs(((float)r.width / (float)r.height) - IDEAL_RATIO);
+            if (calc > IDEAL_RATIO_TOLERANCE) {
+                continue;
+            }
+            if (r.width < MIN_WIDTH ||  r.height < MIN_HEIGHT) {
+                continue;
+            }
             
-            // if (r.width * r.height < MIN_AREA) {
-            //     continue;
-        // }
+            if (r.width * r.height < MIN_AREA) {
+                continue;
+            }
             return r;
         }
         return null;
@@ -108,22 +109,20 @@ public class BallDetection extends DetectionThread {
         }
         PImage[] results = new PImage[2];
         PImage retImage = drawRect(image, roi, roiThickness, roiColor, false);
-        results[0] = boundingBox == null ? retImage : drawRect(retImage, boundingBox, boxColor, boxThickness, false);
-        // if (boundingBox!= null) {
-        //     println("Ball detected");
-// }
-    results[1] = mask;
-    return results;
-}
-
-
-public float toMotorSignalLinear(int xCenter) {
-    int MAXWIDTH = 320; // todo: set variable 
-    return(float)(xCenter - (MAXWIDTH / 2)) / (MAXWIDTH / 2);
-}
-
-public boolean isBallWithinROI() {
-    return isBallWithinROI;
-}
-
+        color boxColor = isBallWithinROI ? boxColorIn : boxColorOut;
+        results[0] = boundingBox == null ? retImage : drawRect(retImage, boundingBox, boxThickness, boxColor, false);
+        results[1] = mask;
+        return results;
+    }
+    
+    
+    public float toMotorSignalLinear(int xCenter) {
+        int MAXWIDTH = 320; // todo: set variable 
+        return(float)(xCenter - (MAXWIDTH / 2)) / (MAXWIDTH / 2);
+    }
+    
+    public boolean isBallWithinROI() {
+        return isBallWithinROI;
+    }
+    
 }

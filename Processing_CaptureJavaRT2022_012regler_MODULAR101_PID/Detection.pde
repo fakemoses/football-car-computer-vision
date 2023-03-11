@@ -8,11 +8,9 @@ abstract class DetectionThread implements IDetectionThread, Runnable {
     PImage image;
     PImage mask;   
     
-    // public DetectionThread(MotorControl motorControl, ColorFilter colorFilter) {
     public DetectionThread(MotorControl motorControl, ColorFilter colorFilter) {
         this.motorControl = motorControl;
         this.colorFilter = colorFilter;
-        // this.objectDetector = objectDetector;
     }
     
     public void startThread() {
@@ -29,7 +27,6 @@ abstract class DetectionThread implements IDetectionThread, Runnable {
     
     protected PImage drawRect(PImage image, Rectangle rect, int thickness, color c, boolean fill) { 
         PointArray<Point> points = new PointArray<Point>();
-        
         if (thickness > 0) {
             for (int i = rect.x; i <= rect.x + rect.width; i++) {
                 for (int j = ceil(rect.y - (thickness / 2)); j <= floor(rect.y + (thickness / 2)); j++) {

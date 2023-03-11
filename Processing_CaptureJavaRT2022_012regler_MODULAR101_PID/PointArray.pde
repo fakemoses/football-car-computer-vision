@@ -16,6 +16,7 @@ class PointArray<E extends Point2D> extends ArrayList<E> {
         if (e.getX() < 0 || e.getX() >= MAX_WIDTH || e.getY() < 0 || e.getY() >= MAX_HEIGHT) {
             return false;
         }
+        // println("Adding point: " + e);
         return super.add(e);
     }
 }

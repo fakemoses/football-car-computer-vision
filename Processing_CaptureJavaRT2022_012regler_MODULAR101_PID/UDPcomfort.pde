@@ -69,7 +69,7 @@ public class UDPcomfort
         String message = new String(data);
         
         // print the result
-        //   println("receive: \""+message+"\" from " + ip + " on port " + port);
+        // println("receive: \""+message+"\" from " + ip + " on port " + port);
         TEMPERATUR = "receive: \""+message+"\" " + ip + " " + port;
     }     
 }

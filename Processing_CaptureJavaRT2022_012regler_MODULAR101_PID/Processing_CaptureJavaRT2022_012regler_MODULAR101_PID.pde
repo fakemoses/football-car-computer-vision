@@ -122,7 +122,7 @@ void setup() {
     
     motorControl.register(lineDetection,1);
     motorControl.register(ballDetection,2);
-    // motorControl.register(goalDetection,3);
+    motorControl.register(goalDetection,3);
     
     algo = new Algo(lineDetection, ballDetection, goalDetection);
     algo.startALL();
