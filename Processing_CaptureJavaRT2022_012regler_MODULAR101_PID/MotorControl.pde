@@ -39,11 +39,11 @@ public class MotorControl implements Mediator {
             // rechts = 0.2f * direction + 0.8f;
             // links = -0.2f * direction + 0.8f;
             if (direction > 0) {
-                rechts = 0.8f;
+                rechts = 0.9f;
                 links = 0.6f;
             } else if (direction < 0) {
                 rechts = 0.6f;
-                links = 0.8f;
+                links = 0.9f;
             } else {
                 rechts = 0.8f;
                 links = 0.8f;

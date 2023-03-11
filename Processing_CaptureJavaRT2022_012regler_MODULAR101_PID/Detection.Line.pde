@@ -31,7 +31,8 @@ public class LineDetection extends DetectionThread{
             ArrayList<Line> detectedLinesArray = lineDetector.detect(image, mask);
             detectedLine = detectedLinesArray == null ? null : detectedLinesArray.get(0);
             if (boundary.isHelpNeeded(detectedLine)) {
-                println("Help needed");
+                // println("Help needed");
+                motorControl.notify(this, motorControl.Reverse(), 5);
             }
             delay(50);
         }

@@ -7,10 +7,6 @@ public class HSVFilter implements ColorFilter {
     
     public HSVFilter(ArrayList<HSVRange> ranges) {
         this.ranges = ranges;
-        println("registering range:");
-        for (HSVRange range : ranges) {
-            println(range.toString());
-        }
     }
     
     public HSVFilter(HSVRange range) {

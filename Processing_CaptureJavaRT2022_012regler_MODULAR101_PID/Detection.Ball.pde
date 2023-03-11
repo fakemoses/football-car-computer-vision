@@ -46,6 +46,7 @@ public class BallDetection extends DetectionThread {
             mask = colorFilter.filter(image);
             rects = objectDetector.detect(image, mask);
             boundingBox = isValid(rects);
+            
             if (boundingBox != null) {
                 if (roi.contains(boundingBox.getCenterX(), boundingBox.getCenterY())) {
                     isBallWithinROI = true;
@@ -54,11 +55,11 @@ public class BallDetection extends DetectionThread {
                     isBallWithinROI = false;
                     motorControl.enableBallNoti();
                 }
-                // motorControl.notify(this,motorControl.Forward((toMotorSignalLinear((int)mid.x))));
+                motorControl.notify(this,motorControl.Forward((toMotorSignalLinear((int)boundingBox.getCenterX()))));
                 // delay(70);
-                // continue;
+                continue;
             } else {    
-                // motorControl.notify(this,motorControl.Turn());
+                motorControl.notify(this,motorControl.Turn());
             }
             delay(40);
         }
@@ -76,17 +77,17 @@ public class BallDetection extends DetectionThread {
             if (r == null) {
                 continue;
             }
-            float calc = abs(((float)r.width / (float)r.height) - IDEAL_RATIO);
-            if (calc > IDEAL_RATIO_TOLERANCE) {
-                continue;
-            }
-            if (r.width < MIN_WIDTH ||  r.height < MIN_HEIGHT) {
-                continue;
-            }
+            // float calc = abs(((float)r.width / (float)r.height) - IDEAL_RATIO);
+            // if (calc > IDEAL_RATIO_TOLERANCE) {
+            //     continue;
+        // }
+            // if (r.width < MIN_WIDTH ||  r.height < MIN_HEIGHT) {
+            //     continue;
+        // }
             
-            if (r.width * r.height < MIN_AREA) {
-                continue;
-            }
+            // if (r.width * r.height < MIN_AREA) {
+            //     continue;
+        // }
             return r;
         }
         return null;
@@ -108,18 +109,21 @@ public class BallDetection extends DetectionThread {
         PImage[] results = new PImage[2];
         PImage retImage = drawRect(image, roi, roiThickness, roiColor, false);
         results[0] = boundingBox == null ? retImage : drawRect(retImage, boundingBox, boxColor, boxThickness, false);
-        results[1] = mask;
-        return results;
-    }
-    
-    
-    public float toMotorSignalLinear(int xCenter) {
-        int MAXWIDTH = 320; // todo: set variable 
-        return(float)(xCenter - (MAXWIDTH / 2)) / (MAXWIDTH / 2);
-    }
-    
-    public boolean isBallWithinROI() {
-        return isBallWithinROI;
-    }
-    
+        // if (boundingBox!= null) {
+        //     println("Ball detected");
+// }
+    results[1] = mask;
+    return results;
+}
+
+
+public float toMotorSignalLinear(int xCenter) {
+    int MAXWIDTH = 320; // todo: set variable 
+    return(float)(xCenter - (MAXWIDTH / 2)) / (MAXWIDTH / 2);
+}
+
+public boolean isBallWithinROI() {
+    return isBallWithinROI;
+}
+
 }

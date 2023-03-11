@@ -52,7 +52,7 @@ String NACHRICHT = "";
 String IP = "192.168.178.48";
 int PORT = 6000;
 
-double antriebMultiplier = 0.9;
+double antriebMultiplier = 1.0;
 
 UDPcomfort udpcomfort;  
 Antrieb antrieb;
@@ -61,17 +61,17 @@ IPCapture cam;
 Algo algo;
 MotorControl motorControl;
 
+Boundary boundary;
 ColorFilter blueHSV;
 ColorFilter redHSV;
 ColorFilter redRGB;
 ColorFilter yellowHSV;
+Detector<Line> lineDetector;
 Detector<Rectangle> goalDetector;
 Detector<Rectangle> ballDetector;
-Detector<Line> lineDetector;
-Boundary boundary;
-DetectionThread lineDetection;
-DetectionThread goalDetection;
-DetectionThread ballDetection;
+LineDetection lineDetection;
+GoalDetection goalDetection;
+BallDetection ballDetection;
 
 OscP5 oscP5;
 NetAddress myRemoteLocation;
@@ -110,9 +110,9 @@ void setup() {
     redRGB = new RGBFilter(RGBType.RED, 30);
     boundary = new Boundary(camWidth,camHeight);
     lineDetector = new RansacDetector(r_maxIteration,r_threshhold, 400,camWidth,camHeight);
-    lineDetection = new LineDetection(motorControl, redRGB, lineDetector, boundary);
+    lineDetection = new LineDetection(motorControl, redHSV, lineDetector, boundary);
     
-    blueHSV = new HSVFilter(HSVColorRange.YELLOW);
+    blueHSV = new HSVFilter(HSVColorRange.BLUE);
     goalDetector = new ContourDetector(camWidth, camHeight);
     goalDetection = new GoalDetection(motorControl, blueHSV, goalDetector);
     
@@ -122,7 +122,7 @@ void setup() {
     
     motorControl.register(lineDetection,1);
     motorControl.register(ballDetection,2);
-    motorControl.register(goalDetection,3);
+    // motorControl.register(goalDetection,3);
     
     algo = new Algo(lineDetection, ballDetection, goalDetection);
     algo.startALL();
