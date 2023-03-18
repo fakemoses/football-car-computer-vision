@@ -39,11 +39,11 @@ public class MotorControl implements Mediator {
             // rechts = 0.2f * direction + 0.8f;
             // links = -0.2f * direction + 0.8f;
             if (direction > 0) {
-                rechts = 0.9f;
-                links = 0.6f;
+                rechts = 0.7f;  //0.8f and 0.5f for the slower robot
+                links = 0.4f;   //0.7f and 0.4f for the faster robot
             } else if (direction < 0) {
-                rechts = 0.6f;
-                links = 0.9f;
+                rechts = 0.4f;
+                links = 0.7f;
             } else {
                 rechts = 0.8f;
                 links = 0.8f;
@@ -134,4 +134,3 @@ public class MotorControl implements Mediator {
         tasks.execute();
     }
 }
-

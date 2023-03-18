@@ -17,7 +17,7 @@ import java.awt.Point;
 
 //Herausgezogene wichtige Parameter des Systems
 boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = false;
-float VORTRIEB = 0.7;
+float VORTRIEB = 0.85; //0.8 min to 0.9 max (preferrably 0.8 to 0.85)
 float PROPORTIONALE_VERSTAERKUNG = 0.50;
 float INTEGRALE_VERSTAERKUNG = 0.15f;
 float DIFFERENTIALE_VERSTAERKUNG = 0.1f;
@@ -49,7 +49,7 @@ String NACHRICHT = "";
 //String TEMPERATUR = "";
 //String IP = "192.168.137.92";
 //String IP = "192.168.0.102";
-String IP = "192.168.178.48";
+String IP = "192.168.43.137";
 int PORT = 6000;
 
 double antriebMultiplier = 1.0;
