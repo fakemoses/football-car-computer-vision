@@ -134,4 +134,3 @@ public class MotorControl implements Mediator {
         tasks.execute();
     }
 }
-
