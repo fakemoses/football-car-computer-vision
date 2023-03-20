@@ -17,11 +17,11 @@ import java.awt.Point;
 
 //Herausgezogene wichtige Parameter des Systems
 boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = false;
-float VORTRIEB = 0.7;
+float VORTRIEB = 0.85;
 float PROPORTIONALE_VERSTAERKUNG = 0.50;
 float INTEGRALE_VERSTAERKUNG = 0.15f;
 float DIFFERENTIALE_VERSTAERKUNG = 0.1f;
-float ASYMMETRIE = 1.0; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
+float ASYMMETRIE = 1.075; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 // float ASYMMETRIE = 1.01; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 
 //VERSION FÜR TP-Link_59C2
@@ -48,8 +48,8 @@ float ASYMMETRIE = 1.0; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS 
 String NACHRICHT = "";
 //String TEMPERATUR = "";
 //String IP = "192.168.137.92";
-//String IP = "192.168.0.102";
-String IP = "192.168.178.48";
+String IP = "192.168.178.70";
+//String IP = "192.168.178.66";
 int PORT = 6000;
 
 double antriebMultiplier = 1.0;
@@ -112,22 +112,23 @@ void setup() {
     lineDetector = new RansacDetector(r_maxIteration,r_threshhold, 400,camWidth,camHeight);
     lineDetection = new LineDetection(motorControl, redHSV, lineDetector, boundary);
     
-    blueHSV = new HSVFilter(HSVColorRange.BLUE);
+    // blueHSV = new HSVFilter(HSVColorRange.GREEN);
+    blueHSV = new RGBFilter(RGBType.GREEN,30);
     goalDetector = new ContourDetector(camWidth, camHeight);
     goalDetection = new GoalDetection(motorControl, blueHSV, goalDetector);
     
-    yellowHSV = new HSVFilter(HSVColorRange.YELLOW);
+    yellowHSV = new HSVFilter(HSVColorRange.BLUE);
     ballDetector = new ContourDetector(camWidth, camHeight);
-    ballDetection = new BallDetection(motorControl, yellowHSV, ballDetector);
+    ballDetection = new BallDetection(motorControl, yellowHSV, ballDetector, comm);
     
     motorControl.register(lineDetection,1);
     motorControl.register(ballDetection,2);
     motorControl.register(goalDetection,3);
     
-    algo = new Algo(lineDetection, ballDetection, goalDetection);
+    algo = new Algo(ballDetection, goalDetection);
+    //algo = new Algo(goalDetection);
     algo.startALL();
 }
-
 
 boolean AKTIV = false;
 
@@ -156,11 +157,11 @@ void draw() {
     motorControl.run();
 }
 
-//event handler for OSC messages
-void oscEvent(OscMessage theOscMessage) {
-    // /* check if theOscMessage has the address pattern we are looking for. */
-    comm.onEventRun(theOscMessage);       
-}
+// //event handler for OSC messages
+// void oscEvent(OscMessage theOscMessage) {
+//     // /* check if theOscMessage has the address pattern we are looking for. */
+//     comm.onEventRun(theOscMessage);       
+// }
 
 void keyPressed() {
     if (key == ' ') {

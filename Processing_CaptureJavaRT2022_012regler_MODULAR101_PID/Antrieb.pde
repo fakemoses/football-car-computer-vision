@@ -33,8 +33,8 @@ public class Antrieb
             rechts = h;
         }
         
-        links  *= multiplier;
-        rechts *= multiplier;
+        links  *= ASYMMETRIE;
+        rechts *= (2.0 - ASYMMETRIE);
         
         if (links > 1.0f)   links  =  1.0f;
         if (links <-  1.0f)  links  = -1.0f;

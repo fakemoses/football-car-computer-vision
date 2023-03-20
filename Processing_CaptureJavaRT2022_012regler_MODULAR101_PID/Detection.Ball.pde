@@ -2,12 +2,15 @@ public class BallDetection extends DetectionThread {
     
     private ArrayList<Rectangle> rects;
     private Rectangle boundingBox;
+    private Rectangle[] previousBoundingBoxes;
+    private boolean isFull;
     
     Detector<Rectangle> objectDetector;
+    Comm comm ;
     
     private final int MIN_WIDTH = 10;
     private final int MIN_HEIGHT = 10;
-    private final int MIN_AREA = 100;
+    private final int MIN_AREA = 200;
     
     private final color boxColorOut = color(0, 0, 255);
     private final color boxColorIn = color(0, 255, 0);
@@ -25,13 +28,15 @@ public class BallDetection extends DetectionThread {
     private final float IDEAL_RATIO_TOLERANCE = 0.25f;
     
     
-    public BallDetection(MotorControl motorControl , ColorFilter colorFilter, Detector<Rectangle> objectDetector) {
+    public BallDetection(MotorControl motorControl , ColorFilter colorFilter, Detector<Rectangle> objectDetector, Comm comm) {
         super(motorControl, colorFilter);
         this.objectDetector = objectDetector;
         
         int w = (int)(End.x - Start.x);
         int h = (int)(End.y - Start.y);
         this.roi = new Rectangle((int) Start.x,(int) Start.y, w, h);
+        this.previousBoundingBoxes = new Rectangle[5];
+        this.isFull = false;
     }
     
     public String getThreadName() {
@@ -47,19 +52,34 @@ public class BallDetection extends DetectionThread {
             mask = colorFilter.filter(image);
             rects = objectDetector.detect(image, mask);
             boundingBox = isValid(rects);
+            updateBbox(boundingBox);
+            int numNullBboxes = 0;
+            Rectangle isBboxAvailable = boundingBox;
+            for (int i = previousBoundingBoxes.length-1; i >= 0; i--) {
+                if (previousBoundingBoxes[i] != null) {
+                    numNullBboxes++;
+                }
+            }
+
+            for (int i = previousBoundingBoxes.length-1; i >= 0; i--) {
+                if (previousBoundingBoxes[i] != null) {
+                    isBboxAvailable = previousBoundingBoxes[i];
+                    break;
+                }
+            }
             
-            if (boundingBox != null) {
-                if (roi.contains(boundingBox.getCenterX(), boundingBox.getCenterY())) {
+            if (isBboxAvailable != null && numNullBboxes > 2) {
+                if (roi.contains(isBboxAvailable.getCenterX(), isBboxAvailable.getCenterY())) {
                     isBallWithinROI = true;
                     motorControl.disableBallNoti();
                 } else {
                     isBallWithinROI = false;
                     motorControl.enableBallNoti();
+                    motorControl.notify(this,motorControl.Forward((toMotorSignalLinear((int)isBboxAvailable.getCenterX()))));
                 }
-                motorControl.notify(this,motorControl.Forward((toMotorSignalLinear((int)boundingBox.getCenterX()))));
-                // delay(70);
+                //delay(70);
                 continue;
-            } else {    
+            } else { 
                 motorControl.notify(this,motorControl.Turn());
             }
             delay(40);
@@ -123,6 +143,26 @@ public class BallDetection extends DetectionThread {
     
     public boolean isBallWithinROI() {
         return isBallWithinROI;
+    }
+
+    public void updateBbox(Rectangle value) {
+        if (!isFull) {
+            // Array is not full, so simply add new value to next available slot
+            for (int i = 0; i < previousBoundingBoxes.length; i++) {
+                if (previousBoundingBoxes[i] == null) {
+                    previousBoundingBoxes[i] = value;
+                    break;
+                }
+            }
+            // Check if array is now full
+            isFull = (previousBoundingBoxes[previousBoundingBoxes.length-1] != null);
+        } else {
+            // Shift all values down one slot
+            for (int i = 0; i < previousBoundingBoxes.length-2; i++) {
+                previousBoundingBoxes[i] = previousBoundingBoxes[i+1];
+            }
+            previousBoundingBoxes[previousBoundingBoxes.length-1] = value;
+        }
     }
     
 }

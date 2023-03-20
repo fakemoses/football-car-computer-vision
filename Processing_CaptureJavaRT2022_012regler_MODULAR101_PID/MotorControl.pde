@@ -13,7 +13,7 @@ public class MotorControl implements Mediator {
     class ReverseHandler implements MotorHandler {
         @Override
         public void execute() {
-            antrieb.fahrt( -1, -1);
+            antrieb.fahrt( -0.8, -0.8);
         }
         
         public String getHandlerName() {
@@ -38,18 +38,18 @@ public class MotorControl implements Mediator {
         public void execute() {
             // rechts = 0.2f * direction + 0.8f;
             // links = -0.2f * direction + 0.8f;
-            if (direction > 0) {
-                rechts = 0.9f;
-                links = 0.6f;
-            } else if (direction < 0) {
-                rechts = 0.6f;
-                links = 0.9f;
+            if (direction > 0.2) {
+                rechts = 0.8f;
+                links = 0.5f;
+            } else if (direction < -0.2) {
+                rechts = 0.5f;
+                links = 0.8f;
             } else {
                 rechts = 0.8f;
                 links = 0.8f;
             }
             
-            println("directon: " + direction + "  links: " + links + " rechts: " + rechts);
+            println("direction: " + direction + "  links: " + links + " rechts: " + rechts);
             antrieb.fahrt(links, rechts);
         }
         
@@ -65,7 +65,7 @@ public class MotorControl implements Mediator {
     class TurnHandler implements MotorHandler {
         @Override
         public void execute() {
-            antrieb.fahrt(0, 0.85);
+            antrieb.fahrt(0, 0.8);
         }
         
         public String getHandlerName() {
