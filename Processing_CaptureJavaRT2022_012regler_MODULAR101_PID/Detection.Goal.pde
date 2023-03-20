@@ -13,10 +13,23 @@ public class GoalDetection extends DetectionThread{
     
     private final color boxColor = color(0, 255, 0);
     private final int boxThickness = 2;
+
+    private final color roiColor = color(255, 0, 0);
+    private final int roiThickness = 2;
+
+    PVector Start = new PVector(40, 120);
+    PVector End = new PVector(299, 160);
+    Rectangle roi;
+
+    private boolean isGoalWithinROI = false;
     
     public GoalDetection(MotorControl motorControl, ColorFilter colorFilter, Detector<Rectangle> objectDetector) {
         super(motorControl, colorFilter);
         this.objectDetector = objectDetector;
+
+        int w = (int)(End.x - Start.x);
+        int h = (int)(End.y - Start.y);
+        this.roi = new Rectangle((int) Start.x,(int) Start.y, w, h);
         previousBoundingBoxes = new Rectangle[5];
         isFull = false;
     }
@@ -43,7 +56,6 @@ public class GoalDetection extends DetectionThread{
                 }
             }
 
-            Rectangle isBboxAvailable = boundingBox;
             for (int i = previousBoundingBoxes.length-1; i >= 0; i--) {
                 if (previousBoundingBoxes[i] != null) {
                     isBboxAvailable = previousBoundingBoxes[i];
@@ -52,9 +64,16 @@ public class GoalDetection extends DetectionThread{
             }
 
             if (isBboxAvailable != null && numNullBboxes > 2) {
-                int xCenter = getXPos(isBboxAvailable);
-                float motorSignal = toMotorSignalLinear(xCenter);
-                motorControl.notify(this,motorControl.Forward(motorSignal));
+                if(roi.contains(isBboxAvailable.getCenterX(), isBboxAvailable.getCenterY()*1.5)){
+                    isGoalWithinROI = true;
+                    motorControl.disableGoalNoti();
+                    motorControl.notify(this,motorControl.StopForGoal());
+                }else{
+                    isGoalWithinROI = false;
+                    motorControl.enableGoalNoti();
+                    motorControl.notify(this,motorControl.Forward((toMotorSignalLinear((int)isBboxAvailable.getCenterX()))));
+                }
+                continue;
             } else{
                 motorControl.notify(this,motorControl.Turn());
             }
@@ -90,7 +109,8 @@ public class GoalDetection extends DetectionThread{
             return null;
         }
         PImage[] results = new PImage[2];
-        results[0] = boundingBox == null ? image : drawRect(image, boundingBox, boxThickness, boxColor, false);
+        PImage retImage = drawRect(image, roi, roiThickness, roiColor, false);
+        results[0] = boundingBox == null ? retImage : drawRect(retImage, boundingBox, boxThickness, boxColor, false);
         results[1] = mask;
         return results;
     }

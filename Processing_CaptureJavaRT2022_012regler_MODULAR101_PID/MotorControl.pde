@@ -3,6 +3,7 @@ public class MotorControl implements Mediator {
     private boolean MOTOR_RUNNING = false;
     private TaskArray<Task> tasks;
     private boolean isBall = false;
+    private boolean isGoal = false;
     
     public MotorControl(Antrieb antrieb) {
         this.antrieb = antrieb;
@@ -76,6 +77,21 @@ public class MotorControl implements Mediator {
     public TurnHandler Turn() {
         return new TurnHandler();
     }   
+
+    class StopForGoalHandler implements MotorHandler {
+        @Override
+        public void execute() {
+            antrieb.fahrt(0, 0);
+        }
+        
+        public String getHandlerName() {
+            return "StopForGoalHandler";
+        }
+    }
+
+    public StopForGoalHandler StopForGoal() {
+        return new StopForGoalHandler();
+    }
     
     public void start() {
         if (!MOTOR_RUNNING) {
@@ -102,6 +118,20 @@ public class MotorControl implements Mediator {
             isBall = false;
         }
     }
+
+    public void disableGoalNoti() {
+        if (!isGoal) {
+            println("DISABLE Notification from Goal Detection");
+            isGoal = true;
+        }
+    }
+    
+    public void enableGoalNoti() {
+        if (isGoal) {
+            println("ENABLE Notification from Goal Detection");
+            isGoal = false;
+        }
+    }
     
     public void register(DetectionThread instance, int priority) {
         tasks.add(new Task(instance, priority));
@@ -116,7 +146,10 @@ public class MotorControl implements Mediator {
     
     @Override
     public void notify(DetectionThread sender, MotorHandler handler, int loopCount) {
-        if (isBall && sender instanceof BallDetection) {
+        if ((isBall && sender instanceof BallDetection)) {
+            return;
+        }
+        if ((isGoal && sender instanceof GoalDetection)) {
             return;
         }
         tasks.updateTask(sender, handler, loopCount);
