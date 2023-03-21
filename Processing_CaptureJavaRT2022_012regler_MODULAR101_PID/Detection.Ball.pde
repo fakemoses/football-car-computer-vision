@@ -69,6 +69,7 @@ public class BallDetection extends DetectionThread {
             }
             
             if (isBboxAvailable != null && numNullBboxes > 2) {
+                // println("BBox: " + isBboxAvailable.getX() + " " + isBboxAvailable.getY() + " " + isBboxAvailable.getWidth() + " " + isBboxAvailable.getHeight());
                 if (roi.contains(isBboxAvailable.getCenterX(), isBboxAvailable.getCenterY())) {
                     isBallWithinROI = true;
                     motorControl.disableBallNoti();
@@ -158,7 +159,7 @@ public class BallDetection extends DetectionThread {
             isFull = (previousBoundingBoxes[previousBoundingBoxes.length-1] != null);
         } else {
             // Shift all values down one slot
-            for (int i = 0; i < previousBoundingBoxes.length-2; i++) {
+            for (int i = 0; i < previousBoundingBoxes.length-1; i++) {
                 previousBoundingBoxes[i] = previousBoundingBoxes[i+1];
             }
             previousBoundingBoxes[previousBoundingBoxes.length-1] = value;

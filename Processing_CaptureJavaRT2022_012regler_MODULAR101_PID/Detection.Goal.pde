@@ -14,9 +14,6 @@ public class GoalDetection extends DetectionThread{
     private final color boxColor = color(0, 255, 0);
     private final int boxThickness = 2;
 
-    private final color roiColor = color(255, 0, 0);
-    private final int roiThickness = 2;
-
     PVector Start = new PVector(40, 120);
     PVector End = new PVector(299, 160);
     Rectangle roi;
@@ -64,14 +61,16 @@ public class GoalDetection extends DetectionThread{
             }
 
             if (isBboxAvailable != null && numNullBboxes > 2) {
-                if(roi.contains(isBboxAvailable.getCenterX(), isBboxAvailable.getCenterY()*1.5)){
+                double bboxArea = isBboxAvailable.getWidth() * isBboxAvailable.getHeight();
+                //second condition is needed but not sure yet... KIV
+                if(bboxArea > 10000.0){
                     isGoalWithinROI = true;
-                    motorControl.disableGoalNoti();
                     motorControl.notify(this,motorControl.StopForGoal());
+                    motorControl.disableGoalNoti();
                 }else{
                     isGoalWithinROI = false;
-                    motorControl.enableGoalNoti();
                     motorControl.notify(this,motorControl.Forward((toMotorSignalLinear((int)isBboxAvailable.getCenterX()))));
+                    motorControl.enableGoalNoti();
                 }
                 continue;
             } else{
@@ -109,8 +108,7 @@ public class GoalDetection extends DetectionThread{
             return null;
         }
         PImage[] results = new PImage[2];
-        PImage retImage = drawRect(image, roi, roiThickness, roiColor, false);
-        results[0] = boundingBox == null ? retImage : drawRect(retImage, boundingBox, boxThickness, boxColor, false);
+        results[0] = boundingBox == null ? image : drawRect(image, boundingBox, boxThickness, boxColor, false);
         results[1] = mask;
         return results;
     }
@@ -133,7 +131,7 @@ public class GoalDetection extends DetectionThread{
             isFull = (previousBoundingBoxes[previousBoundingBoxes.length-1] != null);
         } else {
             // Shift all values down one slot
-            for (int i = 0; i < previousBoundingBoxes.length-2; i++) {
+            for (int i = 0; i < previousBoundingBoxes.length-1; i++) {
                 previousBoundingBoxes[i] = previousBoundingBoxes[i+1];
             }
             previousBoundingBoxes[previousBoundingBoxes.length-1] = value;

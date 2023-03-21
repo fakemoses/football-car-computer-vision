@@ -46,8 +46,8 @@ public class MotorControl implements Mediator {
                 rechts = 0.5f;
                 links = 0.8f;
             } else {
-                rechts = 0.8f;
-                links = 0.8f;
+                rechts = 0.85f;
+                links = 0.85f;
             }
             
             println("direction: " + direction + "  links: " + links + " rechts: " + rechts);
