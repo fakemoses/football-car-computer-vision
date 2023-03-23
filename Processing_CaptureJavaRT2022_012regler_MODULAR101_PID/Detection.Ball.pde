@@ -76,12 +76,12 @@ public class BallDetection extends DetectionThread {
                 } else {
                     isBallWithinROI = false;
                     motorControl.enableBallNoti();
-                    motorControl.notify(this,motorControl.Forward((toMotorSignalLinear((int)isBboxAvailable.getCenterX()))));
+                    motorControl.notify(this,motorControl.Forward((toMotorSignalLinear((int)isBboxAvailable.getCenterX()))),2);
                 }
                 //delay(70);
                 continue;
             } else { 
-                motorControl.notify(this,motorControl.Turn());
+               motorControl.notify(this,motorControl.Turn());
             }
             delay(40);
         }

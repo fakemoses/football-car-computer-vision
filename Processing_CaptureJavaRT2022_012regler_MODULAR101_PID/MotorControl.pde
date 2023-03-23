@@ -32,6 +32,7 @@ public class MotorControl implements Mediator {
         float links;
         float rechts;
         float mult = 0.15;
+
         ForwardHandler(float d) {
             this.direction = d;
         }
@@ -41,13 +42,13 @@ public class MotorControl implements Mediator {
             // links = -0.2f * direction + 0.8f;
             if (direction > 0.2) {
                 rechts = 0.8f;
-                links = 0.5f;
+                links = 0.6f;
             } else if (direction < -0.2) {
                 rechts = 0.5f;
                 links = 0.8f;
             } else {
-                rechts = 0.85f;
-                links = 0.85f;
+                rechts = 0.70f;
+                links = 0.70f;
             }
             
             println("direction: " + direction + "  links: " + links + " rechts: " + rechts);
@@ -146,12 +147,13 @@ public class MotorControl implements Mediator {
     
     @Override
     public void notify(DetectionThread sender, MotorHandler handler, int loopCount) {
+        if ((isGoal)) {
+            return;
+        }
         if ((isBall && sender instanceof BallDetection)) {
             return;
         }
-        if ((isGoal && sender instanceof GoalDetection)) {
-            return;
-        }
+        
         tasks.updateTask(sender, handler, loopCount);
     }
     

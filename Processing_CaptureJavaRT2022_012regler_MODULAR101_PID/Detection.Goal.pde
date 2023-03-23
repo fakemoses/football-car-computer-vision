@@ -47,11 +47,14 @@ public class GoalDetection extends DetectionThread{
             updateBbox(boundingBox);
             int numNullBboxes = 0;
             Rectangle isBboxAvailable = boundingBox;
+            double bboxArea = 0.0;
             for (int i = previousBoundingBoxes.length-1; i >= 0; i--) {
                 if (previousBoundingBoxes[i] != null) {
+                    bboxArea += previousBoundingBoxes[i].getWidth() * previousBoundingBoxes[i].getHeight();	
                     numNullBboxes++;
                 }
             }
+            bboxArea = bboxArea / numNullBboxes;
 
             for (int i = previousBoundingBoxes.length-1; i >= 0; i--) {
                 if (previousBoundingBoxes[i] != null) {
@@ -61,8 +64,7 @@ public class GoalDetection extends DetectionThread{
             }
 
             if (isBboxAvailable != null && numNullBboxes > 2) {
-                double bboxArea = isBboxAvailable.getWidth() * isBboxAvailable.getHeight();
-                //second condition is needed but not sure yet... KIV
+
                 if(bboxArea > 10000.0){
                     isGoalWithinROI = true;
                     motorControl.notify(this,motorControl.StopForGoal());
@@ -70,7 +72,7 @@ public class GoalDetection extends DetectionThread{
                 }else{
                     isGoalWithinROI = false;
                     motorControl.notify(this,motorControl.Forward((toMotorSignalLinear((int)isBboxAvailable.getCenterX()))));
-                    motorControl.enableGoalNoti();
+                    // motorControl.enableGoalNoti();
                 }
                 continue;
             } else{
