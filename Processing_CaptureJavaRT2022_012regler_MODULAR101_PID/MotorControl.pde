@@ -31,7 +31,7 @@ public class MotorControl implements Mediator {
         float direction;
         float links;
         float rechts;
-        float mult = 0.15;
+        float mult = 0.20;
 
         ForwardHandler(float d) {
             this.direction = d;
@@ -41,17 +41,24 @@ public class MotorControl implements Mediator {
             // rechts = 0.2f * direction + 0.8f;
             // links = -0.2f * direction + 0.8f;
             if (direction > 0.2) {
-                rechts = 0.8f;
-                links = 0.6f;
+                rechts = VORTRIEB + (mult * direction);
+                links = VORTRIEB - (mult * direction);
+                // rechts = 0.8f;
+                // links = 0.6f;
             } else if (direction < -0.2) {
-                rechts = 0.5f;
-                links = 0.8f;
+                rechts = VORTRIEB - (mult * abs(direction));
+                links = VORTRIEB + (mult * abs(direction));
+                // rechts = 0.5f;
+                // links = 0.8f;
             } else {
-                rechts = 0.70f;
-                links = 0.70f;
+                rechts = VORTRIEB;
+                links = VORTRIEB;
             }
             
             println("direction: " + direction + "  links: " + links + " rechts: " + rechts);
+            rechts *= (2.0 - ASYMMETRIE);
+            links *= ASYMMETRIE;
+            
             antrieb.fahrt(links, rechts);
         }
         

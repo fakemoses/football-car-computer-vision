@@ -17,11 +17,8 @@ import java.awt.Point;
 
 //Herausgezogene wichtige Parameter des Systems
 boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = true;
-float VORTRIEB = 0.85;
-float PROPORTIONALE_VERSTAERKUNG = 0.50;
-float INTEGRALE_VERSTAERKUNG = 0.15f;
-float DIFFERENTIALE_VERSTAERKUNG = 0.1f;
-float ASYMMETRIE =0.95; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
+float VORTRIEB = 0.73;
+float ASYMMETRIE =0.9855; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 // float ASYMMETRIE = 1.01; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 
 //VERSION FÜR TP-Link_59C2
@@ -125,7 +122,7 @@ void setup() {
     motorControl.register(ballDetection,2);
     motorControl.register(goalDetection,3);
     
-    algo = new Algo(lineDetection, ballDetection, goalDetection);
+    algo = new Algo(goalDetection, ballDetection);
     // algo = new Algo(goalDetection);
     algo.startALL();
 }
