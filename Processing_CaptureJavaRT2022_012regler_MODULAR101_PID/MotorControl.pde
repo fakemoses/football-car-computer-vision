@@ -10,95 +10,20 @@ public class MotorControl implements Mediator {
         tasks = new TaskArray();
     }
     
-    // todo: seperate the motor control from the motor handler
-    class ReverseHandler implements MotorHandler {
-        @Override
-        public void execute() {
-            antrieb.fahrt( -0.8, -0.8);
-        }
-        
-        public String getHandlerName() {
-            return "ReverseHandler";
-        }
-    }
-    
     public ReverseHandler Reverse() {
-        return new ReverseHandler();
-    }
-    
-    // waiting Aaron
-    class ForwardHandler implements MotorHandler {
-        float direction;
-        float links;
-        float rechts;
-        float mult = 0.20;
-
-        ForwardHandler(float d) {
-            this.direction = d;
-        }
-        @Override
-        public void execute() {
-            // rechts = 0.2f * direction + 0.8f;
-            // links = -0.2f * direction + 0.8f;
-            if (direction > 0.2) {
-                rechts = VORTRIEB + (mult * direction);
-                links = VORTRIEB - (mult * direction);
-                // rechts = 0.8f;
-                // links = 0.6f;
-            } else if (direction < -0.2) {
-                rechts = VORTRIEB - (mult * abs(direction));
-                links = VORTRIEB + (mult * abs(direction));
-                // rechts = 0.5f;
-                // links = 0.8f;
-            } else {
-                rechts = VORTRIEB;
-                links = VORTRIEB;
-            }
-            
-            println("direction: " + direction + "  links: " + links + " rechts: " + rechts);
-            rechts *= (2.0 - ASYMMETRIE);
-            links *= ASYMMETRIE;
-            
-            antrieb.fahrt(links, rechts);
-        }
-        
-        public String getHandlerName() {
-            return "ForwardHandler";
-        }
+        return new ReverseHandler(antrieb);
     }
     
     public ForwardHandler Forward(float d) {
-        return new ForwardHandler(d);
-    }
-    
-    class TurnHandler implements MotorHandler {
-        @Override
-        public void execute() {
-            antrieb.fahrt(0, 0.8);
-        }
-        
-        public String getHandlerName() {
-            return "TurnHandler";
-        }
-    }
+        return new ForwardHandler(antrieb, d);
+    }  
     
     public TurnHandler Turn() {
-        return new TurnHandler();
+        return new TurnHandler(antrieb);
     }   
-
-    class StopForGoalHandler implements MotorHandler {
-        @Override
-        public void execute() {
-            antrieb.fahrt(0, 0);
-        }
-        
-        public String getHandlerName() {
-            return "StopForGoalHandler";
-        }
-    }
-
+    
     public StopForGoalHandler StopForGoal() {
-        return new StopForGoalHandler();
+        return new StopForGoalHandler(antrieb);
     }
     
     public void start() {
@@ -126,7 +51,7 @@ public class MotorControl implements Mediator {
             isBall = false;
         }
     }
-
+    
     public void disableGoalNoti() {
         if (!isGoal) {
             println("DISABLE Notification from Goal Detection");
