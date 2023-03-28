@@ -1,8 +1,55 @@
-class ReverseHandler implements MotorHandler {
+public enum HandlerPriority {
+    PRIORITY_HIGH,
+    PRIORITY_MEDIUM,
+    PRIORITY_LOW;
+    
+    public boolean isHigherPriorityThan(HandlerPriority otherPriority) {
+        return compareTo(otherPriority) < 0;
+    }
+    
+    public boolean isLowerPriorityThan(HandlerPriority otherPriority) {
+        return compareTo(otherPriority) > 0;
+    }
+    
+    public boolean isSamePriorityAs(HandlerPriority otherPriority) {
+        return compareTo(otherPriority) == 0;
+    }
+    
+    public boolean isNotSamePriorityAs(HandlerPriority otherPriority) {
+        return !isSamePriorityAs(otherPriority);
+    }
+    
+    public boolean isHigherOrSamePriorityAs(HandlerPriority otherPriority) {
+        return isSamePriorityAs(otherPriority) || isHigherPriorityThan(otherPriority);
+    }
+    
+    public boolean isLowerOrSamePriorityAs(HandlerPriority otherPriority) {
+        return isSamePriorityAs(otherPriority) || isLowerPriorityThan(otherPriority);
+    }
+}
+
+abstract class MotorHandler{
+    
+    private final HandlerPriority priority;
     private Antrieb antrieb;
     
-    public ReverseHandler(Antrieb antrieb) {
+    public MotorHandler(Antrieb antrieb, HandlerPriority priority) {
         this.antrieb = antrieb;
+        this.priority = priority;
+    }
+    
+    public HandlerPriority getPriority() {
+        return priority;
+    }
+    
+    public abstract void execute();
+    public abstract String getHandlerName();
+}
+
+class ReverseHandler extends MotorHandler {
+    
+    public ReverseHandler(Antrieb antrieb) {
+        super(antrieb, HandlerPriority.PRIORITY_MEDIUM);
     }
     
     @Override
@@ -15,19 +62,18 @@ class ReverseHandler implements MotorHandler {
     }
 }
 
-class ForwardHandler implements MotorHandler {
-    private Antrieb antrieb;
+class ForwardHandler extends MotorHandler {
     
     float direction;
     float links;
     float rechts;
     float mult = 0.20;
     
-    
     ForwardHandler(Antrieb antrieb, float d) {
-        this.antrieb = antrieb;
+        super(antrieb, HandlerPriority.PRIORITY_MEDIUM);
         this.direction = d;
     }
+    
     @Override
     public void execute() {
         // rechts = 0.2f * direction + 0.8f;
@@ -60,11 +106,10 @@ class ForwardHandler implements MotorHandler {
 }
 
 
-class TurnHandler implements MotorHandler {
-    private Antrieb antrieb;
+class TurnHandler extends MotorHandler {
     
     TurnHandler(Antrieb antrieb) {
-        this.antrieb = antrieb;
+        super(antrieb, HandlerPriority.PRIORITY_LOW);
     }
     
     @Override
@@ -77,11 +122,10 @@ class TurnHandler implements MotorHandler {
     }
 }
 
-class StopForGoalHandler implements MotorHandler {
-    private Antrieb antrieb;
+class StopForGoalHandler extends MotorHandler {
     
     StopForGoalHandler(Antrieb antrieb) {
-        this.antrieb = antrieb;
+        super(antrieb, HandlerPriority.PRIORITY_MEDIUM);
     }
     
     @Override

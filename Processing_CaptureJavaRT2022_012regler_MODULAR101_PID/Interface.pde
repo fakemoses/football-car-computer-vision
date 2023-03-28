@@ -11,11 +11,6 @@ interface Mediator {
     public abstract void notify(DetectionThread sender, MotorHandler handler);
 }
 
-interface MotorHandler{
-    public abstract void execute();
-    public abstract String getHandlerName();
-}
-
 interface ITask{
     public abstract void setLoopCount(int count);
     public abstract int getLoopCount();
