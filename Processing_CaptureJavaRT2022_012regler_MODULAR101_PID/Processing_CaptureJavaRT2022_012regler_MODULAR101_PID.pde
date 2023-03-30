@@ -17,7 +17,7 @@ import java.awt.Point;
 
 //Herausgezogene wichtige Parameter des Systems
 boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = true;
-float VORTRIEB = 0.73;
+float VORTRIEB = 0.74;
 float ASYMMETRIE =0.9855; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 // float ASYMMETRIE = 1.01; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 
@@ -45,8 +45,8 @@ float ASYMMETRIE =0.9855; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHT
 String NACHRICHT = "";
 //String TEMPERATUR = "";
 //String IP = "192.168.137.92";
-//String IP = "192.168.178.70";
-String IP = "192.168.178.66";
+String IP = "192.168.178.70";
+//String IP = "192.168.178.66";
 int PORT = 6000;
 
 double antriebMultiplier = 1.0;
@@ -122,7 +122,7 @@ void setup() {
     motorControl.register(ballDetection,2);
     motorControl.register(goalDetection,3);
     
-    algo = new Algo(goalDetection, ballDetection);
+    algo = new Algo(lineDetection, goalDetection, ballDetection);
     // algo = new Algo(goalDetection);
     algo.startALL();
 }

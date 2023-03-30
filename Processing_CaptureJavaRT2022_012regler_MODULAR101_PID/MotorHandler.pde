@@ -54,7 +54,7 @@ class ReverseHandler extends MotorHandler {
     
     @Override
     public void execute() {
-        antrieb.fahrt( -0.8, -0.8);
+        antrieb.fahrt( -VORTRIEB, -VORTRIEB);
     }
     
     public String getHandlerName() {
@@ -114,7 +114,7 @@ class TurnHandler extends MotorHandler {
     
     @Override
     public void execute() {
-        antrieb.fahrt(0, 0.8);
+        antrieb.fahrt(0, VORTRIEB);
     }
     
     public String getHandlerName() {
