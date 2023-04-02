@@ -38,8 +38,10 @@ class TaskArray<E extends ITask> extends ArrayList<E> {
                     return;
                 }
                 
+                else 
+                    return;
                 // should be unreachable
-                throw new RuntimeException("Cannot update task. Check implementation");
+                //throw new RuntimeException("Cannot update task. Check implementation");
                 
             }
         }

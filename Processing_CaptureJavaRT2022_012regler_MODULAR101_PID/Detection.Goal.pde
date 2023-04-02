@@ -65,7 +65,7 @@ public class GoalDetection extends DetectionThread{
 
             if (isBboxAvailable != null && numNullBboxes > 2) {
 
-                if(bboxArea > 10000.0){
+                if(bboxArea > 12000.0){
                     isGoalWithinROI = true;
                     motorControl.notify(this,motorControl.StopForGoal());
                     motorControl.disableGoalNoti();

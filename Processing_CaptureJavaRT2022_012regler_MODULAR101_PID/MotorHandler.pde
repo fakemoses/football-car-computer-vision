@@ -76,18 +76,12 @@ class ForwardHandler extends MotorHandler {
     
     @Override
     public void execute() {
-        // rechts = 0.2f * direction + 0.8f;
-        // links = -0.2f * direction + 0.8f;
         if (direction > 0.2) {
-            rechts = VORTRIEB + (mult * direction);
-            links = VORTRIEB - (mult * direction);
-            // rechts = 0.8f;
-            // links = 0.6f;
+            rechts = VORTRIEB - (mult * direction);
+            links = VORTRIEB + (mult * direction);
         } else if (direction < - 0.2) {
-            rechts = VORTRIEB - (mult * abs(direction));
-            links = VORTRIEB + (mult * abs(direction));
-            // rechts = 0.5f;
-            // links = 0.8f;
+            rechts = VORTRIEB + (mult * abs(direction));
+            links = VORTRIEB - (mult * abs(direction));
         } else {
             rechts = VORTRIEB;
             links = VORTRIEB;
@@ -107,6 +101,8 @@ class ForwardHandler extends MotorHandler {
 
 
 class TurnHandler extends MotorHandler {
+
+    boolean executed = false;
     
     TurnHandler(Antrieb antrieb) {
         super(antrieb, HandlerPriority.PRIORITY_LOW);
@@ -114,7 +110,11 @@ class TurnHandler extends MotorHandler {
     
     @Override
     public void execute() {
-        antrieb.fahrt(0, VORTRIEB);
+        if (!executed) {
+            antrieb.fahrt(0, VORTRIEB);
+            executed = true;
+        }  
+        antrieb.fahrt(0, VORTRIEB * 0.91f);
     }
     
     public String getHandlerName() {

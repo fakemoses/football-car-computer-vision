@@ -24,6 +24,10 @@
 const char* ssid = "PinnutNet 2.4 Ghz"; //Smartphone Pixel
 const char* password = "ikanbilismasaklemakff12";
 
+unsigned long previousMillis = 0;
+unsigned long interval = 1000; // every n second check
+
+
 AsyncUDP udp;
 
 #define BLAU  13
@@ -35,16 +39,16 @@ AsyncUDP udp;
 
 void startCameraServer();
 
-/* 
- *  https://circuits4you.com
- *  ESP32 Internal Temperature Sensor Example
- */
+/*
+    https://circuits4you.com
+    ESP32 Internal Temperature Sensor Example
+*/
 
- #ifdef __cplusplus
-  extern "C" {
- #endif
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-  uint8_t temprature_sens_read();
+uint8_t temprature_sens_read();
 
 #ifdef __cplusplus
 }
@@ -52,26 +56,26 @@ void startCameraServer();
 
 uint8_t temprature_sens_read();
 
-void setup() 
+void setup()
 {
-   //RGB LEDs:
-   ledcAttachPin(BLAU, 1);   // 13 BLAU
-   ledcAttachPin(LINKS, 2);  // 15 ROT == LINKS
-   ledcAttachPin(RECHTS, 3); // 14 GRÜN == RECHTS
+  //RGB LEDs:
+  ledcAttachPin(BLAU, 1);   // 13 BLAU
+  ledcAttachPin(LINKS, 2);  // 15 ROT == LINKS
+  ledcAttachPin(RECHTS, 3); // 14 GRÜN == RECHTS
 
-   ledcSetup(1, 12000, 8); // 12 kHz PWM, 8-bit resolution
-   ledcSetup(2, 12000, 8);
-   ledcSetup(3, 12000, 8);
+  ledcSetup(1, 12000, 8); // 12 kHz PWM, 8-bit resolution
+  ledcSetup(2, 12000, 8);
+  ledcSetup(3, 12000, 8);
 
-   pinMode(AUSGANG1, OUTPUT); 
-   pinMode(AUSGANG2, OUTPUT);
-   pinMode(AUSGANG3, OUTPUT);  //Kameralampe
+  pinMode(AUSGANG1, OUTPUT);
+  pinMode(AUSGANG2, OUTPUT);
+  pinMode(AUSGANG3, OUTPUT);  //Kameralampe
 
-   digitalWrite(AUSGANG1, LOW);
-   digitalWrite(AUSGANG2, LOW);
-   digitalWrite(AUSGANG3, LOW);
+  digitalWrite(AUSGANG1, LOW);
+  digitalWrite(AUSGANG2, LOW);
+  digitalWrite(AUSGANG3, LOW);
 
-  
+
   Serial.begin(115200);
   Serial.setDebugOutput(true);
   Serial.println();
@@ -97,10 +101,10 @@ void setup()
   config.pin_reset = RESET_GPIO_NUM;
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_JPEG;
-  
+
   // if PSRAM IC present, init with UXGA resolution and higher JPEG quality
   //                      for larger pre-allocated frame buffer.
-  if(psramFound()){
+  if (psramFound()) {
     config.frame_size = FRAMESIZE_UXGA;
     config.jpeg_quality = 10;
     config.fb_count = 2;
@@ -153,82 +157,91 @@ void setup()
   Serial.println("' to connect");
 }
 
-void loop() 
+void loop()
 {
+
+  //check for wifi connectivity
+  unsigned long currentMillis = millis();
+  // if WiFi is down, try reconnecting
+  if ((WiFi.status() != WL_CONNECTED) && (currentMillis - previousMillis >= interval)) {
+    WiFi.disconnect();
+    WiFi.reconnect();
+    previousMillis = currentMillis;
+  }
 
   // put your main code here, to run repeatedly:
   //delay(10);
-    if(udp.listen(6000)) 
+  if (udp.listen(6000))
+  {
+
+    //Serial.print("UDP Listening on IP: ");
+    //Serial.println(WiFi.localIP());
+    udp.onPacket([](AsyncUDPPacket packet)
     {
-      
-        //Serial.print("UDP Listening on IP: ");
-        //Serial.println(WiFi.localIP());
-        udp.onPacket([](AsyncUDPPacket packet) 
-        {
-            /*
-            Serial.print("UDP Packet Type: ");
-            Serial.print(packet.isBroadcast()?"Broadcast":packet.isMulticast()?"Multicast":"Unicast");
-            Serial.print(", From: ");
-            Serial.print(packet.remoteIP());
-            Serial.print(":");
-            Serial.print(packet.remotePort());
-            Serial.print(", To: ");
-            Serial.print(packet.localIP());
-            Serial.print(":");
-            Serial.print(packet.localPort());
-            Serial.print(", Length: ");
-            Serial.print(packet.length());
-            Serial.print(", Data: ");
-            */
-            Serial.write(packet.data(), packet.length());            
-            Serial.println();
+      /*
+        Serial.print("UDP Packet Type: ");
+        Serial.print(packet.isBroadcast()?"Broadcast":packet.isMulticast()?"Multicast":"Unicast");
+        Serial.print(", From: ");
+        Serial.print(packet.remoteIP());
+        Serial.print(":");
+        Serial.print(packet.remotePort());
+        Serial.print(", To: ");
+        Serial.print(packet.localIP());
+        Serial.print(":");
+        Serial.print(packet.localPort());
+        Serial.print(", Length: ");
+        Serial.print(packet.length());
+        Serial.print(", Data: ");
+      */
+      Serial.write(packet.data(), packet.length());
+      Serial.println();
 
-            uint8_t *mat = packet.data();
-            if(packet.length()>=4 && mat[0]=='L')
-            {
-                ledcWrite(2, (mat[1]-48)*100 + ((mat[2]-48)*10) + (mat[3]-48));
-            }
-            else if(packet.length()>=4 && mat[0]=='R')
-            {
-                ledcWrite(3, (mat[1]-48)*100 + ((mat[2]-48)*10) + (mat[3]-48));
-            }
-            else if(packet.length()>=4 && mat[0]=='A' && mat[1]=='1')
-            {
-                digitalWrite(AUSGANG1, HIGH);
-            }
-            else if(packet.length()>=4 && mat[0]=='B' && mat[1]=='1')
-            {
-                digitalWrite(AUSGANG2, HIGH);
-            }
-            else if(packet.length()>=4 && mat[0]=='C' && mat[1]=='1')
-            {
-                digitalWrite(AUSGANG3, HIGH);
-            }
-            else if(packet.length()>=4 && mat[0]=='A' && mat[1]=='0')
-            {
-                digitalWrite(AUSGANG1, LOW);
-            }
-            else if(packet.length()>=4 && mat[0]=='B' && mat[1]=='0')
-            {
-                digitalWrite(AUSGANG2, LOW);
-            }
-            else if(packet.length()>=4 && mat[0]=='C' && mat[1]=='0')
-            {
-                digitalWrite(AUSGANG3, LOW);
-            }
-            
-            //reply to the client
-            //packet.printf("Got %u bytes of data", packet.length());
+      uint8_t *mat = packet.data();
+      if (packet.length() >= 4 && mat[0] == 'L')
+      {
+        ledcWrite(2, (mat[1] - 48) * 100 + ((mat[2] - 48) * 10) + (mat[3] - 48));
+      }
+      else if (packet.length() >= 4 && mat[0] == 'R')
+      {
+        ledcWrite(3, (mat[1] - 48) * 100 + ((mat[2] - 48) * 10) + (mat[3] - 48));
+      }
+      else if (packet.length() >= 4 && mat[0] == 'A' && mat[1] == '1')
+      {
+        digitalWrite(AUSGANG1, HIGH);
+      }
+      else if (packet.length() >= 4 && mat[0] == 'B' && mat[1] == '1')
+      {
+        digitalWrite(AUSGANG2, HIGH);
+      }
+      else if (packet.length() >= 4 && mat[0] == 'C' && mat[1] == '1')
+      {
+        digitalWrite(AUSGANG3, HIGH);
+      }
+      else if (packet.length() >= 4 && mat[0] == 'A' && mat[1] == '0')
+      {
+        digitalWrite(AUSGANG1, LOW);
+      }
+      else if (packet.length() >= 4 && mat[0] == 'B' && mat[1] == '0')
+      {
+        digitalWrite(AUSGANG2, LOW);
+      }
+      else if (packet.length() >= 4 && mat[0] == 'C' && mat[1] == '0')
+      {
+        digitalWrite(AUSGANG3, LOW);
+      }
 
-             Serial.print("Temperature: ");
-  
-             // Convert raw temperature in F to Celsius degrees
-             Serial.print((temprature_sens_read() - 32) / 1.8);
-             Serial.println(" C");
+      //reply to the client
+      //packet.printf("Got %u bytes of data", packet.length());
 
-             //Temperatur zurück geben:
-             packet.printf("T%f", ((temprature_sens_read() - 32) / 1.8));
-        });
-    }
-    
+      Serial.print("Temperature: ");
+
+      // Convert raw temperature in F to Celsius degrees
+      Serial.print((temprature_sens_read() - 32) / 1.8);
+      Serial.println(" C");
+
+      //Temperatur zurück geben:
+      packet.printf("T%f", ((temprature_sens_read() - 32) / 1.8));
+    });
+  }
+
 }

@@ -4,6 +4,7 @@ public class MotorControl implements Mediator {
     private TaskArray<Task> tasks;
     private boolean isBall = false;
     private boolean isGoal = false;
+    private boolean isTurn = false;
     
     public MotorControl(Antrieb antrieb) {
         this.antrieb = antrieb;
@@ -15,10 +16,16 @@ public class MotorControl implements Mediator {
     }
     
     public ForwardHandler Forward(float d) {
+        if(isTurn && (d > 0.85 || d < -0.85)) {
+            isTurn = false;
+            float limit = d * 0.8f;
+            return new ForwardHandler(antrieb, limit);
+        }
         return new ForwardHandler(antrieb, d);
     }  
     
     public TurnHandler Turn() {
+        isTurn = true;
         return new TurnHandler(antrieb);
     }   
     
