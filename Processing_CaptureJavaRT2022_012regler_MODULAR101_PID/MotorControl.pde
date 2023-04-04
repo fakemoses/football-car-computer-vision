@@ -11,26 +11,33 @@ public class MotorControl implements Mediator {
         tasks = new TaskArray();
     }
     
-    public ReverseHandler Reverse() {
-        return new ReverseHandler(antrieb);
+    public ReverseHandler[] Reverse(int loop) {
+        ReverseHandler[] returnHandler = new ReverseHandler[loop];
+        Arrays.fill(returnHandler, new ReverseHandler(antrieb));
+        return returnHandler;
     }
     
-    public ForwardHandler Forward(float d) {
-        if(isTurn && (d > 0.85 || d < -0.85)) {
+    public ForwardHandler[] Forward(int loop, float d) {
+        ForwardHandler[] returnHandler = new ForwardHandler[loop];
+        if (isTurn && (d > 0.85 || d < - 0.85)) {
             isTurn = false;
-            float limit = d * 0.8f;
-            return new ForwardHandler(antrieb, limit);
+            d *= 0.8f;
         }
-        return new ForwardHandler(antrieb, d);
+        Arrays.fill(returnHandler, new ForwardHandler(antrieb, d));
+        return returnHandler;
     }  
     
-    public TurnHandler Turn() {
+    public TurnHandler[] Turn(int loop) {
+        TurnHandler[] returnHandler = new TurnHandler[loop];
         isTurn = true;
-        return new TurnHandler(antrieb);
+        Arrays.fill(returnHandler, new TurnHandler(antrieb));
+        return returnHandler;
     }   
     
-    public StopForGoalHandler StopForGoal() {
-        return new StopForGoalHandler(antrieb);
+    public StopForGoalHandler[] StopForGoal(int loop) {
+        StopForGoalHandler[] returnHandler = new StopForGoalHandler[loop];
+        Arrays.fill(returnHandler, new StopForGoalHandler(antrieb));
+        return returnHandler;
     }
     
     public void start() {
@@ -84,8 +91,16 @@ public class MotorControl implements Mediator {
         Collections.sort(tasks);
     }
     
+    private MotorHandler[] flatten(MotorHandler[]...handlers) {
+        return Arrays.stream(handlers)
+           .flatMap(row -> Arrays.stream(row))
+           .toArray(MotorHandler[] ::  new);
+    }
+    
     @Override
-    public void notify(DetectionThread sender, MotorHandler handler, int loopCount) {
+    public void notify(DetectionThread sender, HandlerPriority handlerPriority, MotorHandler[]...handler) {
+        
+        //TODO Refractor
         if ((isGoal)) {
             return;
         }
@@ -93,12 +108,7 @@ public class MotorControl implements Mediator {
             return;
         }
         
-        tasks.updateTask(sender, handler, loopCount);
-    }
-    
-    @Override
-    public void notify(DetectionThread sender, MotorHandler handler) {
-        notify(sender, handler, 1);
+        tasks.updateTask(sender, handlerPriority, flatten(handler));
     }
     
     public void run() {

@@ -7,17 +7,20 @@ public interface IDetectionThread {
 }
 
 interface Mediator {
-    public abstract void notify(DetectionThread sender, MotorHandler handler, int loopCount);
-    public abstract void notify(DetectionThread sender, MotorHandler handler);
+    public abstract void notify(DetectionThread sender, HandlerPriority handlerPriority, MotorHandler[]...handler);
 }
 
-interface ITask{
-    public abstract void setLoopCount(int count);
-    public abstract int getLoopCount();
-    
+interface ITask{  
     public abstract DetectionThread getInstance();
-    public abstract MotorHandler getHandler();
-    public abstract void setHandler(MotorHandler handler);
+    
+    public abstract MotorHandler[] getHandler();
+    public abstract MotorHandler getFrontHandler();
+    public abstract void setHandler(MotorHandler...handlers);
+    public abstract int getHandlerSize();
+    public abstract boolean isQueueEmpty();
+    
+    public abstract HandlerPriority getHandlerPriority();
+    public abstract void setHandlerPriority(HandlerPriority handlerPriority);
     
     public abstract void loop();
     public abstract void execute();

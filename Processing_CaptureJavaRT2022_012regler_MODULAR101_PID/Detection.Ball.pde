@@ -6,7 +6,7 @@ public class BallDetection extends DetectionThread {
     private boolean isFull;
     
     Detector<Rectangle> objectDetector;
-    Comm comm ;
+    Comm comm;
     
     private final int MIN_WIDTH = 10;
     private final int MIN_HEIGHT = 10;
@@ -55,13 +55,13 @@ public class BallDetection extends DetectionThread {
             updateBbox(boundingBox);
             int numNullBboxes = 0;
             Rectangle isBboxAvailable = boundingBox;
-            for (int i = previousBoundingBoxes.length-1; i >= 0; i--) {
+            for (int i = previousBoundingBoxes.length - 1; i >= 0; i--) {
                 if (previousBoundingBoxes[i] != null) {
                     numNullBboxes++;
                 }
             }
-
-            for (int i = previousBoundingBoxes.length-1; i >= 0; i--) {
+            
+            for (int i = previousBoundingBoxes.length - 1; i >= 0; i--) {
                 if (previousBoundingBoxes[i] != null) {
                     isBboxAvailable = previousBoundingBoxes[i];
                     break;
@@ -76,12 +76,12 @@ public class BallDetection extends DetectionThread {
                 } else {
                     isBallWithinROI = false;
                     motorControl.enableBallNoti();
-                    motorControl.notify(this,motorControl.Forward((toMotorSignalLinear((int)isBboxAvailable.getCenterX()))),2);
+                    motorControl.notify(this, HandlerPriority.PRIORITY_MEDIUM, motorControl.Forward(2,toMotorSignalLinear((int)isBboxAvailable.getCenterX())));
                 }
                 //delay(70);
                 continue;
             } else { 
-               motorControl.notify(this,motorControl.Turn());
+                motorControl.notify(this, HandlerPriority.PRIORITY_LOW,motorControl.Turn(1));
             }
             delay(40);
         }
@@ -145,7 +145,7 @@ public class BallDetection extends DetectionThread {
     public boolean isBallWithinROI() {
         return isBallWithinROI;
     }
-
+    
     public void updateBbox(Rectangle value) {
         if (!isFull) {
             // Array is not full, so simply add new value to next available slot
@@ -156,13 +156,13 @@ public class BallDetection extends DetectionThread {
                 }
             }
             // Check if array is now full
-            isFull = (previousBoundingBoxes[previousBoundingBoxes.length-1] != null);
+            isFull = (previousBoundingBoxes[previousBoundingBoxes.length - 1] != null);
         } else {
             // Shift all values down one slot
-            for (int i = 0; i < previousBoundingBoxes.length-1; i++) {
-                previousBoundingBoxes[i] = previousBoundingBoxes[i+1];
+            for (int i = 0; i < previousBoundingBoxes.length - 1; i++) {
+                previousBoundingBoxes[i] = previousBoundingBoxes[i + 1];
             }
-            previousBoundingBoxes[previousBoundingBoxes.length-1] = value;
+            previousBoundingBoxes[previousBoundingBoxes.length - 1] = value;
         }
     }
     

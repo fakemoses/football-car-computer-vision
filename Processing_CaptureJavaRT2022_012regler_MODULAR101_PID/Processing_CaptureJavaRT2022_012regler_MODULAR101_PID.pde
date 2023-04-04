@@ -9,6 +9,8 @@ import java.awt.Frame;
 import java.util.Collections;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -18,7 +20,7 @@ import java.awt.Point;
 //Herausgezogene wichtige Parameter des Systems
 boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = false;
 float VORTRIEB = 0.73;
-float ASYMMETRIE =0.99; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
+float ASYMMETRIE = 0.99; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 // float ASYMMETRIE = 1.01; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 
 //VERSION FÜR TP-Link_59C2
@@ -122,7 +124,7 @@ void setup() {
     motorControl.register(ballDetection,2);
     motorControl.register(goalDetection,3);
     
-    algo = new Algo( ballDetection);
+    algo = new Algo(ballDetection);
     // algo = new Algo(goalDetection);
     algo.startALL();
 }
