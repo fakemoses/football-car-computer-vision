@@ -84,17 +84,20 @@ class ForwardHandler extends MotorHandler {
     @Override
     public void execute() {
         if (direction > 0.2) {
-            rechts = motorPower*(VORTRIEB - (mult * direction));
-            links = motorPower*(VORTRIEB + (mult * direction));
+            rechts = motorPower*(VORTRIEB + (mult * direction));
+            links = motorPower*(VORTRIEB - (mult * direction));
         } else if (direction < - 0.2) {
-            rechts = motorPower*(VORTRIEB + (mult * abs(direction)));
-            links = motorPower*(VORTRIEB - (mult * abs(direction)));
+            rechts = motorPower*(VORTRIEB - (mult * abs(direction)));
+            links = motorPower*(VORTRIEB + (mult * abs(direction)));
         } else {
             rechts = VORTRIEB;
             links = VORTRIEB;
         }
         
-        println("direction: " + direction + "  links: " + links + " rechts: " + rechts + " Motor Power: " + motorPower);
+        if(TAUSCHE_ANTRIEB_LINKS_RECHTS)
+            println("direction: " + direction + "  links: " + rechts + " rechts: " + links + " Motor Power: " + motorPower);
+        else
+            println("direction: " + direction + "  links: " + links + " rechts: " + rechts + " Motor Power: " + motorPower);
         rechts *= (2.0 - ASYMMETRIE);
         links *= ASYMMETRIE;
         

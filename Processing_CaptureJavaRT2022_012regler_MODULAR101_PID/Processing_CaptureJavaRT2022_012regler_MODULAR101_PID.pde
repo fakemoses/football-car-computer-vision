@@ -16,7 +16,7 @@ import java.awt.Shape;
 import java.awt.Point;
 
 //Herausgezogene wichtige Parameter des Systems
-boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = false;
+boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = true;
 float VORTRIEB = 0.72;
 float ASYMMETRIE =0.95; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 // float ASYMMETRIE = 1.01; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER

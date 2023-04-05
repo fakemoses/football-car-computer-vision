@@ -42,7 +42,7 @@ public class BallDetection extends DetectionThread {
         int w = (int)(End.x - Start.x);
         int h = (int)(End.y - Start.y);
         this.roi = new Rectangle((int) Start.x,(int) Start.y, w, h);
-        this.previousBoundingBoxes = new Rectangle[15];
+        this.previousBoundingBoxes = new Rectangle[60];
         this.isFull = false;
     }
     
