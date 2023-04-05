@@ -19,7 +19,8 @@ public class GoalDetection extends DetectionThread{
     Rectangle roi;
 
     private boolean isGoalWithinROI = false;
-    
+    private float motorPower = 1.0f;
+
     public GoalDetection(MotorControl motorControl, ColorFilter colorFilter, Detector<Rectangle> objectDetector) {
         super(motorControl, colorFilter);
         this.objectDetector = objectDetector;
@@ -71,7 +72,7 @@ public class GoalDetection extends DetectionThread{
                     motorControl.disableGoalNoti();
                 }else{
                     isGoalWithinROI = false;
-                    motorControl.notify(this,motorControl.Forward((toMotorSignalLinear((int)isBboxAvailable.getCenterX()))));
+                    motorControl.notify(this,motorControl.Forward((toMotorSignalLinear((int)isBboxAvailable.getCenterX())),motorPower));
                     // motorControl.enableGoalNoti();
                 }
                 continue;

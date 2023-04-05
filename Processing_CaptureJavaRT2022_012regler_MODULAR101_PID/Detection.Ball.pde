@@ -4,6 +4,7 @@ public class BallDetection extends DetectionThread {
     private Rectangle boundingBox;
     private Rectangle[] previousBoundingBoxes;
     private boolean isFull;
+    private boolean isTurn = false;
     
     Detector<Rectangle> objectDetector;
     Comm comm ;
@@ -26,6 +27,12 @@ public class BallDetection extends DetectionThread {
     private boolean isBallWithinROI = false;
     private float IDEAL_RATIO = 0.85f;
     private final float IDEAL_RATIO_TOLERANCE = 0.25f;
+
+    private long startTime = System.currentTimeMillis();
+    private long endTime = 0;
+    private long duration = 0;
+    private float motorPower = 1.0f;
+
     
     
     public BallDetection(MotorControl motorControl , ColorFilter colorFilter, Detector<Rectangle> objectDetector, Comm comm) {
@@ -35,7 +42,7 @@ public class BallDetection extends DetectionThread {
         int w = (int)(End.x - Start.x);
         int h = (int)(End.y - Start.y);
         this.roi = new Rectangle((int) Start.x,(int) Start.y, w, h);
-        this.previousBoundingBoxes = new Rectangle[5];
+        this.previousBoundingBoxes = new Rectangle[15];
         this.isFull = false;
     }
     
@@ -69,19 +76,33 @@ public class BallDetection extends DetectionThread {
             }
             
             if (isBboxAvailable != null && numNullBboxes > 2) {
-                // println("BBox: " + isBboxAvailable.getX() + " " + isBboxAvailable.getY() + " " + isBboxAvailable.getWidth() + " " + isBboxAvailable.getHeight());
                 if (roi.contains(isBboxAvailable.getCenterX(), isBboxAvailable.getCenterY())) {
                     isBallWithinROI = true;
                     motorControl.disableBallNoti();
                 } else {
                     isBallWithinROI = false;
+                    float motorSignal = toMotorSignalLinear((int)isBboxAvailable.getCenterX());
+                    endTime = System.currentTimeMillis();
+                    if (isTurn && (endTime - startTime) < 1000){
+                        motorPower = 0.0f;
+                    } else if(isTurn && (endTime - startTime) > 1000 && (endTime - startTime) < 2000){
+                        if(motorSignal > 0.6 || motorSignal < -0.6){
+                            motorPower = 0.7f;           
+                        }
+                    }
+                    else{
+                        isTurn = false;
+                        motorPower = 1.0f;
+                    }
                     motorControl.enableBallNoti();
-                    motorControl.notify(this,motorControl.Forward((toMotorSignalLinear((int)isBboxAvailable.getCenterX()))),2);
+                    motorControl.notify(this,motorControl.Forward(motorSignal, motorPower),2);
                 }
                 //delay(70);
                 continue;
             } else { 
-               motorControl.notify(this,motorControl.Turn());
+                isTurn = true;
+                startTime = System.currentTimeMillis();
+                motorControl.notify(this,motorControl.Turn());  
             }
             delay(40);
         }

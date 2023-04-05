@@ -3,7 +3,7 @@ public enum HSVColorRange{
         RED2(new HSVRange(170, 180, 100, 255, 100, 255)),
         YELLOW(new HSVRange(25, 35, 50, 255, 70, 255)),
         GREEN(new HSVRange(36, 86, 35, 255, 70, 255)),
-        BLUE(new HSVRange(90, 128, 100, 255, 70, 255));
+        BLUE(new HSVRange(90, 128, 95, 255, 70, 255));
     
     private HSVRange hsvRange;
     

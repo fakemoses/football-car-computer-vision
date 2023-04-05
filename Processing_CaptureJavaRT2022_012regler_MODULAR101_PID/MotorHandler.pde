@@ -67,27 +67,34 @@ class ForwardHandler extends MotorHandler {
     float direction;
     float links;
     float rechts;
-    float mult = 0.20;
+    float mult = 0.2f;
+    float motorPower;
     
-    ForwardHandler(Antrieb antrieb, float d) {
+    // ForwardHandler(Antrieb antrieb, float d) {
+    //     super(antrieb, HandlerPriority.PRIORITY_MEDIUM);
+    //     this.direction = d;
+    // }
+
+    ForwardHandler(Antrieb antrieb, float d, float motorPower) {
         super(antrieb, HandlerPriority.PRIORITY_MEDIUM);
         this.direction = d;
+        this.motorPower = motorPower;
     }
     
     @Override
     public void execute() {
         if (direction > 0.2) {
-            rechts = VORTRIEB - (mult * direction);
-            links = VORTRIEB + (mult * direction);
+            rechts = motorPower*(VORTRIEB - (mult * direction));
+            links = motorPower*(VORTRIEB + (mult * direction));
         } else if (direction < - 0.2) {
-            rechts = VORTRIEB + (mult * abs(direction));
-            links = VORTRIEB - (mult * abs(direction));
+            rechts = motorPower*(VORTRIEB + (mult * abs(direction)));
+            links = motorPower*(VORTRIEB - (mult * abs(direction)));
         } else {
             rechts = VORTRIEB;
             links = VORTRIEB;
         }
         
-        println("direction: " + direction + "  links: " + links + " rechts: " + rechts);
+        println("direction: " + direction + "  links: " + links + " rechts: " + rechts + " Motor Power: " + motorPower);
         rechts *= (2.0 - ASYMMETRIE);
         links *= ASYMMETRIE;
         
@@ -114,7 +121,7 @@ class TurnHandler extends MotorHandler {
             antrieb.fahrt(0, VORTRIEB);
             executed = true;
         }  
-        antrieb.fahrt(0, VORTRIEB * 0.91f);
+        antrieb.fahrt(0, VORTRIEB * 0.92f);
     }
     
     public String getHandlerName() {
