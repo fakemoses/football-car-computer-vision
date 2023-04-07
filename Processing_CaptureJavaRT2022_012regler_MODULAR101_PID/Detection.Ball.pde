@@ -7,7 +7,7 @@ public class BallDetection extends DetectionThread {
     private boolean isTurn = false;
     
     Detector<Rectangle> objectDetector;
-    Comm comm ;
+    Comm comm;
     
     private final int MIN_WIDTH = 10;
     private final int MIN_HEIGHT = 10;
@@ -27,12 +27,12 @@ public class BallDetection extends DetectionThread {
     private boolean isBallWithinROI = false;
     private float IDEAL_RATIO = 0.85f;
     private final float IDEAL_RATIO_TOLERANCE = 0.25f;
-
+    
     private long startTime = System.currentTimeMillis();
     private long endTime = 0;
     private long duration = 0;
     private float motorPower = 1.0f;
-
+    
     
     
     public BallDetection(MotorControl motorControl , ColorFilter colorFilter, Detector<Rectangle> objectDetector, Comm comm) {
@@ -62,13 +62,13 @@ public class BallDetection extends DetectionThread {
             updateBbox(boundingBox);
             int numNullBboxes = 0;
             Rectangle isBboxAvailable = boundingBox;
-            for (int i = previousBoundingBoxes.length-1; i >= 0; i--) {
+            for (int i = previousBoundingBoxes.length - 1; i >= 0; i--) {
                 if (previousBoundingBoxes[i] != null) {
                     numNullBboxes++;
                 }
             }
-
-            for (int i = previousBoundingBoxes.length-1; i >= 0; i--) {
+            
+            for (int i = previousBoundingBoxes.length - 1; i >= 0; i--) {
                 if (previousBoundingBoxes[i] != null) {
                     isBboxAvailable = previousBoundingBoxes[i];
                     break;
@@ -83,10 +83,10 @@ public class BallDetection extends DetectionThread {
                     isBallWithinROI = false;
                     float motorSignal = toMotorSignalLinear((int)isBboxAvailable.getCenterX());
                     endTime = System.currentTimeMillis();
-                    if (isTurn && (endTime - startTime) < 1000){
+                    if (isTurn && (endTime - startTime) < 1000) {
                         motorPower = 0.0f;
-                    } else if(isTurn && (endTime - startTime) > 1000 && (endTime - startTime) < 2000){
-                        if(motorSignal > 0.6 || motorSignal < -0.6){
+                    } else if (isTurn && (endTime - startTime) > 1000 && (endTime - startTime) < 2000) {
+                        if (motorSignal > 0.6 || motorSignal < - 0.6) {
                             motorPower = 0.7f;           
                         }
                     }
@@ -96,13 +96,14 @@ public class BallDetection extends DetectionThread {
                     }
                     motorControl.enableBallNoti();
                     motorControl.notify(this,motorControl.Forward(motorSignal, motorPower),2);
+                    motorControl.notify(this, HandlerPriority.PRIORITY_MEDIUM, motorControl.Forward(2,toMotorSignalLinear((int)isBboxAvailable.getCenterX())));
                 }
                 //delay(70);
                 continue;
             } else { 
                 isTurn = true;
                 startTime = System.currentTimeMillis();
-                motorControl.notify(this,motorControl.Turn());  
+                motorControl.notify(this, HandlerPriority.PRIORITY_LOW,motorControl.Turn(1));  
             }
             delay(40);
         }
@@ -166,7 +167,7 @@ public class BallDetection extends DetectionThread {
     public boolean isBallWithinROI() {
         return isBallWithinROI;
     }
-
+    
     public void updateBbox(Rectangle value) {
         if (!isFull) {
             // Array is not full, so simply add new value to next available slot
@@ -177,13 +178,13 @@ public class BallDetection extends DetectionThread {
                 }
             }
             // Check if array is now full
-            isFull = (previousBoundingBoxes[previousBoundingBoxes.length-1] != null);
+            isFull = (previousBoundingBoxes[previousBoundingBoxes.length - 1] != null);
         } else {
             // Shift all values down one slot
-            for (int i = 0; i < previousBoundingBoxes.length-1; i++) {
-                previousBoundingBoxes[i] = previousBoundingBoxes[i+1];
+            for (int i = 0; i < previousBoundingBoxes.length - 1; i++) {
+                previousBoundingBoxes[i] = previousBoundingBoxes[i + 1];
             }
-            previousBoundingBoxes[previousBoundingBoxes.length-1] = value;
+            previousBoundingBoxes[previousBoundingBoxes.length - 1] = value;
         }
     }
     

@@ -32,7 +32,7 @@ public class LineDetection extends DetectionThread{
             detectedLine = detectedLinesArray == null ? null : detectedLinesArray.get(0);
             if (boundary.isHelpNeeded(detectedLine)) {
                 // println("Help needed");
-                motorControl.notify(this, motorControl.Reverse(), 5);
+                motorControl.notify(this, HandlerPriority.PRIORITY_HIGH, motorControl.Reverse(5));
             }
             delay(50);
         }

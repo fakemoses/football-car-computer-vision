@@ -13,18 +13,18 @@ public class GoalDetection extends DetectionThread{
     
     private final color boxColor = color(0, 255, 0);
     private final int boxThickness = 2;
-
+    
     PVector Start = new PVector(40, 120);
     PVector End = new PVector(299, 160);
     Rectangle roi;
-
+    
     private boolean isGoalWithinROI = false;
     private float motorPower = 1.0f;
-
+    
     public GoalDetection(MotorControl motorControl, ColorFilter colorFilter, Detector<Rectangle> objectDetector) {
         super(motorControl, colorFilter);
         this.objectDetector = objectDetector;
-
+        
         int w = (int)(End.x - Start.x);
         int h = (int)(End.y - Start.y);
         this.roi = new Rectangle((int) Start.x,(int) Start.y, w, h);
@@ -49,35 +49,35 @@ public class GoalDetection extends DetectionThread{
             int numNullBboxes = 0;
             Rectangle isBboxAvailable = boundingBox;
             double bboxArea = 0.0;
-            for (int i = previousBoundingBoxes.length-1; i >= 0; i--) {
+            for (int i = previousBoundingBoxes.length - 1; i >= 0; i--) {
                 if (previousBoundingBoxes[i] != null) {
                     bboxArea += previousBoundingBoxes[i].getWidth() * previousBoundingBoxes[i].getHeight();	
                     numNullBboxes++;
                 }
             }
             bboxArea = bboxArea / numNullBboxes;
-
-            for (int i = previousBoundingBoxes.length-1; i >= 0; i--) {
+            
+            for (int i = previousBoundingBoxes.length - 1; i >= 0; i--) {
                 if (previousBoundingBoxes[i] != null) {
                     isBboxAvailable = previousBoundingBoxes[i];
                     break;
                 }
             }
-
+            
             if (isBboxAvailable != null && numNullBboxes > 2) {
-
-                if(bboxArea > 12000.0){
+                
+                if (bboxArea > 12000.0) {
                     isGoalWithinROI = true;
-                    motorControl.notify(this,motorControl.StopForGoal());
+                    motorControl.notify(this, HandlerPriority.PRIORITY_HIGH, motorControl.StopForGoal(1));
                     motorControl.disableGoalNoti();
-                }else{
+                } else{
                     isGoalWithinROI = false;
-                    motorControl.notify(this,motorControl.Forward((toMotorSignalLinear((int)isBboxAvailable.getCenterX())),motorPower));
+                    motorControl.notify(this, HandlerPriority.PRIORITY_MEDIUM ,motorControl.Forward(1,(toMotorSignalLinear((int)isBboxAvailable.getCenterX())),motorPower));
                     // motorControl.enableGoalNoti();
                 }
                 continue;
-            } else{
-                motorControl.notify(this,motorControl.Turn());
+            } else {
+                motorControl.notify(this, HandlerPriority.PRIORITY_LOW, motorControl.Turn(1));
             }
             delay(50);
         }
@@ -120,7 +120,7 @@ public class GoalDetection extends DetectionThread{
         int MAXWIDTH = 320; // todo: set variable 
         return(float)(xCenter - (MAXWIDTH / 2)) / (MAXWIDTH / 2);
     }
-
+    
     public void updateBbox(Rectangle value) {
         if (!isFull) {
             // Array is not full, so simply add new value to next available slot
@@ -131,13 +131,13 @@ public class GoalDetection extends DetectionThread{
                 }
             }
             // Check if array is now full
-            isFull = (previousBoundingBoxes[previousBoundingBoxes.length-1] != null);
+            isFull = (previousBoundingBoxes[previousBoundingBoxes.length - 1] != null);
         } else {
             // Shift all values down one slot
-            for (int i = 0; i < previousBoundingBoxes.length-1; i++) {
-                previousBoundingBoxes[i] = previousBoundingBoxes[i+1];
+            for (int i = 0; i < previousBoundingBoxes.length - 1; i++) {
+                previousBoundingBoxes[i] = previousBoundingBoxes[i + 1];
             }
-            previousBoundingBoxes[previousBoundingBoxes.length-1] = value;
+            previousBoundingBoxes[previousBoundingBoxes.length - 1] = value;
         }
     }
 }

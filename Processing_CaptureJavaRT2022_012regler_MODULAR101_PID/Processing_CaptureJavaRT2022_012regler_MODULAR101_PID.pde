@@ -9,6 +9,8 @@ import java.awt.Frame;
 import java.util.Collections;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -125,6 +127,7 @@ void setup() {
     motorControl.register(goalDetection,3);
     
     algo = new Algo(ballDetection2);
+    algo = new Algo(ballDetection);
     // algo = new Algo(goalDetection);
     algo.startALL();
 }

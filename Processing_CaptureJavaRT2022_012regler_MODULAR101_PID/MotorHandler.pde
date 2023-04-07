@@ -29,17 +29,10 @@ public enum HandlerPriority {
 }
 
 abstract class MotorHandler{
-    
-    private final HandlerPriority priority;
     private Antrieb antrieb;
     
-    public MotorHandler(Antrieb antrieb, HandlerPriority priority) {
+    public MotorHandler(Antrieb antrieb) {
         this.antrieb = antrieb;
-        this.priority = priority;
-    }
-    
-    public HandlerPriority getPriority() {
-        return priority;
     }
     
     public abstract void execute();
@@ -49,7 +42,7 @@ abstract class MotorHandler{
 class ReverseHandler extends MotorHandler {
     
     public ReverseHandler(Antrieb antrieb) {
-        super(antrieb, HandlerPriority.PRIORITY_MEDIUM);
+        super(antrieb);
     }
     
     @Override
@@ -73,10 +66,10 @@ class ForwardHandler extends MotorHandler {
     // ForwardHandler(Antrieb antrieb, float d) {
     //     super(antrieb, HandlerPriority.PRIORITY_MEDIUM);
     //     this.direction = d;
-    // }
-
+// }
+    
     ForwardHandler(Antrieb antrieb, float d, float motorPower) {
-        super(antrieb, HandlerPriority.PRIORITY_MEDIUM);
+        super(antrieb);
         this.direction = d;
         this.motorPower = motorPower;
     }
@@ -84,17 +77,17 @@ class ForwardHandler extends MotorHandler {
     @Override
     public void execute() {
         if (direction > 0.2) {
-            rechts = motorPower*(VORTRIEB + (mult * direction));
-            links = motorPower*(VORTRIEB - (mult * direction));
+            rechts = motorPower * (VORTRIEB + (mult * direction));
+            links = motorPower * (VORTRIEB - (mult * direction));
         } else if (direction < - 0.2) {
-            rechts = motorPower*(VORTRIEB - (mult * abs(direction)));
-            links = motorPower*(VORTRIEB + (mult * abs(direction)));
+            rechts = motorPower * (VORTRIEB - (mult * abs(direction)));
+            links = motorPower * (VORTRIEB + (mult * abs(direction)));
         } else {
             rechts = VORTRIEB;
             links = VORTRIEB;
         }
         
-        if(TAUSCHE_ANTRIEB_LINKS_RECHTS)
+        if (TAUSCHE_ANTRIEB_LINKS_RECHTS)
             println("direction: " + direction + "  links: " + rechts + " rechts: " + links + " Motor Power: " + motorPower);
         else
             println("direction: " + direction + "  links: " + links + " rechts: " + rechts + " Motor Power: " + motorPower);
@@ -111,11 +104,11 @@ class ForwardHandler extends MotorHandler {
 
 
 class TurnHandler extends MotorHandler {
-
+    
     boolean executed = false;
     
     TurnHandler(Antrieb antrieb) {
-        super(antrieb, HandlerPriority.PRIORITY_LOW);
+        super(antrieb);
     }
     
     @Override
@@ -135,7 +128,7 @@ class TurnHandler extends MotorHandler {
 class StopForGoalHandler extends MotorHandler {
     
     StopForGoalHandler(Antrieb antrieb) {
-        super(antrieb, HandlerPriority.PRIORITY_MEDIUM);
+        super(antrieb);
     }
     
     @Override
