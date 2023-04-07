@@ -30,3 +30,7 @@ interface ColorFilter {
 interface Detector<T extends Shape>{
     public abstract ArrayList<T> detect(PImage image, PImage mask);
 }
+
+interface PostFilter {
+    public abstract PImage process(PImage image);
+}

@@ -1,5 +1,7 @@
 public class HSVFilterCV extends PApplet implements ColorFilter {
     private OpenCV opencv;
+    
+    private ArrayList<PostFilter> postFilters;
     private ArrayList<HSVRange> ranges;
     
     public HSVFilterCV(ArrayList<HSVRange> ranges) {
@@ -17,15 +19,21 @@ public class HSVFilterCV extends PApplet implements ColorFilter {
         this(range.getHSVRange());
     }
     
+    public HSVFilterCV addPostFilter(PostFilter filter) {
+        postFilters.add(filter);
+        return this;
+    }
+    
     public PImage filter(PImage image) {
         PImage[] array = new PImage[ranges.size()];
         for (int i = 0; i < ranges.size(); i++) {
             array[i] = mask(ranges.get(i), image);
         }
-        return combinemask(array);
+        PImage returnImage = combinemask(array);
+        return executePostFilters(returnImage);
     }
     
-    public PImage mask(HSVRange r, PImage img) {
+    private PImage mask(HSVRange r, PImage img) {
         opencv.loadImage(img);
         opencv.useColor(HSB);
         
@@ -52,7 +60,7 @@ public class HSVFilterCV extends PApplet implements ColorFilter {
         return opencv.getSnapshot();
     }
     
-    public PImage combinemask(PImage...masks) {
+    private PImage combinemask(PImage...masks) {
         PImage returnImage = createImage(masks[0].width, masks[0].height, RGB);
         int[] pix = returnImage.pixels;
         for (int i = 0; i < pix.length; i++) {
@@ -64,6 +72,13 @@ public class HSVFilterCV extends PApplet implements ColorFilter {
             }
         }
         return returnImage;
+    }
+    
+    private PImage executePostFilters(PImage image) {
+        for (PostFilter filter : postFilters) {
+            image = filter.process(image);
+        }
+        return image;
     }
 }
 

@@ -6,9 +6,17 @@ class RGBFilter implements ColorFilter{
     protected RGBType type;
     protected int threshold;
     
+    private ArrayList<PostFilter> postFilters;
+    
     public RGBFilter(RGBType type, int threshold) {
         this.type = type;
         this.threshold = threshold;
+        postFilters = new ArrayList<PostFilter>();
+    }
+    
+    public RGBFilter addPostFilter(PostFilter filter) {
+        postFilters.add(filter);
+        return this;
     }
     
     public PImage filter(PImage image) {
@@ -18,7 +26,7 @@ class RGBFilter implements ColorFilter{
         for (int i = 0; i < rgbPixel.length; i++) {
             maskPixel[i] = evaluate(rgbPixel[i]) ? 0xFFFFFFFF : 0xFF000000;
         }
-        return mask;
+        return executePostFilters(mask);
     }
     
     public boolean evaluate(color c) {
@@ -34,6 +42,13 @@ class RGBFilter implements ColorFilter{
             return 2 * b - r - g > threshold;
         }
         return false;
+    }
+    
+    private PImage executePostFilters(PImage image) {
+        for (PostFilter filter : postFilters) {
+            image = filter.process(image);
+        }
+        return image;
     }
 }
 

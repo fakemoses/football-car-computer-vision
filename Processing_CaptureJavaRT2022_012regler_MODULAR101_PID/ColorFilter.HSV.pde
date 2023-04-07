@@ -3,10 +3,13 @@ public class HSVFilter implements ColorFilter {
     private final int MAX_SATURATION = 255;
     private final int MAX_VALUE = 255;
     
-    ArrayList<HSVRange> ranges;
+    private ArrayList<PostFilter> postFilters;
+    private ArrayList<HSVRange> ranges;
     
     public HSVFilter(ArrayList<HSVRange> ranges) {
         this.ranges = ranges;
+        postFilters = new ArrayList<PostFilter>();
+        
     }
     
     public HSVFilter(HSVRange range) {
@@ -17,6 +20,11 @@ public class HSVFilter implements ColorFilter {
     
     public HSVFilter(HSVColorRange range) {
         this(range.getHSVRange());
+    }
+    
+    public HSVFilter addPostFilter(PostFilter filter) {
+        postFilters.add(filter);
+        return this;
     }
     
     public PImage filter(PImage image) {
@@ -111,7 +119,14 @@ public class HSVFilter implements ColorFilter {
             
             pix[i] = 0xFFFFFFFF;
         }
-        return hsv;
+        return executePostFilters(hsv);
+    }
+    
+    private PImage executePostFilters(PImage image) {
+        for (PostFilter filter : postFilters) {
+            image = filter.process(image);
+        }
+        return image;
     }
 }
 

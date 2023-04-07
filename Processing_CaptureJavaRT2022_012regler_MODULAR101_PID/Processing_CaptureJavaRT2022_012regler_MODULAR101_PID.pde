@@ -18,7 +18,7 @@ import java.awt.Point;
 //Herausgezogene wichtige Parameter des Systems
 boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = true;
 float VORTRIEB = 0.72;
-float ASYMMETRIE =0.95; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
+float ASYMMETRIE = 0.95; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 // float ASYMMETRIE = 1.01; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 
 //VERSION FÜR TP-Link_59C2
@@ -46,7 +46,7 @@ String NACHRICHT = "";
 //String TEMPERATUR = "";
 //String IP = "192.168.137.92";
 //String IP = "192.168.178.70";
-String IP = "192.168.178.66";
+String IP = "192.168.178.65";
 int PORT = 6000;
 
 double antriebMultiplier = 1.0;
@@ -59,16 +59,17 @@ Algo algo;
 MotorControl motorControl;
 
 Boundary boundary;
-ColorFilter blueHSV;
+ColorFilter goalFilter;
 ColorFilter redHSV;
 ColorFilter redRGB;
-ColorFilter yellowHSV;
+ColorFilter ballFilter;
 Detector<Line> lineDetector;
 Detector<Rectangle> goalDetector;
 Detector<Rectangle> ballDetector;
 LineDetection lineDetection;
 GoalDetection goalDetection;
 BallDetection ballDetection;
+BallDetection2 ballDetection2;
 
 OscP5 oscP5;
 NetAddress myRemoteLocation;
@@ -109,20 +110,21 @@ void setup() {
     lineDetector = new RansacDetector(r_maxIteration,r_threshhold, 400,camWidth,camHeight);
     lineDetection = new LineDetection(motorControl, redHSV, lineDetector, boundary);
     
-    blueHSV = new HSVFilter(HSVColorRange.GREEN);
-    //blueHSV = new RGBFilter(RGBType.GREEN,30);
+    goalFilter = new HSVFilter(HSVColorRange.GREEN);
+    //goalFilter = new RGBFilter(RGBType.GREEN,30);
     goalDetector = new ContourDetector(camWidth, camHeight);
-    goalDetection = new GoalDetection(motorControl, blueHSV, goalDetector);
+    goalDetection = new GoalDetection(motorControl, goalFilter, goalDetector);
     
-    yellowHSV = new HSVFilter(HSVColorRange.BLUE);
-    ballDetector = new ContourDetector(camWidth, camHeight);
-    ballDetection = new BallDetection(motorControl, yellowHSV, ballDetector, comm);
+    ballFilter = new HSVFilter(HSVColorRange.BLUE).addPostFilter(new MedianFilter(9)).addPostFilter(new GaussianFilter1D(9, 100));
+    // ballDetector = new ContourDetector(camWidth, camHeight);
+    ballDetector = new RansacDetectorRect(1000,150);
+    ballDetection2 = new BallDetection2(motorControl, ballFilter, ballDetector, comm);
     
     motorControl.register(lineDetection,1);
-    motorControl.register(ballDetection,2);
+    motorControl.register(ballDetection2,2);
     motorControl.register(goalDetection,3);
     
-    algo = new Algo(ballDetection);
+    algo = new Algo(ballDetection2);
     // algo = new Algo(goalDetection);
     algo.startALL();
 }

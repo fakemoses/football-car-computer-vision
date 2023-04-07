@@ -32,6 +32,8 @@ class TaskArray<E extends ITask> extends ArrayList<E> {
                 // e.g. turnhandler has priority 1, and movehandler has priority 2
                 // if movehandler requests update, it will override turnhandler
                 // if turnhandler requests update, it will not override movehandler
+                // println("Current task priority: " + task.getHandler().getPriority());
+                // println("New task priority: " + handler.getPriority());
                 if (task.getHandler().getPriority().isLowerOrSamePriorityAs(handler.getPriority())) {
                     task.setLoopCount(loopCount);
                     task.setHandler(handler);
