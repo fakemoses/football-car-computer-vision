@@ -9,6 +9,7 @@ import java.awt.Frame;
 import java.util.Collections;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.ListIterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.awt.geom.Line2D;
@@ -63,8 +64,7 @@ MotorControl motorControl;
 
 Boundary boundary;
 ColorFilter goalFilter;
-ColorFilter redHSV;
-ColorFilter redRGB;
+ColorFilter lineFilter;
 ColorFilter ballFilter;
 Detector<Line> lineDetector;
 Detector<Rectangle> goalDetector;
@@ -72,8 +72,6 @@ Detector<Rectangle> ballDetector;
 LineDetection lineDetection;
 GoalDetection goalDetection;
 BallDetection ballDetection;
-BallDetection2 ballDetection2;
-BallDetection3 ballDetection3;
 
 OscP5 oscP5;
 NetAddress myRemoteLocation;
@@ -108,11 +106,10 @@ void setup() {
     motorControl = new MotorControl(antrieb);
     
     
-    redHSV = new HSVFilter(HSVColorRange.combine(HSVColorRange.RED1, HSVColorRange.RED2));
-    redRGB = new RGBFilter(RGBType.RED, 30);
+    lineFilter = new HSVFilter(HSVColorRange.combine(HSVColorRange.RED1, HSVColorRange.RED2));
     boundary = new Boundary(camWidth,camHeight);
     lineDetector = new RansacDetector(r_maxIteration,r_threshhold, 400,camWidth,camHeight);
-    lineDetection = new LineDetection(motorControl, redHSV, lineDetector, boundary);
+    lineDetection = new LineDetection(motorControl, lineFilter, lineDetector, boundary);
     
     goalFilter = new HSVFilter(HSVColorRange.GREEN);
     //goalFilter = new RGBFilter(RGBType.GREEN,30);
@@ -120,16 +117,14 @@ void setup() {
     goalDetection = new GoalDetection(motorControl, goalFilter, goalDetector);
     
     ballFilter = new HSVFilter(HSVColorRange.BLUE).addPostFilter(new MedianFilter(9)).addPostFilter(new GaussianFilter1D(9, 100));
-    // ballDetector = new ContourDetector(camWidth, camHeight);
     ballDetector = new RansacDetectorRect(1000,150);
-    ballDetection2 = new BallDetection2(motorControl, ballFilter, ballDetector, comm);
-    // ballDetection3 = new BallDetection3(motorControl, ballFilter, ballDetector, comm);
+    ballDetection = new BallDetection(motorControl, ballFilter, ballDetector, comm);
     
     motorControl.register(lineDetection,1);
-    motorControl.register(ballDetection2,2);
+    motorControl.register(ballDetection,2);
     motorControl.register(goalDetection,3);
     
-    algo = new Algo(lineDetection, ballDetection2);
+    algo = new Algo(lineDetection, ballDetection);
     // algo = new Algo(goalDetection);
     algo.startALL();
 }

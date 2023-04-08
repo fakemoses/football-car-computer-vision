@@ -7,74 +7,84 @@ public class GaussianFilter1D implements PostFilter{
     
     public GaussianFilter1D(double sigma, int threshold) {
         this.threshold = threshold;
-        this.kernelSize = calculateKernelSize(sigma);
         this.gaussianKernel = calculateGaussianKernel(sigma);
     } 
     
     public PImage process(PImage img) {
-        // Copy the input image into a new output image
-        PImage output = img.copy();
-        
-        // Apply the gaussianKernel in the x-direction
-        PImage temp = createImage(img.width, img.height, ALPHA);
-        temp.loadPixels();
+        PImage convX = convoluteInX(img);
+        return convoluteInYWithThreshhold(convX, img);
+    }
+    
+    private PImage convoluteInX(PImage img) {
+        PImage returnImage = createImage(img.width, img.height, ALPHA);
+        returnImage.loadPixels();
         
         for (int y = 0; y < img.height; y++) {
             for (int x = halfSize; x < img.width - halfSize; x++) {
-                float sumR = 0, sumG = 0, sumB = 0, sumA = 0;
+                float sumR = 0;
                 for (int i = 0; i < kernelSize; i++) {
-                    int idx = img.width * y + x - halfSize + i;
-                    int c = img.pixels[idx];
-                    double w = gaussianKernel[i];
-                    sumR += w * red(c);
-                    sumG += w * green(c);
-                    sumB += w * blue(c);
-                    sumA += w * alpha(c);
+                    int kernelIdx = img.width * y + x - halfSize + i;
+                    int c = img.pixels[kernelIdx];
+                    double weight = gaussianKernel[i];
+                    sumR += weight * (c >> 16 & 0xFF);
                 }
                 int idx = img.width * y + x;
-                temp.pixels[idx] = color(sumR, sumG, sumB, sumA);
+                returnImage.pixels[idx] = color(sumR);
             }
         }
+        return returnImage;
+    }
+    
+    private PImage convoluteInY(PImage img) {
+        PImage returnImage = createImage(img.width, img.height, ALPHA);
+        returnImage.loadPixels();
         
-        // Apply the gaussianKernel in the y-direction
         for (int y = halfSize; y < img.height - halfSize; y++) {
             for (int x = 0; x < img.width; x++) {
                 float sumR = 0, sumG = 0, sumB = 0, sumA = 0;
                 for (int i = 0; i < kernelSize; i++) {
-                    int idx = img.width * (y - halfSize + i) + x;
-                    int c = temp.pixels[idx];
-                    double w = gaussianKernel[i];
-                    sumR += w * red(c);
-                    sumG += w * green(c);
-                    sumB += w * blue(c);
-                    sumA += w * alpha(c);
+                    int kernelIdx = img.width * (y - halfSize + i) + x;
+                    int c = img.pixels[kernelIdx];
+                    double weight = gaussianKernel[i];
+                    sumR += weight * (c >> 16 & 0xFF);
                 }
                 int idx = img.width * y + x;
-                
-                // Threshold the alpha channel
-                color res;
-                if (sumA < threshold) {
-                    res = color(0, 0, 0, 0);
-                } else {
-                    res = color(255, 255, 255, 255);
-                }
-                output.pixels[idx] = res;
+                returnImage.pixels[idx] = color(sumR);
             }
         }
-        
-        output.updatePixels();
-        return output;
+        return returnImage;
+    }
+    
+    private PImage convoluteInYWithThreshhold(PImage img, PImage src) {
+        PImage returnImage = src.copy();
+        returnImage.loadPixels();
+        for (int y = halfSize; y < img.height - halfSize; y++) {
+            for (int x = 0; x < img.width; x++) {
+                float sumR = 0;
+                for (int i = 0; i < kernelSize; i++) {
+                    int kernelIdx = img.width * (y - halfSize + i) + x;
+                    int c = img.pixels[kernelIdx];
+                    double weight = gaussianKernel[i];
+                    sumR += weight * (c >> 16 & 0xFF);
+                }
+                int idx = img.width * y + x;
+                returnImage.pixels[idx] = sumR > threshold ? 0xFFFFFFFF : 0xFF000000;
+            }
+        }
+        return returnImage;
     }
     
     private double[] calculateGaussianKernel(double sigma) {
         this.kernelSize = calculateKernelSize(sigma);
         this.halfSize = kernelSize / 2;
         double[] gaussianKernel = new double[kernelSize];
-        float sum = 0;
+        
+        double sum = 0;
         for (int i = 0; i < kernelSize; i++) {
-            gaussianKernel[i] = (float) Math.exp( -0.5 * Math.pow((i - halfSize) / sigma, 2));
+            gaussianKernel[i] = (double) Math.exp( -0.5 * Math.pow((i - halfSize) / sigma, 2));
             sum += gaussianKernel[i];
         }
+        
         // Normalize the gaussianKernel
         for (int i = 0; i < kernelSize; i++) {
             gaussianKernel[i] /= sum;

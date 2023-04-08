@@ -3,10 +3,10 @@ public class GaussianFilter2D implements PostFilter{
     private double[][] gaussianKernel;
     private int threshold;
     private int kernelSize;
+    private int halfSize;
     
     public GaussianFilter2D(double sigma, int threshold) {
         this.threshold = threshold;
-        this.kernelSize = calculateKernelSize(sigma);
         this.gaussianKernel = calculateGaussianKernel(sigma);
     } 
     
@@ -54,25 +54,29 @@ public class GaussianFilter2D implements PostFilter{
     }
     
     private double[][] calculateGaussianKernel(double sigma) {
-        double[][] kernel = new double[kernelSize][kernelSize];
+        this.kernelSize = calculateKernelSize(sigma);
+        this.halfSize = kernelSize / 2;
         
-        double sum = 0.0;
-        for (int j = -kernelSize / 2; j <= kernelSize / 2; j++) {
-            for (int i = -kernelSize / 2; i <= kernelSize / 2; i++) {
-                double exponent = -((i * i + j * j) / (2 * sigma * sigma));
-                kernel[j + kernelSize / 2][i + kernelSize / 2] = Math.exp(exponent);
-                sum += kernel[j + kernelSize / 2][i + kernelSize / 2];
+        double[][] gaussianKernel = new double[kernelSize][kernelSize];
+        
+        double sum = 0;
+        
+        for (int j = 0; j < kernelSize; j++) {
+            for (int i = 0; i < kernelSize; i++) {
+                double exponent = -0.5 * (Math.pow((i - halfSize) / sigma, 2.0) + Math.pow((j - halfSize) / sigma, 2.0));
+                gaussianKernel[j][i] = Math.exp(exponent);
+                sum += gaussianKernel[j][i];
             }
         }
         
         // normalize the kernel so that it sums to 1
         for (int j = 0; j < kernelSize; j++) {
             for (int i = 0; i < kernelSize; i++) {
-                kernel[j][i] /= sum;
+                gaussianKernel[j][i] /= sum;
             }
         }
         
-        return kernel;
+        return gaussianKernel;
     }
     
     private int calculateKernelSize(double sigma) {

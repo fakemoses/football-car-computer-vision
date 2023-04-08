@@ -1,4 +1,4 @@
-public class BallDetection2 extends DetectionThread {
+public class BallDetection4 extends DetectionThread {
     
     private ArrayList<Rectangle> rects;
     private Rectangle boundingBox;
@@ -37,7 +37,7 @@ public class BallDetection2 extends DetectionThread {
     
     
     
-    public BallDetection2(MotorControl motorControl , ColorFilter colorFilter, Detector<Rectangle> objectDetector, Comm comm) {
+    public BallDetection4(MotorControl motorControl , ColorFilter colorFilter, Detector<Rectangle> objectDetector, Comm comm) {
         super(motorControl, colorFilter);
         this.objectDetector = objectDetector;
         
@@ -49,7 +49,7 @@ public class BallDetection2 extends DetectionThread {
     }
     
     public String getThreadName() {
-        return "BallDetection2";
+        return "BallDetection4";
     }
     
     public void run() {

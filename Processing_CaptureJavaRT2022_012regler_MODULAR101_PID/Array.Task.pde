@@ -22,7 +22,6 @@ class TaskArray<E extends ITask> extends ArrayList<E> {
             if (task.getInstance() == sender) {
                 
                 if (task.isQueueEmpty()) {
-                    // task.setLoopCount(loopCount);
                     task.setHandler(handlers);
                     task.setHandlerPriority(newHandlerPriority);
                     return;
@@ -34,9 +33,7 @@ class TaskArray<E extends ITask> extends ArrayList<E> {
                 // if movehandler requests update, it will override turnhandler
                 // if turnhandler requests update, it will not override movehandler
                 HandlerPriority currHandlerPriority = task.getHandlerPriority();
-                println("Current handler priority: " + currHandlerPriority);
                 if (currHandlerPriority.isLowerOrSamePriorityAs(newHandlerPriority)) {
-                    // task.setLoopCount(loopCount);
                     task.setHandler(handlers);
                     task.setHandlerPriority(newHandlerPriority);
                 }
