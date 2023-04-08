@@ -18,6 +18,7 @@ public class GaussianFilter1D implements PostFilter{
         // Apply the gaussianKernel in the x-direction
         PImage temp = createImage(img.width, img.height, ALPHA);
         temp.loadPixels();
+        
         for (int y = 0; y < img.height; y++) {
             for (int x = halfSize; x < img.width - halfSize; x++) {
                 float sumR = 0, sumG = 0, sumB = 0, sumA = 0;

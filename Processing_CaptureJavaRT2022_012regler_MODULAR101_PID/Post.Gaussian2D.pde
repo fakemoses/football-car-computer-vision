@@ -28,6 +28,9 @@ public class GaussianFilter2D implements PostFilter{
                         int py = y + j;
                         
                         // check if the pixel is inside the image
+                        // Expensive computation, O(n^2)
+                        // Alternative: Use GaussianFilter1D instead
+                        // Does it differ ?
                         if (px >= 0 && py >= 0 && px < w && py < h) {
                             // get the pixel value and weight from the kernel
                             double pixelValue = brightness(image.pixels[py * w + px]);

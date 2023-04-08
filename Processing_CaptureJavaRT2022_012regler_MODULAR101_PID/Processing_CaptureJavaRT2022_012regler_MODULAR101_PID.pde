@@ -19,7 +19,8 @@ import java.awt.Point;
 
 //Herausgezogene wichtige Parameter des Systems
 boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = true;
-float VORTRIEB = 0.72;
+// float VORTRIEB = 0.72;
+float VORTRIEB = 0.8;
 float ASYMMETRIE = 0.95; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 // float ASYMMETRIE = 1.01; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 
@@ -72,6 +73,7 @@ LineDetection lineDetection;
 GoalDetection goalDetection;
 BallDetection ballDetection;
 BallDetection2 ballDetection2;
+BallDetection3 ballDetection3;
 
 OscP5 oscP5;
 NetAddress myRemoteLocation;
@@ -121,13 +123,13 @@ void setup() {
     // ballDetector = new ContourDetector(camWidth, camHeight);
     ballDetector = new RansacDetectorRect(1000,150);
     ballDetection2 = new BallDetection2(motorControl, ballFilter, ballDetector, comm);
+    // ballDetection3 = new BallDetection3(motorControl, ballFilter, ballDetector, comm);
     
     motorControl.register(lineDetection,1);
     motorControl.register(ballDetection2,2);
     motorControl.register(goalDetection,3);
     
-    algo = new Algo(ballDetection2);
-    algo = new Algo(ballDetection);
+    algo = new Algo(lineDetection, ballDetection2);
     // algo = new Algo(goalDetection);
     algo.startALL();
 }

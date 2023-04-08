@@ -55,6 +55,22 @@ class ReverseHandler extends MotorHandler {
     }
 }
 
+class StopHandler extends MotorHandler {
+    
+    public StopHandler(Antrieb antrieb) {
+        super(antrieb);
+    }
+    
+    @Override
+    public void execute() {
+        antrieb.fahrt(0, 0);
+    }
+    
+    public String getHandlerName() {
+        return "StopHandler";
+    }
+}
+
 class ForwardHandler extends MotorHandler {
     
     float direction;
@@ -83,8 +99,8 @@ class ForwardHandler extends MotorHandler {
             rechts = motorPower * (VORTRIEB - (mult * abs(direction)));
             links = motorPower * (VORTRIEB + (mult * abs(direction)));
         } else {
-            rechts = VORTRIEB;
-            links = VORTRIEB;
+            rechts = VORTRIEB * 0.95f;
+            links = VORTRIEB * 0.95f;
         }
         
         if (TAUSCHE_ANTRIEB_LINKS_RECHTS)

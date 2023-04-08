@@ -1,4 +1,4 @@
-public class BallDetection2 extends DetectionThread {
+public class BallDetection3 extends DetectionThread {
     
     private ArrayList<Rectangle> rects;
     private Rectangle boundingBox;
@@ -37,19 +37,19 @@ public class BallDetection2 extends DetectionThread {
     
     
     
-    public BallDetection2(MotorControl motorControl , ColorFilter colorFilter, Detector<Rectangle> objectDetector, Comm comm) {
+    public BallDetection3(MotorControl motorControl , ColorFilter colorFilter, Detector<Rectangle> objectDetector, Comm comm) {
         super(motorControl, colorFilter);
         this.objectDetector = objectDetector;
         
         int w = (int)(End.x - Start.x);
         int h = (int)(End.y - Start.y);
         this.roi = new Rectangle((int) Start.x,(int) Start.y, w, h);
-        this.previousBoundingBoxes = new Rectangle[15];
+        this.previousBoundingBoxes = new Rectangle[60];
         this.isFull = false;
     }
     
     public String getThreadName() {
-        return "BallDetection2";
+        return "BallDetection3";
     }
     
     public void run() {
@@ -65,42 +65,24 @@ public class BallDetection2 extends DetectionThread {
             if (rects == null || rects.size() == 0) {
                 boundingBox = null;
                 // println("Rects is null");
-            } else{
-                // println(rects.size());
+                // continue;
+            }
+            else{
+                println(rects.size());
                 boundingBox = rects.get(0);
-            }
-            // boundingBox = isValid(rects);
-            updateBbox(boundingBox);
-            int numNullBboxes = 0;
-            isBboxAvailable = boundingBox;
-            for (int i = previousBoundingBoxes.length - 1; i >= 0; i--) {
-                if (previousBoundingBoxes[i] != null) {
-                    numNullBboxes++;
-                }
-            }
-            
-            for (int i = previousBoundingBoxes.length - 1; i >= 0; i--) {
-                if (previousBoundingBoxes[i] != null) {
-                    isBboxAvailable = previousBoundingBoxes[i];
-                    break;
-                }
-            }
-            
-            if (numNullBboxes <= 2) {
-                isBboxAvailable = null;
             }
             
             
             // TODO: Refactor this
             // IDEA: Move Logic to MotorControl
             // DetectionThread should have less clutter
-            if (isBboxAvailable != null && numNullBboxes > 2) {
-                // if (roi.contains(isBboxAvailable.getCenterX(), isBboxAvailable.getCenterY())) {
+            if (boundingBox != null) {
+                // if (roi.contains(boundingBox.getCenterX(), boundingBox.getCenterY())) {
                 //     isBallWithinROI = true;
                 //     motorControl.disableBallNoti();
             // } else {
                 //     isBallWithinROI = false;
-                float motorSignal = toMotorSignalLinear((int)isBboxAvailable.getCenterX());
+                float motorSignal = toMotorSignalLinear((int)boundingBox.getCenterX());
                 // endTime = System.currentTimeMillis();
                 
                 if (isTurn) {
@@ -108,7 +90,6 @@ public class BallDetection2 extends DetectionThread {
                     motorControl.notify(this, HandlerPriority.PRIORITY_HIGH, motorControl.Stop(15), motorControl.Forward(2, motorSignal, 0.75f));
                     continue;
                 }
-                
                 // if (isTurn && (endTime - startTime) < 1000) {
                 //     motorPower = 0.0f;
             // } else if (isTurn && (endTime - startTime) > 1000 && (endTime - startTime) < 2000) {
@@ -128,22 +109,23 @@ public class BallDetection2 extends DetectionThread {
             } else { 
                 isTurn = true;
                 // startTime = System.currentTimeMillis();
+                println("Turn");
                 motorControl.notify(this, HandlerPriority.PRIORITY_LOW,motorControl.Turn(1));  
             }
-            delay(40);
         }
     }
+    
     
     public Rectangle getBoundingBox() {
         return boundingBox;
     }
     
     public Rectangle isValid(ArrayList<Rectangle> rects) {
-        if (rects ==  null) {
+        if (rects == null) {
             return null;
         }
         for (Rectangle r : rects) {
-            if (r == null) {
+            if (r ==  null) {
                 continue;
             }
             float calc = abs(((float)r.width / (float)r.height) - IDEAL_RATIO);
@@ -172,23 +154,23 @@ public class BallDetection2 extends DetectionThread {
     }
     
     public PImage[] getResults() {
-        if (image == null || mask == null) {
+        if (image == null ||  mask == null) {
             return null;
         }
         PImage[] results = new PImage[2];
         PImage retImage = drawRect(image, roi, roiThickness, roiColor, false);
         color boxColor = isBallWithinROI ? boxColorIn : boxColorOut;
-        if (isBboxAvailable == null) {
-            println("isBboxAvailable is null");
+        if (boundingBox == null) {
+            println("boundingBoxis null");
         }
-        results[0] = isBboxAvailable == null ? retImage : drawRect(retImage, isBboxAvailable, boxThickness, boxColor, false);
+        results[0] = boundingBox == null ? retImage : drawRect(retImage, boundingBox, boxThickness, boxColor, false);
         results[1] = mask;
         return results;
     }
     
     
     public float toMotorSignalLinear(int xCenter) {
-        int MAXWIDTH = 320; // todo: set variable 
+        int MAXWIDTH = 320; // todo: setvariable 
         return(float)(xCenter - (MAXWIDTH / 2)) / (MAXWIDTH / 2);
     }
     

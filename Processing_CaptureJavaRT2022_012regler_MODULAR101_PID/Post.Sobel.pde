@@ -57,13 +57,13 @@ public enum KERNEL_TYPE {
 public class Sobel implements PostFilter {
     // https://de.wikipedia.org/wiki/Sobel-Operator
     
-    int[][] kernelX;
-    int[][] kernelY;
+    private final int[][] kernelX;
+    private final int[][] kernelY;
     
-    int lowThreshold = 100;
-    int highThreshold = 150;
+    private final int lowThreshold;
+    private final int highThreshold;
     
-    int halfLength;
+    private final int halfLength;
     
     public Sobel(KERNEL_TYPE kernelType, int lowThreshold, int highThreshold) {
         this.kernelX = kernelType.getKernelX();

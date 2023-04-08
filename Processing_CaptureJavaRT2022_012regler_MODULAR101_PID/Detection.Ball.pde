@@ -95,8 +95,8 @@ public class BallDetection extends DetectionThread {
                         motorPower = 1.0f;
                     }
                     motorControl.enableBallNoti();
-                    motorControl.notify(this,motorControl.Forward(motorSignal, motorPower),2);
-                    motorControl.notify(this, HandlerPriority.PRIORITY_MEDIUM, motorControl.Forward(2,toMotorSignalLinear((int)isBboxAvailable.getCenterX())));
+                    // motorControl.notify(this,motorControl.Forward(motorSignal, motorPower),2);
+                    motorControl.notify(this, HandlerPriority.PRIORITY_MEDIUM, motorControl.Forward(2, motorSignal, motorPower));
                 }
                 //delay(70);
                 continue;

@@ -31,7 +31,9 @@ class Task implements Comparable<Task>, ITask{
     
     public void setHandler(MotorHandler...handlers) {
         // debug
+        // clear queue
         try {
+            handlersQueue.clear();
             for (MotorHandler handler : handlers) {
                 handlersQueue.put(handler);
             } 
@@ -77,6 +79,8 @@ class Task implements Comparable<Task>, ITask{
         }
         
         handlersQueue.remove();
+        // println("Removing handler from queue");
+        // println("Queue size: " + handlersQueue.size());
     }
     
 }
