@@ -62,7 +62,8 @@ public class BallDetection extends DetectionThread {
             
             if (lastMemory == null) {
                 isTurn = true;
-                motorControl.notify(this, HandlerPriority.PRIORITY_LOW,motorControl.Turn(1));  
+                // motorControl.notify(this, HandlerPriority.PRIORITY_LOW,motorControl.Turn(1));  
+                motorControl.notify(this, HandlerPriority.PRIORITY_LOWEST,motorControl.randomHandler(10, 3));  
                 continue;
             }
             

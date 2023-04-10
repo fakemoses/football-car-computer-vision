@@ -35,10 +35,31 @@ public class MotorControl implements Mediator {
         Arrays.fill(returnHandler, new StopForGoalHandler(antrieb));
         return returnHandler;
     }
-
+    
     public StopHandler[] Stop(int loop) {
         StopHandler[] returnHandler = new StopHandler[loop];
         Arrays.fill(returnHandler, new StopHandler(antrieb));
+        return returnHandler;
+    }
+    
+    public MotorHandler[] randomHandler(int loop, int randomHandlerCount) {
+        
+        if (loop < 1 || randomHandlerCount < 1) {
+            throw new IllegalArgumentException("loop and randomHandlerCount must be greater than 0");
+        }
+        
+        MotorHandler[] returnHandler = new MotorHandler[loop * randomHandlerCount];
+        
+        // random
+        for (int i = 0; i < randomHandlerCount; i++) {
+            float random = (float)(Math.random());            
+            if (random <=  0.75) {
+                float direction = (float)(Math.random() * 2 - 1);
+                Arrays.fill(returnHandler, loop * i, loop * (i + 1), new ForwardHandler(antrieb, direction, 0.85f));
+            } else {
+                Arrays.fill(returnHandler, loop * i, loop * (i + 1), new TurnHandler(antrieb));
+            }
+        }
         return returnHandler;
     }
     

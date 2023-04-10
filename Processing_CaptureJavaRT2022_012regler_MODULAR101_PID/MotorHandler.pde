@@ -1,7 +1,8 @@
 public enum HandlerPriority {
     PRIORITY_HIGH,
     PRIORITY_MEDIUM,
-    PRIORITY_LOW;
+    PRIORITY_LOW,
+    PRIORITY_LOWEST; // temporary priority for random handlers
     
     public boolean isHigherPriorityThan(HandlerPriority otherPriority) {
         return compareTo(otherPriority) < 0;
@@ -24,6 +25,9 @@ public enum HandlerPriority {
     }
     
     public boolean isLowerOrSamePriorityAs(HandlerPriority otherPriority) {
+        if (this == PRIORITY_LOWEST && otherPriority == PRIORITY_LOWEST) { // temporary priority for random handlers. avoid overriding
+            return false;
+        }
         return isSamePriorityAs(otherPriority) || isLowerPriorityThan(otherPriority);
     }
 }
@@ -78,11 +82,6 @@ class ForwardHandler extends MotorHandler {
     float rechts;
     float mult = 0.2f;
     float motorPower;
-    
-    // ForwardHandler(Antrieb antrieb, float d) {
-    //     super(antrieb, HandlerPriority.PRIORITY_MEDIUM);
-    //     this.direction = d;
-// }
     
     ForwardHandler(Antrieb antrieb, float d, float motorPower) {
         super(antrieb);
