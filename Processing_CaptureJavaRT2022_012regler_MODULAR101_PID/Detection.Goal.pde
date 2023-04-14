@@ -2,10 +2,19 @@ public class GoalDetection extends DetectionThread{
     
     private ArrayList<Rectangle> rects;
     private Rectangle boundingBox;
-    private Rectangle[] previousBoundingBoxes;
+
+    private MemoryArray<Rectangle> memory;
+    private final int MEMORY_SIZE = 15;
+
+    Detector<Rectangle> objectDetector;
+
     private boolean isFull;
-    
-    private Detector<Rectangle> objectDetector;
+    private boolean isShot;
+
+    //timer
+    private long startTime;
+    private long endTime;
+    private long duration;
     
     private final int MIN_WIDTH = 30;
     private final int MIN_HEIGHT = 30;
@@ -20,6 +29,8 @@ public class GoalDetection extends DetectionThread{
     
     private boolean isGoalWithinROI = false;
     private float motorPower = 1.0f;
+
+    private Rectangle lastMemory;
     
     public GoalDetection(MotorControl motorControl, ColorFilter colorFilter, Detector<Rectangle> objectDetector) {
         super(motorControl, colorFilter);
@@ -28,8 +39,10 @@ public class GoalDetection extends DetectionThread{
         int w = (int)(End.x - Start.x);
         int h = (int)(End.y - Start.y);
         this.roi = new Rectangle((int) Start.x,(int) Start.y, w, h);
-        previousBoundingBoxes = new Rectangle[5];
+        this.memory = new MemoryArray<Rectangle>(MEMORY_SIZE);
+
         isFull = false;
+        isShot = false;
     }
     
     public String getThreadName() {
@@ -44,50 +57,52 @@ public class GoalDetection extends DetectionThread{
             }
             mask = colorFilter.filter(image);
             rects = objectDetector.detect(image, mask);
-            boundingBox = isValid(rects);
-            updateBbox(boundingBox);
-            int numNullBboxes = 0;
-            Rectangle isBboxAvailable = boundingBox;
-            double bboxArea = 0.0;
-            for (int i = previousBoundingBoxes.length - 1; i >= 0; i--) {
-                if (previousBoundingBoxes[i] != null) {
-                    bboxArea += previousBoundingBoxes[i].getWidth() * previousBoundingBoxes[i].getHeight();	
-                    numNullBboxes++;
-                }
-            }
-            bboxArea = bboxArea / numNullBboxes;
-            
-            for (int i = previousBoundingBoxes.length - 1; i >= 0; i--) {
-                if (previousBoundingBoxes[i] != null) {
-                    isBboxAvailable = previousBoundingBoxes[i];
-                    break;
-                }
-            }
-            
-            if (isBboxAvailable != null && numNullBboxes > 2) {
+
+            Rectangle result = getRectangleFromDetectionResult(rects);
+            memory.addCurrentMemory(result);
+
+            lastMemory = memory.getLastRememberedMemory(); 
+
+            if (lastMemory != null) {
+                float motorSignal = toMotorSignalLinear((int)lastMemory.getCenterX());
+                double bboxArea = lastMemory.getWidth() * lastMemory.getHeight();	
                 
-                if (bboxArea > 12000.0) {
+                if (bboxArea > 12000.0 && !isShot) {
                     isGoalWithinROI = true;
+                    isShot = true;
+                    startTime = System.currentTimeMillis();
                     motorControl.notify(this, HandlerPriority.PRIORITY_HIGH, motorControl.StopForGoal(1));
-                    motorControl.disableGoalNoti();
-                } else{
+                    //motorControl.disableGoalNoti();
+                } else if(isShot){
+                    endTime = System.currentTimeMillis();
+                    duration = (endTime - startTime);
+                    if(duration > 1000 && duration < 3000){
+                       motorControl.notify(this, HandlerPriority.PRIORITY_HIGH ,motorControl.Reverse(5)); 
+                    }
+                    else if(duration > 3000 && duration < 4000){
+                        motorControl.notify(this, HandlerPriority.PRIORITY_HIGH ,motorControl.Turn(1));
+                    }
+                    else if(duration > 4000){
+                        isShot = false;
+                        //motorControl.enableGoalNoti();
+                    }
+                }
+                else{
                     isGoalWithinROI = false;
-                    motorControl.notify(this, HandlerPriority.PRIORITY_MEDIUM ,motorControl.Forward(1,(toMotorSignalLinear((int)isBboxAvailable.getCenterX())),motorPower));
-                    // motorControl.enableGoalNoti();
+                    motorControl.notify(this, HandlerPriority.PRIORITY_MEDIUM ,motorControl.Forward(1,motorSignal,motorPower));
                 }
                 continue;
             } else {
-                motorControl.notify(this, HandlerPriority.PRIORITY_LOW, motorControl.Turn(1));
+                motorControl.notify(this, HandlerPriority.PRIORITY_LOWEST,motorControl.randomHandler(10, 3));  
             }
             delay(50);
         }
     }
-    
-    public Rectangle isValid(ArrayList<Rectangle> rects) {
-        if (rects == null) {
+
+    private Rectangle getRectangleFromDetectionResult(ArrayList<Rectangle> rects) {
+        if (rects == null || rects.size() == 0) {
             return null;
         }
-        
         for (Rectangle r : rects) {
             if (r.width < MIN_WIDTH ||  r.height < MIN_HEIGHT) {
                 continue;
@@ -101,6 +116,7 @@ public class GoalDetection extends DetectionThread{
         return null;
     }
     
+    
     public int getXPos(Rectangle r) {
         return r.x + r.width / 2;
         
@@ -111,7 +127,7 @@ public class GoalDetection extends DetectionThread{
             return null;
         }
         PImage[] results = new PImage[2];
-        results[0] = boundingBox == null ? image : drawRect(image, boundingBox, boxThickness, boxColor, false);
+        results[0] = lastMemory == null ? image : drawRect(image, lastMemory, boxThickness, boxColor, false);
         results[1] = mask;
         return results;
     }
@@ -119,25 +135,5 @@ public class GoalDetection extends DetectionThread{
     public float toMotorSignalLinear(int xCenter) {
         int MAXWIDTH = 320; // todo: set variable 
         return(float)(xCenter - (MAXWIDTH / 2)) / (MAXWIDTH / 2);
-    }
-    
-    public void updateBbox(Rectangle value) {
-        if (!isFull) {
-            // Array is not full, so simply add new value to next available slot
-            for (int i = 0; i < previousBoundingBoxes.length; i++) {
-                if (previousBoundingBoxes[i] == null) {
-                    previousBoundingBoxes[i] = value;
-                    break;
-                }
-            }
-            // Check if array is now full
-            isFull = (previousBoundingBoxes[previousBoundingBoxes.length - 1] != null);
-        } else {
-            // Shift all values down one slot
-            for (int i = 0; i < previousBoundingBoxes.length - 1; i++) {
-                previousBoundingBoxes[i] = previousBoundingBoxes[i + 1];
-            }
-            previousBoundingBoxes[previousBoundingBoxes.length - 1] = value;
-        }
     }
 }

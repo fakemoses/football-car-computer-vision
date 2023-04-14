@@ -19,10 +19,10 @@ import java.awt.Shape;
 import java.awt.Point;
 
 //Herausgezogene wichtige Parameter des Systems
-boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = true;
+boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = false;
 // float VORTRIEB = 0.72;
 float VORTRIEB = 0.8;
-float ASYMMETRIE = 0.95; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
+float ASYMMETRIE = 1.01; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 // float ASYMMETRIE = 1.01; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 
 //VERSION FÜR TP-Link_59C2
@@ -50,7 +50,7 @@ String NACHRICHT = "";
 //String TEMPERATUR = "";
 //String IP = "192.168.137.92";
 //String IP = "192.168.178.70";
-String IP = "192.168.178.65";
+String IP = "192.168.178.70";
 int PORT = 6000;
 
 double antriebMultiplier = 1.0;
@@ -123,10 +123,9 @@ void setup() {
     motorControl.register(lineDetection,1);
     motorControl.register(ballDetection,2);
     motorControl.register(goalDetection,3);
-    
-    // algo = new Algo(ballDetection);
-    algo = new Algo(lineDetection, ballDetection);
-    // algo = new Algo(goalDetection);
+
+    algo = new Algo(lineDetection,goalDetection);
+
     algo.startALL();
 }
 
@@ -140,7 +139,7 @@ void draw() {
             cam.updatePixels();
             algo.updateImage(cam);
         } else {
-            throw new RuntimeException("Camera not available");
+                throw new RuntimeException("Camera not available");
         }
     }
     catch(Exception e) {

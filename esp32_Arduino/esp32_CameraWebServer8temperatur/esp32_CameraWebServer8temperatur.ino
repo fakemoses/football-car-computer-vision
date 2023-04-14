@@ -1,5 +1,6 @@
 #include "esp_camera.h"
 #include "AsyncUDP.h"
+#include "esp_wifi.h"
 
 #include <WiFi.h>
 
@@ -140,6 +141,9 @@ void setup()
   s->set_vflip(s, 1);
   s->set_hmirror(s, 1);
 #endif
+  //disable sleep for best performance
+//  WiFi.mode(WIFI_STA);
+//  esp_wifi_set_ps(WIFI_PS_NONE);
 
   WiFi.begin(ssid, password);
 

@@ -81,15 +81,6 @@ public class BallDetection extends DetectionThread {
                 continue;
             }
             
-            
-            // Still necessary?
-            // if (isTurn && (endTime - startTime) < 1000) 
-            //     motorPower = 0.0f;
-            // elseif (isTurn && (endTime - startTime) > 1000 && (endTime - startTime) < 2000) {
-            //  if (motorSignal > 0.6 || motorSignal < - 0.6) {
-            //  motorPower = 0.7f;           
-            //     }
-            
             motorPower = 0.85f;
             isBallWithinROI = false;
             motorControl.enableBallNoti();
