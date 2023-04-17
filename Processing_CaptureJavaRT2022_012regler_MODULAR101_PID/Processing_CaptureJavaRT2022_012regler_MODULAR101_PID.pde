@@ -50,7 +50,7 @@ String NACHRICHT = "";
 //String TEMPERATUR = "";
 //String IP = "192.168.137.92";
 //String IP = "192.168.178.70";
-String IP = "192.168.178.70";
+String IP = "192.168.178.65";
 int PORT = 6000;
 
 double antriebMultiplier = 1.0;
@@ -123,9 +123,9 @@ void setup() {
     motorControl.register(lineDetection,1);
     motorControl.register(ballDetection,2);
     motorControl.register(goalDetection,3);
-
+    
     algo = new Algo(lineDetection,goalDetection);
-
+    
     algo.startALL();
 }
 
@@ -139,7 +139,7 @@ void draw() {
             cam.updatePixels();
             algo.updateImage(cam);
         } else {
-                throw new RuntimeException("Camera not available");
+            throw new RuntimeException("Camera not available");
         }
     }
     catch(Exception e) {
