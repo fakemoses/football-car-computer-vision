@@ -22,7 +22,7 @@ public class Algo {
         }
     }
     
-    public PImage[][] getTIResult() {
+    public PImage[][] getDetectionResults() {
         PImage[][] images = new PImage[threads.length][];
         for (int i = 0; i < threads.length; i++) {
             PImage[] result = threads[i].getResults();

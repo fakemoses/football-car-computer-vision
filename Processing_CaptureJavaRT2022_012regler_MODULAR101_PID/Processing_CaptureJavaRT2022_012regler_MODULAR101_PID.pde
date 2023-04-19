@@ -17,6 +17,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.Shape;
 import java.awt.Point;
+import java.net.*;
+import java.io.*;
 
 //Herausgezogene wichtige Parameter des Systems
 boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = false;
@@ -57,7 +59,7 @@ double antriebMultiplier = 1.0;
 
 UDPcomfort udpcomfort;  
 Antrieb antrieb;
-IPCapture cam;
+CustomCam cam;
 
 Algo algo;
 MotorControl motorControl;
@@ -91,7 +93,7 @@ void setup() {
     size(1280,720);
     frameRate(15);
     
-    cam = new IPCapture(this, "http://" + IP + ":81/stream", "", "");
+    cam = new CustomCam(this, "http://" + IP + ":81/stream", "", "");
     cam.start();
     
     surface.setLocation( -5, 0);
@@ -124,8 +126,9 @@ void setup() {
     motorControl.register(ballDetection,2);
     motorControl.register(goalDetection,3);
     
-    algo = new Algo(lineDetection,goalDetection);
-    
+    // algo = new Algo(ballDetection);
+    algo = new Algo(lineDetection, ballDetection,goalDetection);
+    // algo = new Algo(goalDetection);
     algo.startALL();
 }
 
@@ -133,25 +136,37 @@ boolean AKTIV = false;
 
 void draw() {
     
-    try {
-        if (cam.isAvailable()) {
-            cam.read();
-            cam.updatePixels();
-            algo.updateImage(cam);
-        } else {
-            throw new RuntimeException("Camera not available");
-        }
-    }
-    catch(Exception e) {
-        e.printStackTrace();
+    // try {
+    //     if (cam.isAvailable()) {
+    //         cam.read();
+    //         cam.updatePixels();
+    //         algo.updateImage(cam);
+    //     } else {
+    //         throw new RuntimeException("Camera not available");
+    //     }
+// }
+    // catch(Exception e) {
+    //     e.printStackTrace();
+// }
+    
+    
+    if (cam.isDown()) {
+        noLoop();
+        println("Camera is down");
+        println("Reconnecting...");
+        cam.reconnect();
+        delay(5000);
+        loop();
     }
     
-    PImage[][] res = algo.getTIResult();
-    for (int i = 0; i < res.length; i++) {
-        for (int j = 0; j < res[i].length; j++) {
-            image(res[i][j], camWidth * i, camHeight * j);
-        }
+    
+    if (cam.isAvailable()) {
+        cam.read();
+        // is it possible that the pixels updated during grabbing image? need locking ?
+        algo.updateImage(cam);
     }
+    
+    drawResults(algo.getDetectionResults());
     
     motorControl.run();
 }
@@ -208,4 +223,12 @@ void keyPressed() {
 
 void captureEvent(Capture c) {
     c.read();
+}
+
+void drawResults(PImage[][] results) {
+    for (int i = 0; i < results.length; i++) {
+        for (int j = 0; j < results[i].length; j++) {
+            image(results[i][j],camWidth * i, camHeight * j);
+        }
+    }
 }
