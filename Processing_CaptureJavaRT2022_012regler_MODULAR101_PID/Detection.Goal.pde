@@ -2,15 +2,15 @@ public class GoalDetection extends DetectionThread{
     
     private ArrayList<Rectangle> rects;
     private Rectangle boundingBox;
-
+    
     private MemoryArray<Rectangle> memory;
     private final int MEMORY_SIZE = 15;
-
+    
     Detector<Rectangle> objectDetector;
-
+    
     private boolean isFull;
     private boolean isShot;
-
+    
     //timer
     private long startTime;
     private long endTime;
@@ -29,7 +29,7 @@ public class GoalDetection extends DetectionThread{
     
     private boolean isGoalWithinROI = false;
     private float motorPower = 1.0f;
-
+    
     private Rectangle lastMemory;
     
     public GoalDetection(MotorControl motorControl, ColorFilter colorFilter, Detector<Rectangle> objectDetector) {
@@ -40,7 +40,7 @@ public class GoalDetection extends DetectionThread{
         int h = (int)(End.y - Start.y);
         this.roi = new Rectangle((int) Start.x,(int) Start.y, w, h);
         this.memory = new MemoryArray<Rectangle>(MEMORY_SIZE);
-
+        
         isFull = false;
         isShot = false;
     }
@@ -57,32 +57,33 @@ public class GoalDetection extends DetectionThread{
             }
             mask = colorFilter.filter(image);
             rects = objectDetector.detect(image, mask);
-
+            
             Rectangle result = getRectangleFromDetectionResult(rects);
+
             memory.addCurrentMemory(result);
-
+            
             lastMemory = memory.getLastRememberedMemory(); 
-
+            
             if (lastMemory != null) {
                 float motorSignal = toMotorSignalLinear((int)lastMemory.getCenterX());
                 double bboxArea = lastMemory.getWidth() * lastMemory.getHeight();	
                 
-                if (bboxArea > 12000.0 && !isShot) {
+                if (bboxArea > 10000.0 && !isShot) {
                     isGoalWithinROI = true;
                     isShot = true;
                     startTime = System.currentTimeMillis();
                     motorControl.notify(this, HandlerPriority.PRIORITY_HIGH, motorControl.StopForGoal(1));
                     //motorControl.disableGoalNoti();
-                } else if(isShot){
+                } else if (isShot) {
                     endTime = System.currentTimeMillis();
                     duration = (endTime - startTime);
-                    if(duration > 1000 && duration < 3000){
-                       motorControl.notify(this, HandlerPriority.PRIORITY_HIGH ,motorControl.Reverse(5)); 
+                    if (duration > 1000 && duration < 3000) {
+                        motorControl.notify(this, HandlerPriority.PRIORITY_HIGH ,motorControl.Reverse(5)); 
                     }
-                    else if(duration > 3000 && duration < 4000){
+                    else if (duration > 3000 && duration < 4000) {
                         motorControl.notify(this, HandlerPriority.PRIORITY_HIGH ,motorControl.Turn(1));
                     }
-                    else if(duration > 4000){
+                    else if (duration > 4000) {
                         isShot = false;
                         //motorControl.enableGoalNoti();
                     }
@@ -93,27 +94,34 @@ public class GoalDetection extends DetectionThread{
                 }
                 continue;
             } else {
-                motorControl.notify(this, HandlerPriority.PRIORITY_LOWEST,motorControl.randomHandler(10, 3));  
+                motorControl.notify(this, HandlerPriority.PRIORITY_LOW,motorControl.Turn(1));  
             }
             delay(50);
         }
     }
+    
+    // private Rectangle getRectangleFromDetectionResult(ArrayList<Rectangle> rects) {
+    //     if (rects == null || rects.size() == 0) {
+    //         return null;
+    //     }
+    //     // for (Rectangle r : rects) {
+    //     //     if (r.width < MIN_WIDTH ||  r.height < MIN_HEIGHT) {
+    //     //         continue;
+    //     //     }
+            
+    //     //     if (r.width * r.height < MIN_AREA) {
+    //     //         continue;
+    //     //     }
+    //     //     return r;
+    //     // }
+    //     // return r;
+    // }
 
     private Rectangle getRectangleFromDetectionResult(ArrayList<Rectangle> rects) {
         if (rects == null || rects.size() == 0) {
             return null;
         }
-        for (Rectangle r : rects) {
-            if (r.width < MIN_WIDTH ||  r.height < MIN_HEIGHT) {
-                continue;
-            }
-            
-            if (r.width * r.height < MIN_AREA) {
-                continue;
-            }
-            return r;
-        }
-        return null;
+        return rects.get(0);
     }
     
     

@@ -127,9 +127,9 @@ public class MotorControl implements Mediator {
     public void notify(DetectionThread sender, HandlerPriority handlerPriority, MotorHandler[]...handler) {
         
         //TODO Refractor
-        if ((isBall)) {
-            return;
-        }
+        // if ((isBall)) {
+        //     return;
+        // }
         if ((isBall && sender instanceof BallDetection)) {
             return;
         }

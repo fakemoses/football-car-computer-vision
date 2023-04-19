@@ -6,24 +6,28 @@ import processing.awt.PSurfaceAWT;
 import processing.awt.PSurfaceAWT.SmoothCanvas;
 import java.awt.*;
 import java.awt.Frame;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.Shape;
+import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.ListIterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.Shape;
-import java.awt.Point;
 import java.net.*;
 import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 //Herausgezogene wichtige Parameter des Systems
 boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = false;
 // float VORTRIEB = 0.72;
-float VORTRIEB = 0.8;
+float VORTRIEB = 0.83;
 float ASYMMETRIE = 1.01; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 // float ASYMMETRIE = 1.01; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 
@@ -52,7 +56,7 @@ String NACHRICHT = "";
 //String TEMPERATUR = "";
 //String IP = "192.168.137.92";
 //String IP = "192.168.178.70";
-String IP = "192.168.178.65";
+String IP = "192.168.178.73";
 int PORT = 6000;
 
 double antriebMultiplier = 1.0;
@@ -113,12 +117,11 @@ void setup() {
     lineDetector = new RansacDetector(r_maxIteration,r_threshhold, 400,camWidth,camHeight);
     lineDetection = new LineDetection(motorControl, lineFilter, lineDetector, boundary);
     
-    goalFilter = new HSVFilter(HSVColorRange.GREEN);
-    //goalFilter = new RGBFilter(RGBType.GREEN,30);
-    goalDetector = new ContourDetector(camWidth, camHeight);
+    goalFilter = new HSVFilter(HSVColorRange.GREEN).addPostFilter(new MedianFilter(9));
+    goalDetector = new  RansacDetectorRect(1000,50);
     goalDetection = new GoalDetection(motorControl, goalFilter, goalDetector);
     
-    ballFilter = new HSVFilter(HSVColorRange.BLUE).addPostFilter(new MedianFilter(9)).addPostFilter(new GaussianFilter1D(9, 100));
+    ballFilter = new HSVFilter(HSVColorRange.YELLOW).addPostFilter(new MedianFilter(3)).addPostFilter(new GaussianFilter1D(5, 100));
     ballDetector = new RansacDetectorRect(1000,150);
     ballDetection = new BallDetection(motorControl, ballFilter, ballDetector, comm);
     
@@ -134,21 +137,7 @@ void setup() {
 
 boolean AKTIV = false;
 
-void draw() {
-    
-    // try {
-    //     if (cam.isAvailable()) {
-    //         cam.read();
-    //         cam.updatePixels();
-    //         algo.updateImage(cam);
-    //     } else {
-    //         throw new RuntimeException("Camera not available");
-    //     }
-// }
-    // catch(Exception e) {
-    //     e.printStackTrace();
-// }
-    
+void draw() {   
     
     if (cam.isDown()) {
         noLoop();

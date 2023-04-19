@@ -71,7 +71,7 @@ public class BallDetection extends DetectionThread {
             
             if (isTurn) {
                 isTurn = false;
-                motorControl.notify(this, HandlerPriority.PRIORITY_HIGH, motorControl.Stop(15), motorControl.Forward(2, motorSignal, 0.75f));
+                motorControl.notify(this, HandlerPriority.PRIORITY_HIGH, motorControl.Stop(15), motorControl.Forward(2, motorSignal, 0.9f));
                 continue;
             }
             
