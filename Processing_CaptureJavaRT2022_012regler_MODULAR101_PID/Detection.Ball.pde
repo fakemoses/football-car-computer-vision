@@ -1,13 +1,11 @@
 public class BallDetection extends DetectionThread {
     
-    private ArrayList<Rectangle> rects;
-    private Rectangle boundingBox;
-    
-    private MemoryArray<Rectangle> memory;
-    private final int MEMORY_SIZE = 15;
-    
     Detector<Rectangle> objectDetector;
+    DataContainer data;
     Comm comm;
+    
+    private ArrayList<Rectangle> rects;
+    private Rectangle lastMemory;
     
     private final color boxColorOut = color(0, 0, 255);
     private final color boxColorIn = color(0, 255, 0);
@@ -20,21 +18,17 @@ public class BallDetection extends DetectionThread {
     PVector End = new PVector(225, 236);
     Rectangle roi;
     
-    private boolean isTurn = false;
-    private boolean isBallWithinROI = false;
-    
     private float motorPower = 1.0f;
-    private Rectangle lastMemory;
     
-    public BallDetection(MotorControl motorControl , ColorFilter colorFilter, Detector<Rectangle> objectDetector, Comm comm) {
+    public BallDetection(MotorControl motorControl , DataContainer data, ColorFilter colorFilter, Detector<Rectangle> objectDetector, Comm comm) {
         super(motorControl, colorFilter);
+        
         this.objectDetector = objectDetector;
+        this.data = data;
         
         int w = (int)(End.x - Start.x);
         int h = (int)(End.y - Start.y);
         this.roi = new Rectangle((int) Start.x,(int) Start.y, w, h);
-        
-        this.memory = new MemoryArray<Rectangle>(MEMORY_SIZE);
     }
     
     public String getThreadName() {
@@ -53,44 +47,37 @@ public class BallDetection extends DetectionThread {
             rects = objectDetector.detect(image, mask);
             
             Rectangle result = getRectangleFromDetectionResult(rects);
-            memory.addCurrentMemory(result);
             
-            // TODO: Refactor this
-            // IDEA: Move Logic to MotorControl
-            // DetectionThread should have less clutter
-            lastMemory = memory.getLastRememberedMemory(); 
+            // TODO: DataContainer method seperate -> update, getVar
+            // is upcasting possible? SUS
+            lastMemory = (Rectangle)data.update(this, result);
             
             if (lastMemory == null) {
-                isTurn = true;
-                // motorControl.notify(this, HandlerPriority.PRIORITY_LOW,motorControl.Turn(1));  
+                data.setIsTurn(true);
                 motorControl.notify(this, HandlerPriority.PRIORITY_LOWEST,motorControl.randomHandler(10, 3));  
                 continue;
             }
             
             float motorSignal = toMotorSignalLinear((int)lastMemory.getCenterX());
             
-            if (isTurn) {
-                isTurn = false;
+            if (data.isTurn()) {
+                data.setIsTurn(false);
                 motorControl.notify(this, HandlerPriority.PRIORITY_HIGH, motorControl.Stop(15), motorControl.Forward(2, motorSignal, 0.9f));
                 continue;
             }
             
-            if (isRectInROI(lastMemory)) {
-                isBallWithinROI = true;
+            data.setIsBallInRoi(isRectInROI(lastMemory));
+            
+            if (data.isBallInRoi()) {
                 motorControl.disableBallNoti();
                 continue;
             }
             
             motorPower = 0.85f;
-            isBallWithinROI = false;
             motorControl.enableBallNoti();
             motorControl.notify(this, HandlerPriority.PRIORITY_MEDIUM, motorControl.Forward(2, motorSignal, motorPower));
             continue;            
         }
-    }
-    
-    public Rectangle getBoundingBox() {
-        return boundingBox;
     }
     
     private Rectangle getRectangleFromDetectionResult(ArrayList<Rectangle> rects) {
@@ -112,20 +99,25 @@ public class BallDetection extends DetectionThread {
         if (image == null || mask == null) {
             return null;
         }
+        
         PImage[] results = new PImage[2];
+
         PImage retImage = drawRect(image, roi, roiThickness, roiColor, false);
-        color boxColor = isBallWithinROI ? boxColorIn : boxColorOut;
+        
+        color boxColor = data.isBallInRoi() ? boxColorIn : boxColorOut;
+        
         results[0] = lastMemory == null ? retImage : drawRect(retImage, lastMemory, boxThickness, boxColor, false);
         results[1] = mask;
+        
         return results;
     }
     
     public float toMotorSignalLinear(int xCenter) {
-        int MAXWIDTH = 320; // todo: set variable 
+        int MAXWIDTH = 320; // TODO: set variable 
         return(float)(xCenter - (MAXWIDTH / 2)) / (MAXWIDTH / 2);
     }
     
-    public boolean isBallWithinROI() {
-        return isBallWithinROI;
+    public boolean isBallInRoi() {
+        return data.isBallInRoi();
     } 
 }

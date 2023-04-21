@@ -18,6 +18,7 @@ import java.util.Comparator;
 import java.util.ListIterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.ReentrantLock;
 import java.net.*;
 import java.io.*;
 import java.io.ByteArrayInputStream;
@@ -68,6 +69,8 @@ CustomCam cam;
 Algo algo;
 MotorControl motorControl;
 
+DataContainer dataContainer;
+
 Boundary boundary;
 ColorFilter goalFilter;
 ColorFilter lineFilter;
@@ -111,19 +114,20 @@ void setup() {
     
     motorControl = new MotorControl(antrieb);
     
+    dataContainer = new DataContainer();
     
     lineFilter = new HSVFilter(HSVColorRange.combine(HSVColorRange.RED1, HSVColorRange.RED2));
     boundary = new Boundary(camWidth,camHeight);
     lineDetector = new RansacDetector(r_maxIteration,r_threshhold, 400,camWidth,camHeight);
-    lineDetection = new LineDetection(motorControl, lineFilter, lineDetector, boundary);
-    
-    goalFilter = new HSVFilter(HSVColorRange.GREEN).addPostFilter(new MedianFilter(9));
-    goalDetector = new  RansacDetectorRect(1000,50);
-    goalDetection = new GoalDetection(motorControl, goalFilter, goalDetector);
+    lineDetection = new LineDetection(motorControl, dataContainer, lineFilter, lineDetector, boundary);
     
     ballFilter = new HSVFilter(HSVColorRange.YELLOW).addPostFilter(new MedianFilter(3)).addPostFilter(new GaussianFilter1D(5, 100));
     ballDetector = new RansacDetectorRect(1000,150);
-    ballDetection = new BallDetection(motorControl, ballFilter, ballDetector, comm);
+    ballDetection = new BallDetection(motorControl, dataContainer, ballFilter, ballDetector, comm);
+    
+    goalFilter = new HSVFilter(HSVColorRange.GREEN).addPostFilter(new MedianFilter(9));
+    goalDetector = new  RansacDetectorRect(1000,50);
+    goalDetection = new GoalDetection(motorControl, dataContainer, goalFilter, goalDetector);
     
     motorControl.register(lineDetection,1);
     motorControl.register(ballDetection,2);

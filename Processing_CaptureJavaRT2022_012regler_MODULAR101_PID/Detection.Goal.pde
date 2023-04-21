@@ -1,15 +1,10 @@
 public class GoalDetection extends DetectionThread{
     
-    private ArrayList<Rectangle> rects;
-    private Rectangle boundingBox;
-    
-    private MemoryArray<Rectangle> memory;
-    private final int MEMORY_SIZE = 15;
-    
     Detector<Rectangle> objectDetector;
+    DataContainer data;
     
-    private boolean isFull;
-    private boolean isShot;
+    private ArrayList<Rectangle> rects;
+    private Rectangle lastMemory;
     
     //timer
     private long startTime;
@@ -27,22 +22,19 @@ public class GoalDetection extends DetectionThread{
     PVector End = new PVector(299, 160);
     Rectangle roi;
     
-    private boolean isGoalWithinROI = false;
     private float motorPower = 1.0f;
+    private final double MIN_GOAL_AREA = 10000.0;
     
-    private Rectangle lastMemory;
     
-    public GoalDetection(MotorControl motorControl, ColorFilter colorFilter, Detector<Rectangle> objectDetector) {
+    public GoalDetection(MotorControl motorControl, DataContainer data, ColorFilter colorFilter, Detector<Rectangle> objectDetector) {
         super(motorControl, colorFilter);
+        
         this.objectDetector = objectDetector;
+        this.data = data;        
         
         int w = (int)(End.x - Start.x);
         int h = (int)(End.y - Start.y);
         this.roi = new Rectangle((int) Start.x,(int) Start.y, w, h);
-        this.memory = new MemoryArray<Rectangle>(MEMORY_SIZE);
-        
-        isFull = false;
-        isShot = false;
     }
     
     public String getThreadName() {
@@ -56,14 +48,13 @@ public class GoalDetection extends DetectionThread{
                 delay(50);
                 continue;
             }
+            
             mask = colorFilter.filter(image);
             rects = objectDetector.detect(image, mask);
             
             Rectangle result = getRectangleFromDetectionResult(rects);
             
-            memory.addCurrentMemory(result);
-            
-            lastMemory = memory.getLastRememberedMemory();
+            lastMemory = (Rectangle)data.update(this, result);
             
             if (lastMemory == null) {
                 motorControl.notify(this, HandlerPriority.PRIORITY_LOW,motorControl.Turn(1));  
@@ -73,32 +64,33 @@ public class GoalDetection extends DetectionThread{
             float motorSignal = toMotorSignalLinear((int)lastMemory.getCenterX());
             double bboxArea = lastMemory.getWidth() * lastMemory.getHeight();
             
-            if (bboxArea < 10000.0) {
-                isGoalWithinROI = false;
+            data.setIsGoalInRoi(bboxArea > MIN_GOAL_AREA);
+            
+            if (data.isGoalInRoi()) {
                 motorControl.notify(this, HandlerPriority.PRIORITY_MEDIUM ,motorControl.Forward(1,motorSignal,motorPower));            
                 continue;
             } 	
             
-            if (!isShot) {
-                isGoalWithinROI = true;
-                isShot = true;
+            if (!data.isShot()) {
+                data.setIsShot(true);
                 startTime = System.currentTimeMillis();
                 motorControl.notify(this, HandlerPriority.PRIORITY_HIGH, motorControl.StopForGoal(1));
                 //motorControl.disableGoalNoti();
                 continue;
             } 
             
-            if (isShot) {
+            if (data.isShot()) {
+                // TODO:Refactor this
                 endTime = System.currentTimeMillis();
                 duration = (endTime - startTime);
                 if (duration > 1000 && duration < 3000) {
                     motorControl.notify(this, HandlerPriority.PRIORITY_HIGH ,motorControl.Reverse(5)); 
                 }
-                elseif (duration > 3000 && duration < 4000) {
+                else if (duration > 3000 && duration < 4000) {
                     motorControl.notify(this, HandlerPriority.PRIORITY_HIGH ,motorControl.Turn(1));
                 }
-                elseif (duration > 4000) {
-                    isShot = false;
+                else if (duration > 4000) {
+                    data.setIsShot(false);
                     //motorControl.enableGoalNoti();
                 }
                 continue;
@@ -108,23 +100,6 @@ public class GoalDetection extends DetectionThread{
             throw new RuntimeException("Should not reach here");
         }
     }
-    
-    // private Rectangle getRectangleFromDetectionResult(ArrayList<Rectangle> rects) {
-    //     if (rects == null || rects.size() == 0) {
-    //         return null;
-    //     }
-    //     // for (Rectangle r : rects) {
-    //     //     if (r.width < MIN_WIDTH ||  r.height < MIN_HEIGHT) {
-    //     //         continue;
-    //     //     }
-    
-    //     //     if (r.width * r.height < MIN_AREA) {
-    //     //         continue;
-    //     //     }
-    //     //     return r;
-    //     // }
-    //     // return r;
-// }
     
     private Rectangle getRectangleFromDetectionResult(ArrayList<Rectangle> rects) {
         if (rects == null || rects.size() == 0) {
