@@ -44,6 +44,7 @@ public class GoalDetection extends DetectionThread{
     public void run() {
         
         while(STARTED) {
+            
             if (image == null) {
                 delay(50);
                 continue;
@@ -67,7 +68,7 @@ public class GoalDetection extends DetectionThread{
             data.setIsGoalInRoi(bboxArea > MIN_GOAL_AREA);
             
             if (data.isGoalInRoi()) {
-                motorControl.notify(this, HandlerPriority.PRIORITY_MEDIUM ,motorControl.Forward(1,motorSignal,motorPower));            
+                motorControl.notify(this, HandlerPriority.PRIORITY_MEDIUM ,motorControl.Forward(1,motorSignal,motorPower));       
                 continue;
             } 	
             

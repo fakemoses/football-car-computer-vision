@@ -124,7 +124,7 @@ public class HSVFilter implements ColorFilter {
     
     private PImage executePostFilters(PImage image) {
         for (PostFilter filter : postFilters) {
-            image = filter.process(image);
+            image = filter.apply(image);
         }
         return image;
     }

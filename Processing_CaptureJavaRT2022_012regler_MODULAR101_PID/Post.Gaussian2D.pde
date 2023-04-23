@@ -10,7 +10,7 @@ public class GaussianFilter2D implements PostFilter{
         this.gaussianKernel = calculateGaussianKernel(sigma);
     } 
     
-    public PImage process(PImage image) {
+    public PImage apply(PImage image) {
         int w = image.width;
         int h = image.height;
         PImage result = createImage(w, h, RGB);

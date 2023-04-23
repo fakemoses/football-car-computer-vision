@@ -1,6 +1,8 @@
 public class DataContainer {
     
-    private ReentrantLock lock;
+    private final ReentrantReadWriteLock rwl;
+    private final Lock readLock;
+    private final Lock writeLock;
     
     // TODO: MotorState -> state controlled by MotorControl
     // TODO: Should ROI also use MemoryArray?
@@ -29,7 +31,9 @@ public class DataContainer {
     
     
     public DataContainer() {
-        this.lock = new ReentrantLock();
+        this.rwl = new ReentrantReadWriteLock();
+        this.readLock = rwl.readLock();
+        this.writeLock = rwl.writeLock();
         
         this.ballMemory = new MemoryArray<Rectangle>(BALL_MEMORY_SIZE);
         this.goalMemory = new MemoryArray<Rectangle>(GOAL_MEMORY_SIZE);
@@ -40,10 +44,10 @@ public class DataContainer {
     
     public Shape update(DetectionThread instance, Shape shape) {
         try {
-            lock.lock();
+            writeLock.lock();
             return route(instance, shape);
         } finally {
-            lock.unlock();
+            writeLock.unlock();
         }
     }
     
@@ -83,127 +87,127 @@ public class DataContainer {
     
     private Rectangle getLatestBallMemory() {
         try{
-            lock.lock();
+            readLock.lock();
             return latestBallMemory;
         } finally {
-            lock.unlock();
+            readLock.unlock();
         }
     }
     
     private Rectangle getLatestGoalMemory() {
         try{
-            lock.lock();
+            readLock.lock();
             return latestGoalMemory;
         } finally {
-            lock.unlock();
+            readLock.unlock();
         }
     }
     
     private Line getLatestLineMemory() {
         try{
-            lock.lock();
+            readLock.lock();
             return latestLineMemory;
         } finally {
-            lock.unlock();
+            readLock.unlock();
         }
     }
     
     public boolean isBallDetected() {
         try{
-            lock.lock();
+            readLock.lock();
             return latestBallMemory != null;
         } finally {
-            lock.unlock();
+            readLock.unlock();
         }
     }
     
     public boolean isGoalDetected() {
         try{
-            lock.lock();
+            readLock.lock();
             return latestGoalMemory != null;
         } finally {
-            lock.unlock();
+            readLock.unlock();
         }
     }
     
     public boolean isLineDetected() {
         try{
-            lock.lock();
+            readLock.lock();
             return latestLineMemory != null;
         } finally {
-            lock.unlock();
+            readLock.unlock();
         }
     }
     
     public void setIsBallInRoi(boolean isBallInRoi) {
         try{
-            lock.lock();
+            writeLock.lock();
             this.isBallInRoi = isBallInRoi;
         } finally {
-            lock.unlock();
+            writeLock.unlock();
         }
     }
     
     public boolean isBallInRoi() {
         try{
-            lock.lock();
+            readLock.lock();
             return isBallInRoi;
         } finally {
-            lock.unlock();
+            readLock.unlock();
         }
     }
     
     public void setIsGoalInRoi(boolean isGoalInRoi) {
         try{
-            lock.lock();
+            writeLock.lock();
             this.isGoalInRoi = isGoalInRoi;
         } finally {
-            lock.unlock();
+            writeLock.unlock();
         }
     }
     
     public boolean isGoalInRoi() {
         try{
-            lock.lock();
+            readLock.lock();
             return isGoalInRoi;
         } finally {
-            lock.unlock();
+            readLock.unlock();
         }
     }
     
     public void setIsTurn(boolean isTurn) {
         try{
-            lock.lock();
+            writeLock.lock();
             this.isTurn = isTurn;
         } finally {
-            lock.unlock();
+            writeLock.unlock();
         }
     }
     
     public boolean isTurn() {
         try{
-            lock.lock();
+            readLock.lock();
             return isTurn;
         } finally {
-            lock.unlock();
+            readLock.unlock();
         }
     }
     
     public void setIsShot(boolean isShot) {
         try{
-            lock.lock();
+            writeLock.lock();
             this.isShot = isShot;
         } finally {
-            lock.unlock();
+            writeLock.unlock();
         }
     }
     
     public boolean isShot() {
         try{
-            lock.lock();
+            readLock.lock();
             return isShot;
         } finally {
-            lock.unlock();
+            readLock.unlock();
         }
     }
     

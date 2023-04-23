@@ -10,7 +10,7 @@ public class GaussianFilter1D implements PostFilter{
         this.gaussianKernel = calculateGaussianKernel(sigma);
     } 
     
-    public PImage process(PImage img) {
+    public PImage apply(PImage img) {
         PImage convX = convoluteInX(img);
         return convoluteInYWithThreshhold(convX, img);
     }

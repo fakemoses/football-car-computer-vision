@@ -11,7 +11,7 @@ class Padding implements PostFilter {
         this.left = left;
     }
     
-    public PImage process(PImage image) {
+    public PImage apply(PImage image) {
         PImage result = image.copy();
         
         for (int i = 0; i < result.width; i++) {          

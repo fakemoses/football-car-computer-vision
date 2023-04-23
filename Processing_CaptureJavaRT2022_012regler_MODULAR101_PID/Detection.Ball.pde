@@ -35,8 +35,9 @@ public class BallDetection extends DetectionThread {
         return "BallDetection";
     }
     
+    
     public void run() {
-        while(STARTED) {
+        while(STARTED) {    
             
             if (image == null) {
                 delay(50);
@@ -96,12 +97,13 @@ public class BallDetection extends DetectionThread {
     }
     
     public PImage[] getResults() {
+        
         if (image == null || mask == null) {
             return null;
         }
         
         PImage[] results = new PImage[2];
-
+        
         PImage retImage = drawRect(image, roi, roiThickness, roiColor, false);
         
         color boxColor = data.isBallInRoi() ? boxColorIn : boxColorOut;

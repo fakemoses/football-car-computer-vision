@@ -76,7 +76,7 @@ public class HSVFilterCV extends PApplet implements ColorFilter {
     
     private PImage executePostFilters(PImage image) {
         for (PostFilter filter : postFilters) {
-            image = filter.process(image);
+            image = filter.apply(image);
         }
         return image;
     }

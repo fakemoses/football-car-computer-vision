@@ -35,5 +35,5 @@ interface Detector<T extends Shape>{
 }
 
 interface PostFilter {
-    public abstract PImage process(PImage image);
+    public abstract PImage apply(PImage image);
 }

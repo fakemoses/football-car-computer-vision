@@ -18,7 +18,9 @@ import java.util.Comparator;
 import java.util.ListIterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.net.*;
 import java.io.*;
 import java.io.ByteArrayInputStream;
@@ -57,7 +59,7 @@ String NACHRICHT = "";
 //String TEMPERATUR = "";
 //String IP = "192.168.137.92";
 //String IP = "192.168.178.70";
-String IP = "192.168.178.73";
+String IP = "192.168.178.65";
 int PORT = 6000;
 
 double antriebMultiplier = 1.0;
@@ -121,11 +123,11 @@ void setup() {
     lineDetector = new RansacDetector(r_maxIteration,r_threshhold, 400,camWidth,camHeight);
     lineDetection = new LineDetection(motorControl, dataContainer, lineFilter, lineDetector, boundary);
     
-    ballFilter = new HSVFilter(HSVColorRange.YELLOW).addPostFilter(new MedianFilter(3)).addPostFilter(new GaussianFilter1D(5, 100));
+    ballFilter = new HSVFilter(HSVColorRange.YELLOW).addPostFilter(new MedianFilter(3)).addPostFilter(new GaussianFilter1D(5, 100)).addPostFilter(new Padding(50,0,0,0));
     ballDetector = new RansacDetectorRect(1000,150);
     ballDetection = new BallDetection(motorControl, dataContainer, ballFilter, ballDetector, comm);
     
-    goalFilter = new HSVFilter(HSVColorRange.GREEN).addPostFilter(new MedianFilter(9));
+    goalFilter = new HSVFilter(HSVColorRange.GREEN).addPostFilter(new MedianFilter(9)).addPostFilter(new Padding(50,0,0,0));
     goalDetector = new  RansacDetectorRect(1000,50);
     goalDetection = new GoalDetection(motorControl, dataContainer, goalFilter, goalDetector);
     

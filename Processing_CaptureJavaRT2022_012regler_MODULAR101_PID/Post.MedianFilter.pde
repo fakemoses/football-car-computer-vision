@@ -7,7 +7,7 @@ public class MedianFilter implements PostFilter {
         this.kernelSize = kernelSize;
     }
     
-    public PImage process(PImage image) {
+    public PImage apply(PImage image) {
         int width = image.width;
         int height = image.height;
         int radius = kernelSize / 2;

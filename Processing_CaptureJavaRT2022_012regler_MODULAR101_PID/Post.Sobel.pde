@@ -74,7 +74,7 @@ public class Sobel implements PostFilter {
         halfLength = kernelX.length / 2;
     }
     
-    public PImage process(PImage image) {
+    public PImage apply(PImage image) {
         int width = image.width;
         int height = image.height;
         
