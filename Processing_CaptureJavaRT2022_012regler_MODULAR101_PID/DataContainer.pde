@@ -35,7 +35,7 @@ public class DataContainer {
         this.readLock = rwl.readLock();
         this.writeLock = rwl.writeLock();
         
-        this.ballMemory = new MemoryArray<Rectangle>(BALL_MEMORY_SIZE);
+        this.ballMemory = new MemoryArray<Rectangle>(BALL_MEMORY_SIZE);        
         this.goalMemory = new MemoryArray<Rectangle>(GOAL_MEMORY_SIZE);
         
         this.isBallInRoi = false;

@@ -28,7 +28,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 //Herausgezogene wichtige Parameter des Systems
-boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = false;
+boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = true;
 // float VORTRIEB = 0.72;
 float VORTRIEB = 0.83;
 float ASYMMETRIE = 1.01; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
@@ -127,7 +127,7 @@ void setup() {
     ballDetector = new RansacDetectorRect(1000,150);
     ballDetection = new BallDetection(motorControl, dataContainer, ballFilter, ballDetector, comm);
     
-    goalFilter = new HSVFilter(HSVColorRange.GREEN).addPostFilter(new MedianFilter(9)).addPostFilter(new Padding(50,0,0,0));
+    goalFilter = new HSVFilter(HSVColorRange.GREEN).addPostFilter(new MedianFilter(9)).addPostFilter(new GaussianFilter1D(5, 200)).addPostFilter(new Padding(50,0,0,0));
     goalDetector = new  RansacDetectorRect(1000,50);
     goalDetection = new GoalDetection(motorControl, dataContainer, goalFilter, goalDetector);
     
