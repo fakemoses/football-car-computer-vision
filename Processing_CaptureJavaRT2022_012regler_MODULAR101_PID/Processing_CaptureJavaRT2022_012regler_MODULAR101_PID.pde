@@ -123,7 +123,7 @@ void setup() {
     lineDetector = new RansacDetector(r_maxIteration,r_threshhold, 400,camWidth,camHeight);
     lineDetection = new LineDetection(motorControl, dataContainer, lineFilter, lineDetector, boundary);
     
-    ballFilter = new HSVFilter(HSVColorRange.YELLOW).addPostFilter(new MedianFilter(3)).addPostFilter(new GaussianFilter1D(5, 100)).addPostFilter(new Padding(50,0,0,0));
+    ballFilter = new HSVFilter(HSVColorRange.YELLOW3).addPostFilter(new MedianFilter(3)).addPostFilter(new GaussianFilter1D(5, 100)).addPostFilter(new Padding(50,0,0,0));
     ballDetector = new RansacDetectorRect(1000,150);
     ballDetection = new BallDetection(motorControl, dataContainer, ballFilter, ballDetector, comm);
     

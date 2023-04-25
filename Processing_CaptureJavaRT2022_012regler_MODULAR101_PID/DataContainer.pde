@@ -76,6 +76,12 @@ public class DataContainer {
     
     private Rectangle goalDetectionRoute(Rectangle shape) {
         goalMemory.addCurrentMemory(shape);
+        
+        // if (goalMemory.getLastRememberedMemory() == null) {
+        //     latestGoalMemory = null;
+        //     return null;
+    // }
+        // latestGoalMemory = trimmed(goalMemory.getAllMemory(), 20);
         latestGoalMemory = goalMemory.getLastRememberedMemory();
         return latestGoalMemory;
     }
@@ -209,6 +215,29 @@ public class DataContainer {
         } finally {
             readLock.unlock();
         }
+    }
+    
+    public Rectangle trimmed(Rectangle[] all, double percentage) {
+        Arrays.sort(all, new Comparator<Rectangle>() {
+            @Override
+            public int compare(Rectangle o1, Rectangle o2) {
+                return(o1.width * o1.height) - (o2.width * o2.height);
+            }
+        });
+        
+        int trim = (int)(all.length * percentage);
+        
+        Rectangle[] trimmed = Arrays.copyOfRange(all, trim, all.length - trim);
+        
+        int x = 0, y = 0, width = 0, height = 0;
+        for (Rectangle r : trimmed) {
+            x += r.x;
+            y += r.y;
+            width += r.width;
+            height += r.height;
+        }
+        
+        return new Rectangle(x / trimmed.length, y / trimmed.length, width / trimmed.length, height / trimmed.length);
     }
     
     

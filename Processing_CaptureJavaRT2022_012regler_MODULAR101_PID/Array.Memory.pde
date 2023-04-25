@@ -40,4 +40,10 @@ class MemoryArray<T> extends ArrayList<T>{
         }
         return null;
     }
+    
+    public T[] getAllMemory() {
+        return(T[]) toArray();
+    }
+    
+    
 }

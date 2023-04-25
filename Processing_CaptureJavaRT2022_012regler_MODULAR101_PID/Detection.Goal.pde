@@ -64,6 +64,8 @@ public class GoalDetection extends DetectionThread{
             
             float motorSignal = toMotorSignalLinear((int)lastMemory.getCenterX());
             double bboxArea = lastMemory.getWidth() * lastMemory.getHeight();
+
+            println("bboxArea: " + bboxArea);
             
             data.setIsGoalInRoi(bboxArea > MIN_GOAL_AREA);
             
