@@ -19,9 +19,8 @@ public class Regler
     public void fahren()
     {
       updateInput();
-      //println("px: " + px + " py: " + py + " start: " + start + " stop: " + stop);
-      if(py > 0.0 && start && !stop){
-         
+      if((py > 0.05 || py < -0.05) && start && !stop){
+
          float s =  VORTRIEB * abs(py);
          if(px > -0.05 && px < 0.05){
             u_links = s;
