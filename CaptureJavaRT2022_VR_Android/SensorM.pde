@@ -49,8 +49,8 @@ class RotVecListener implements SensorEventListener {
         // Calculate device orientation
         SensorManager.getOrientation(rotationMatrix, orientation);
 
-        float x = (float) Math.toDegrees(orientation[1]);
-        float y = (float) Math.toDegrees(orientation[2]);
+        float x = -(float) Math.toDegrees(orientation[1]);
+        float y = -(float) Math.toDegrees(orientation[2]);
         float z = (float) Math.toDegrees(orientation[0]);
 
         sensorM.x = x;
