@@ -1,3 +1,6 @@
+import ipcapture.*;
+
+
 String fileName = "rgbtest2.jpg";
 
 PImage image;
@@ -7,6 +10,11 @@ HSVFilter filter = new HSVFilter();
 
 // 0 = color picker
 // 1 = range picker
+
+String IP = "192.168.178.65";
+int PORT = 6000;
+
+IPCapture cam;
 
 color p1;
 color p2;
@@ -23,10 +31,17 @@ void setup() {
     println("Hello World");
     size(640, 480);
     image = loadImage(fileName);
+    
+    cam = new IPCapture(this, "http://" + IP + ":81/stream", "", "");
+    cam.start();
 }
 
 void draw() {
-    hsv = filter.filter(image);
+  
+    if (cam.isAvailable()) {
+        cam.read();
+    }
+    hsv = filter.filter(cam);
     image(hsv, 0, 0);
     image(image, image.width, 0);
     
