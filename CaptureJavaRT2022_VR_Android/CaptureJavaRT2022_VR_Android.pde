@@ -46,6 +46,7 @@ Regler regler;
 SensorM sensorData;
 
 long currTime = System.currentTimeMillis();
+long maxDuration = 5000;
 
 
 void setup()
@@ -84,7 +85,7 @@ void draw()
   translate(0, 0, 200);
   long timeDiff = System.currentTimeMillis() - currTime;
 
-  if (timeDiff <= 5000) {
+  if (timeDiff <= maxDuration) {
     drawStartScreen(timeDiff);
   } else {
 
@@ -109,11 +110,14 @@ void drawStartScreen(long timeDiff) {
 
   //redesign this shit to a better GUI
   // include those roation, cam mode etc
-  // TODO: Descending counting
+  // nod to start -> stay still till timer is done -> play
 
   background(0);
   textSize(35);
-  text("Starting in " + Math.round(timeDiff/1000), -100, 0);
+
+  long remainingTime = maxDuration - timeDiff;
+  if(remainingTime >= 0)
+    text("Starting in " + Math.round(remainingTime/1000), -100, 0);
 }
 
 void keyPressed()
