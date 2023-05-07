@@ -44,18 +44,18 @@ public class Regler
       float s =  VORTRIEB * py * 1.95f;
       if (pz > -0.1 && pz < 0.1) {
         direction ="Straight";
-        u_links = s;
-        u_rechts = s;
+        u_links = s * 0.9f;
+        u_rechts = s * 0.9f;
       } else if (pz > 0.1)
       {
         direction ="Right";
-        u_links = (s < pz) ? 0 : s - pz;
-        u_rechts = s;
+        u_links = (s < pz) ? 0 : (s*0.9f) - pz;
+        u_rechts = s * 0.9f;
       } else if (pz < -0.1)
       {
         direction ="Left";
-        u_links = s;
-        u_rechts = (s > pz) ? 0 : s - pz;
+        u_links = s * 0.9f;
+        u_rechts = (s > pz) ? 0 : (s*0.9f) - pz;
       }
 
       if (px > 0.35) {

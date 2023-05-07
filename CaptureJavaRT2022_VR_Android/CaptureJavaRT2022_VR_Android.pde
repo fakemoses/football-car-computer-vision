@@ -46,7 +46,7 @@ Regler regler;
 SensorM sensorData;
 
 long currTime = System.currentTimeMillis();
-long maxDuration = 5000;
+long maxDuration = 10000;
 
 
 void setup()
@@ -113,6 +113,7 @@ void drawStartScreen(long timeDiff) {
   // nod to start -> stay still till timer is done -> play
 
   background(0);
+  image(cam, 0, 0);
   textSize(35);
 
   long remainingTime = maxDuration - timeDiff;
