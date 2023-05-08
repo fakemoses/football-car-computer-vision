@@ -3,7 +3,7 @@ import processing.vr.*;
 import ipcapture2.*;
 
 //Herausgezogene wichtige Parameter des Systems
-boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = false;
+boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = true;
 float VORTRIEB = 0.9;
 float ASYMMETRIE = 1.01; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 
@@ -32,7 +32,7 @@ String NACHRICHT = "";
 //String TEMPERATUR = "";
 //String IP = "192.168.137.92";
 //String IP = "192.168.0.102";
-String IP = "192.168.178.68";
+String IP = "192.168.178.65";
 int PORT = 6000;
 
 //UDP udp;  // define the UDP object
@@ -48,7 +48,6 @@ SensorM sensorData;
 long currTime = System.currentTimeMillis();
 long maxDuration = 10000;
 
-
 void setup()
 {
   //size(320,240);
@@ -56,7 +55,9 @@ void setup()
   camera = new VRCamera(this);
   fullScreen(VR);
 
+  //cam = new IPCapture2(this, "http://192.168.178.38:4747/video", "", "");
   cam = new IPCapture2(this, "http://"+IP+":81/stream", "", "");
+
   cam.setMode(Mode.ANDROID);
   cam.start();
 
@@ -66,7 +67,7 @@ void setup()
   antrieb = new Antrieb(udpcomfort);
   regler = new Regler(antrieb, sensorData);
 
-  //frameRate(15);
+  frameRate(5);
 }
 
 
@@ -77,7 +78,7 @@ void draw()
   background(0);
   if (cam.isAvailable()) {
     cam.read();
-  }
+  } else println("camerror");
   camera.setPosition(0, 0, 400);
 
   camera.sticky();
@@ -90,10 +91,14 @@ void draw()
   } else {
 
     rotate(PI);
+    rotateY(PI);
     image(cam, 0, 0);
 
     // region: show Text in Image
+
     rotate(PI);
+    rotateY(PI);
+
     textSize(15);
     text("X Norm:" + nf(((sensorData.x) / 90.0f)-regler.offSetX, 0, 2), 0, 0);
     text("Y Norm:" + nf(((sensorData.y) / 90.0f)-regler.offSetY, 0, 2), 0, 20);
@@ -104,6 +109,7 @@ void draw()
   }
   textSize(35);
   camera.noSticky();
+  delay(16);
 }
 
 void drawStartScreen(long timeDiff) {
@@ -113,11 +119,12 @@ void drawStartScreen(long timeDiff) {
   // nod to start -> stay still till timer is done -> play
 
   background(0);
-  image(cam, 0, 0);
+  //rotate(PI);
+  //image(cam, 0, 0);
   textSize(35);
 
   long remainingTime = maxDuration - timeDiff;
-  if(remainingTime >= 0)
+  if (remainingTime >= 0)
     text("Starting in " + Math.round(remainingTime/1000), -100, 0);
 }
 

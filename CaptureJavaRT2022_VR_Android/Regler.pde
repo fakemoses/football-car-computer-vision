@@ -38,10 +38,10 @@ public class Regler
 
     //TODO: Sensor seems to be inverted -> need to check if it's the case for all phones
     // start is when the phone is slanted to the left, stop when to the right -> pz is checked
-    if ((px < -0.35 || start) && !stop && (py > 0.1 || py < -0.1)) {
+    if ((px < -0.35 || start) && !stop && (py > 0.05 || py < -0.05)) {
 
       start = true;
-      float s =  VORTRIEB * py * 1.95f;
+      float s =  VORTRIEB * py * 3.0f;
       if (pz > -0.1 && pz < 0.1) {
         direction ="Straight";
         u_links = s * 0.9f;
@@ -58,7 +58,7 @@ public class Regler
         u_rechts = (s > pz) ? 0 : (s*0.9f) - pz;
       }
 
-      if (px > 0.35) {
+      if (px > 0.8) {
         stop = true;
       }
     } else {
@@ -69,7 +69,9 @@ public class Regler
     u_links*=ASYMMETRIE;
     u_rechts*=(2.0 - ASYMMETRIE);
 
-    println("u_links: " + nf(u_links, 0, 2) + " u_rechts: " + nf(u_rechts, 0, 2) + " direction: " + direction  + " px: " + nf(px, 0, 2) + " py: " + nf(py, 0, 2) + " pz: " + nf(pz, 0, 2));
+    println("u_links: " + nf(u_links, 0, 2) + " u_rechts: " + nf(u_rechts, 0, 2) + " direction: " + direction  + " px: " + nf(px, 0, 2) + " py: " + nf(py, 0, 2) + " pz: " + nf(pz, 0, 2)+ " start: "+ start);
+
+
     antrieb.fahrt(u_links, u_rechts);
   }
 
