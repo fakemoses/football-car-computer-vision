@@ -5,7 +5,7 @@ import ipcapture2.*;
 //Herausgezogene wichtige Parameter des Systems
 boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = true;
 float VORTRIEB = 0.9;
-float ASYMMETRIE = 1.01; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
+float ASYMMETRIE = 1; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 
 //VERSION FÜR TP-Link_59C2
 
@@ -47,6 +47,8 @@ SensorM sensorData;
 
 long currTime = System.currentTimeMillis();
 long maxDuration = 10000;
+float tilt_thres = -0.2;
+boolean stats = true;
 
 void setup()
 {
@@ -55,8 +57,8 @@ void setup()
   camera = new VRCamera(this);
   fullScreen(VR);
 
-  //cam = new IPCapture2(this, "http://192.168.178.38:4747/video", "", "");
-  cam = new IPCapture2(this, "http://"+IP+":81/stream", "", "");
+  cam = new IPCapture2(this, "http://192.168.178.45:4747/video", "", "");
+  //cam = new IPCapture2(this, "http://"+IP+":81/stream", "", "");
 
   cam.setMode(Mode.ANDROID);
   cam.start();
@@ -89,22 +91,7 @@ void draw()
   if (timeDiff <= maxDuration) {
     drawStartScreen(timeDiff);
   } else {
-
-    rotate(PI);
-    rotateY(PI);
-    image(cam, 0, 0);
-
-    // region: show Text in Image
-
-    rotate(PI);
-    rotateY(PI);
-
-    textSize(15);
-    text("X Norm:" + nf(((sensorData.x) / 90.0f)-regler.offSetX, 0, 2), 0, 0);
-    text("Y Norm:" + nf(((sensorData.y) / 90.0f)-regler.offSetY, 0, 2), 0, 20);
-    text("Z Norm:" + nf(((sensorData.z) / 180.0f)-regler.offSetZ, 0, 2), 0, 40);
-    //
-
+    drawMainScreen();
     regler.fahren();
   }
   textSize(35);
@@ -121,63 +108,45 @@ void drawStartScreen(long timeDiff) {
   background(0);
   //rotate(PI);
   //image(cam, 0, 0);
-  textSize(35);
+  textSize(25);
 
   long remainingTime = maxDuration - timeDiff;
-  if (remainingTime >= 0)
-    text("Starting in " + Math.round(remainingTime/1000), -100, 0);
+  if (remainingTime >= 0){
+    text("Starting in " + Math.round(remainingTime / 1000), -100, 0);
+    text("Don't move your head till the timer ends", -250, -40);
+  }
 }
 
-void keyPressed()
-{
-  if (key == ' ')
-  {
-    if (cam.isAlive())
-    {
-      cam.stop();
-      NACHRICHT = "Kamera gestoppt";
-    } else
-    {
-      cam.start();
-      NACHRICHT = "Kamera gestartet";
+void drawMainScreen(){
+
+  rotate(PI);
+    rotateY(PI);
+    image(cam, 0, 0);
+
+    // region: show Text in Image
+
+    rotate(PI);
+    rotateY(PI);
+
+    if(stats){
+      fill(0,0,0);
+      rect(-200,0,100,60);
+      fill(255,255,255);
+      textSize(15);
+      text("X Norm:" + nf(((sensorData.x) / 90.0f)-regler.offSetX, 0, 2), -200, 0);
+      text("Y Norm:" + nf(((sensorData.y) / 90.0f)-regler.offSetY, 0, 2), -200, 20);
+      text("Z Norm:" + nf(((sensorData.z) / 180.0f)-regler.offSetZ, 0, 2), -200, 40);
+    }   
+
+    if((((sensorData.x) / 90.0f)-regler.offSetX > tilt_thres || regler.stop) && !regler.start){
+      fill(255, 0, 0);
+      rect(150, 130, 50, 50);
+    } else if(regler.start && !regler.stop){
+      fill(0, 255, 0);
+      rect(150, 130, 50, 50);
+    } else{
+      fill(255, 0, 0);
+      rect(150, 130, 50, 50);
     }
-  } else if (key=='0') //stopp
-  {
-    antrieb.fahrt(0.0, 0.0);
-    NACHRICHT = "Fahrt gestoppt";
-    AKTIV=false;
-  } else if (key=='1') //beide vor
-  {
-    antrieb.fahrt(1.0, 1.0);
-    NACHRICHT = "Fahrt VORWÄRTS";
-    AKTIV=true;
-  } else if (key=='2') //beide rueck
-  {
-    antrieb.fahrt(-1.0, -1.0);
-    NACHRICHT = "Fahrt RÜCKWÄRTS";
-  } else if (key=='3') //links langsam vor
-  {
-    antrieb.fahrt(0.85, 0.0);
-    NACHRICHT = "Fahrt LINKS langsam vor";
-  } else if (key=='4') //rechts langsam vor
-  {
-    antrieb.fahrt(0.0, 0.85);
-    NACHRICHT = "Fahrt RECHTS langsam vor";
-  } else if (key=='5') //links langsam rück
-  {
-    antrieb.fahrt(-0.93, 0.0);
-    NACHRICHT = "Fahrt LINKS langsam zurück";
-  } else if (key=='6') //rechts langsam rück
-  {
-    antrieb.fahrt(0.0, -0.93);
-    NACHRICHT = "Fahrt RECHTS langsam zurück";
-  } else if (key=='7') //Kameralicht AN
-  {
-    udpcomfort.send(4, 1);
-    NACHRICHT = "Kameralicht AN";
-  } else if (key=='8') //Kameralicht AUS
-  {
-    udpcomfort.send(4, 0);
-    NACHRICHT = "Kameralicht AUS";
-  }
+    
 }

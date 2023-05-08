@@ -4,7 +4,7 @@ public class Regler
 {
   private Antrieb antrieb;
   private float px, py, pz;
-  private boolean start, stop;
+  public boolean start, stop;
   private boolean offS;
   SensorM sensorData;
   String direction ="";
@@ -38,7 +38,7 @@ public class Regler
 
     //TODO: Sensor seems to be inverted -> need to check if it's the case for all phones
     // start is when the phone is slanted to the left, stop when to the right -> pz is checked
-    if ((px < -0.35 || start) && !stop && (py > 0.05 || py < -0.05)) {
+    if ((px < tilt_thres || start) && !stop && (py > 0.05 || py < -0.05)) {
 
       start = true;
       float s =  VORTRIEB * py * 3.0f;
@@ -49,13 +49,13 @@ public class Regler
       } else if (pz > 0.1)
       {
         direction ="Right";
-        u_links = (s < pz) ? 0 : (s*0.9f) - pz;
+        u_links = (s*0.9f) - pz;
         u_rechts = s * 0.9f;
       } else if (pz < -0.1)
       {
         direction ="Left";
         u_links = s * 0.9f;
-        u_rechts = (s > pz) ? 0 : (s*0.9f) - pz;
+        u_rechts = (s*0.9f) - abs(pz);
       }
 
       if (px > 0.8) {
