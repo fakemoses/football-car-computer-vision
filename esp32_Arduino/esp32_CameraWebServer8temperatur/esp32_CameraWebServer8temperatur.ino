@@ -21,8 +21,11 @@
 
 #include "camera_pins.h"
 
-const char* ssid = "PinnutNet 2.4 Ghz"; //Smartphone Pixel
-const char* password = "PinnutTennut6625@";
+//const char* ssid = "PinnutNet 2.4 Ghz"; //Smartphone Pixel
+//const char* password = "PinnutTennut6625@";
+
+const char* ssid = "AARON 5306"; //Aaron's Laptop
+const char* password = "670F0:e5";
 
 AsyncUDP udp;
 

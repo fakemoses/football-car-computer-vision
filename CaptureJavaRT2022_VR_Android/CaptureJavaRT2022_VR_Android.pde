@@ -32,7 +32,8 @@ String NACHRICHT = "";
 //String TEMPERATUR = "";
 //String IP = "192.168.137.92";
 //String IP = "192.168.0.102";
-String IP = "192.168.178.65";
+//String IP = "192.168.178.65";
+String IP = "192.168.137.222";
 int PORT = 6000;
 
 //UDP udp;  // define the UDP object
@@ -57,8 +58,8 @@ void setup()
   camera = new VRCamera(this);
   fullScreen(VR);
 
-  cam = new IPCapture2(this, "http://192.168.178.45:4747/video", "", "");
-  //cam = new IPCapture2(this, "http://"+IP+":81/stream", "", "");
+  //cam = new IPCapture2(this, "http://192.168.178.45:4747/video", "", "");
+  cam = new IPCapture2(this, "http://"+IP+":81/stream", "", "");
 
   cam.setMode(Mode.ANDROID);
   cam.start();
