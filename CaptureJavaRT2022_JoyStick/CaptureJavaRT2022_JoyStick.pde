@@ -51,7 +51,6 @@ void setup()
      size(320,240);
      cam = new IPCapture(this, "http://"+IP+":81/stream", "", "");
      cam.start();
-     //bildverarbeitung = new Bildverarbeitung(cam);
      control = new Controller(this, controllerName);
 
      if (!control.isDeviceAvailable()) {

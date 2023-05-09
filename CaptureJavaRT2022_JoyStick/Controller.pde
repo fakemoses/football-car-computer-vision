@@ -22,12 +22,10 @@ public class Controller{
     }
   
     public UserInput getUserInput() {
-        float px = map(stick.getSlider("X").getValue(), -1, 1, 0, width);
-        float py = map(stick.getSlider("Y").getValue(), -1, 1, 0, height);
-        boolean start = stick.getButton("Start").pressed();
-        boolean stop = stick.getButton("Stop").pressed();
+        float px = map(stick.getSlider("direction").getValue(), -1, 1, 0, width);
+        float py = map(stick.getSlider("throttle").getValue(), -1, 1, 0, height); 
 
-        UserInput input = new UserInput(px, py, start, stop);
+        UserInput input = new UserInput(px, py);
         return input;
     }
 }
@@ -35,13 +33,10 @@ public class Controller{
 public class UserInput {
     public float px;
     public float py;
-    public boolean start;
-    public boolean stop;
 
-    public UserInput(float px, float py, boolean start, boolean stop) {
+    public UserInput(float px, float py) {
         this.px = px;
         this.py = py;
-        this.start = start;
-        this.stop = stop;
+
     }
 }
