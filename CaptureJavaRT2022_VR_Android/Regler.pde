@@ -41,21 +41,21 @@ public class Regler
     if ((px < tilt_thres || start) && !stop && (py > 0.05 || py < -0.05)) {
 
       start = true;
-      float s =  VORTRIEB * py * 2.5f;
+      float s =  VORTRIEB * py * 3f;
       if (pz > -0.1 && pz < 0.1) {
         direction ="Straight";
-        u_links = s * 0.95f;
-        u_rechts = s * 0.95f;
+        u_links = s * 0.9f;
+        u_rechts = s * 0.9f;
       } else if (pz > 0.1)
       {
         direction ="Right";
-        u_links = (s*0.95f) - pz;
-        u_rechts = s * 0.95f;
+        u_links = s * 0.5f;
+        u_rechts = (s*0.9f) + pz;
       } else if (pz < -0.1)
       {
         direction ="Left";
-        u_links = s * 0.95f;
-        u_rechts = (s*0.95f) - abs(pz);
+        u_links = (s*0.9f) + abs(pz);
+        u_rechts = s * 0.5f;
       }
 
       if (px > 0.8) {
