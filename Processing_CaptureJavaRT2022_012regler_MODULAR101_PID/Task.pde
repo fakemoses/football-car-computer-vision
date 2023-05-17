@@ -30,8 +30,6 @@ class Task implements Comparable<Task>, ITask{
     }
     
     public void setHandler(MotorHandler...handlers) {
-        // debug
-        // clear queue
         try {
             handlersQueue.clear();
             for (MotorHandler handler : handlers) {
@@ -60,27 +58,19 @@ class Task implements Comparable<Task>, ITask{
     }
     
     public void execute() {
-        
-        // debug
         if (isQueueEmpty()) {
             throw new RuntimeException("Check Implementation");
         }
-        
         MotorHandler handler = getFrontHandler();      
         handler.execute();
         println("Executing task: " + this.instance.getThreadName() + " handler name: " + handler.getHandlerName());
-        
     }
     
-    public void loop() {
-        
+    public void loop() {  
         if (isQueueEmpty()) {
             return;
-        }
-        
+        }    
         handlersQueue.remove();
-        // println("Removing handler from queue");
-        // println("Queue size: " + handlersQueue.size());
     }
     
 }
