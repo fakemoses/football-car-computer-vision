@@ -37,9 +37,9 @@ public class LineDetection extends DetectionThread {
             
             Line result = getLineFromDetectionResult(lines);
             
-            detectedLine = (Line)data.update(this, result);
+            data.update(this, result);
+            detectedLine = data.getLatestLineMemory();
             
-            // TODO: boundary method seperate, -> update, isHelpNeeded
             if (boundary.isHelpNeeded(detectedLine)) {
                 motorControl.notify(this, HandlerPriority.PRIORITY_HIGH, motorControl.Reverse(5));
             }

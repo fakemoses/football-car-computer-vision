@@ -98,6 +98,7 @@ int camHeight = 240;
 int r_maxIteration = 500;
 float r_threshhold = 0.2;
 
+
 void setup() {
     size(1280,720);
     frameRate(15);
@@ -120,7 +121,7 @@ void setup() {
     
     lineFilter = new HSVFilter(HSVColorRange.combine(HSVColorRange.RED1, HSVColorRange.RED2));
     boundary = new Boundary(camWidth,camHeight);
-    lineDetector = new RansacDetector(r_maxIteration,r_threshhold, 400,camWidth,camHeight);
+    lineDetector = new RansacDetector(r_maxIteration,r_threshhold, 400);
     lineDetection = new LineDetection(motorControl, dataContainer, lineFilter, lineDetector, boundary);
     
     ballFilter = new HSVFilter(HSVColorRange.YELLOW3).addPostFilter(new MedianFilter(3)).addPostFilter(new GaussianFilter1D(5, 100)).addPostFilter(new Padding(50,0,0,0));
@@ -157,7 +158,6 @@ void draw() {
     
     if (cam.isAvailable()) {
         cam.read();
-        // is it possible that the pixels updated during grabbing image? need locking ?
         algo.updateImage(cam);
     }
     
@@ -165,12 +165,6 @@ void draw() {
     
     motorControl.run();
 }
-
-// //event handler for OSC messages
-// void oscEvent(OscMessage theOscMessage) {
-//     // /* check if theOscMessage has the address pattern we are looking for. */
-//     comm.onEventRun(theOscMessage);       
-// }
 
 void keyPressed() {
     if (key == ' ') {

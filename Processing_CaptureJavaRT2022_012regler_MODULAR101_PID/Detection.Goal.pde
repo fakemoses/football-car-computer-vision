@@ -55,7 +55,8 @@ public class GoalDetection extends DetectionThread{
             
             Rectangle result = getRectangleFromDetectionResult(rects);
             
-            lastMemory = (Rectangle)data.update(this, result);
+            data.update(this, result);
+            lastMemory = data.getLatestGoalMemory();
             
             if (lastMemory == null) {
                 motorControl.notify(this, HandlerPriority.PRIORITY_LOW,motorControl.Turn(1));  
@@ -64,7 +65,7 @@ public class GoalDetection extends DetectionThread{
             
             float motorSignal = toMotorSignalLinear((int)lastMemory.getCenterX());
             double bboxArea = lastMemory.getWidth() * lastMemory.getHeight();
-
+            
             println("bboxArea: " + bboxArea);
             
             data.setIsGoalInRoi(bboxArea > MIN_GOAL_AREA);

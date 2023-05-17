@@ -49,9 +49,8 @@ public class BallDetection extends DetectionThread {
             
             Rectangle result = getRectangleFromDetectionResult(rects);
             
-            // TODO: DataContainer method seperate -> update, getVar
-            // is upcasting possible? SUS
-            lastMemory = (Rectangle)data.update(this, result);
+            data.update(this, result);
+            lastMemory = data.getBallMemory();
             
             if (lastMemory == null) {
                 data.setIsTurn(true);
