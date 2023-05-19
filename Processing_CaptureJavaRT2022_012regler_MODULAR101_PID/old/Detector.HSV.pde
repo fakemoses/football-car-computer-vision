@@ -7,15 +7,28 @@ public class ColorHSV extends PApplet {
     private int hsvRange[][];
     private PImage maskHS, maskHSV;
     private PImage H, S, V;
-    
+    private int thickness = 10;
+    private PointArray<Point> pointArray = new PointArray<Point>();
     public ColorHSV(PImage img, int[][] hsvRange) {
-        this.opencv = new OpenCV(this, img);
-        this.hsvRange = hsvRange;
+        this(img.width, img.height, hsvRange);
     }
     
-    public ColorHSV(int width, int height, int[][] hsvRange) {
-        this.opencv = new OpenCV(this, width, height);
+    public ColorHSV(int w, int h, int[][] hsvRange) {
+        this.opencv = new OpenCV(this, w, h);
         this.hsvRange = hsvRange;
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < thickness; j++) {
+                pointArray.add(new Point(i, j));
+                pointArray.add(new Point(i, h - j));
+            }
+        }
+        
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < thickness; j++) {
+                pointArray.add(new Point(j, i));
+                pointArray.add(new Point(w - j, i));
+            }
+        }
     }
     
     public ColorHSV setHSVRange(int[][] hsvRange) {
@@ -23,8 +36,36 @@ public class ColorHSV extends PApplet {
         return this;
     }
     
-    public PImage getMask(PImage img, boolean withColor) {
-        opencv.loadImage(img);
+    public Rectangle detect(PImage image) {
+        processMask(image);
+        ArrayList<Contour> contours = getContour();
+        if (contours.size() == 0) {
+            return null;
+        }
+        Contour biggest = contours.get(0);
+        return biggest.getBoundingBox();
+    }
+    
+    public Rectangle detect(PImage image, PImage mask) {
+        return detect(image);
+    }
+    
+    public Rectangle[] det2(PImage image) {
+        processMask(image);
+        ArrayList<Contour> contours = getContour();
+        if (contours.size() == 0) {
+            return null;
+        }
+        int Limit = min(5, contours.size());
+        Rectangle[] rect = new Rectangle[Limit];
+        for (int i = 0; i < Limit; i++) {
+            rect[i] = contours.get(i).getBoundingBox();
+        }
+        return rect;
+    }
+    
+    private void processMask(PImage image) {
+        opencv.loadImage(image);
         opencv.useColor(HSB);
         
         opencv.setGray(opencv.getH().clone());
@@ -48,6 +89,15 @@ public class ColorHSV extends PApplet {
         opencv.threshold(0);
         opencv.invert();
         maskHSV = opencv.getSnapshot();
+    }
+    
+    
+    
+    public PImage getMask() {   
+        return maskHSV;
+    }
+    
+    public PImage getMask(PImage image, boolean withColor) {
         if (!withColor) {
             return maskHSV;
         }
@@ -89,6 +139,13 @@ public class ColorHSV extends PApplet {
     }
     
     public ArrayList<Contour> getContour() {
+        maskHSV.loadPixels();
+        for (int i = 0; i < pointArray.size(); i++) {
+            Point p = pointArray.get(i);
+            maskHSV.pixels[p.x + p.y * maskHSV.width] = color(0, 0, 0);
+        }    
+        maskHSV.updatePixels();
+        opencv.loadImage(maskHSV);
         return opencv.findContours(true, true);
     }
     

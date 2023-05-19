@@ -1,57 +1,86 @@
-class Task implements Comparable<Task>, TaskProperties{
-    private final int priority;
-    private final ThreadInterface instance;
+class Task implements Comparable<Task>, ITask{
+    private final int taskPriority;
+    private final DetectionThread instance;
     
-    /*
-    * loopCount indicate that task is available for execution
-    * if loopCount is 0, try to execute next task
-    * some tasks require more loops to be executed
-    * for example, reverse or turning
-    */
-    private int loopCount;
+    private BlockingQueue<MotorHandler> handlersQueue;
     
-    private MotorHandler handler;
+    private HandlerPriority handlerPriority;
     
-    public Task(ThreadInterface instance, int priority) {
+    public Task(DetectionThread instance, int taskPriority) {
         this.instance = instance;
-        this.priority = priority;	
-        this.loopCount = 0;
+        this.taskPriority = taskPriority;	
+        handlersQueue = new LinkedBlockingQueue<>();
     }
     
     @Override
     public int compareTo(Task t) {
-        return this.priority - t.priority;
+        return this.taskPriority - t.taskPriority;
     }
     
-    public int getLoopCount() {
-        return loopCount;
-    }
-    
-    public void setLoopCount(int count) {
-        this.loopCount = count;
-    }
-    
-    public ThreadInterface getInstance() {
+    public DetectionThread getInstance() {
         return this.instance;
     }
     
-    public void setHandler(MotorHandler handler) {
-        this.handler = handler;
+    public HandlerPriority getHandlerPriority() {
+        return this.handlerPriority;
     }
     
-    public MotorHandler getHandler() {
-        return this.handler;
+    public void setHandlerPriority(HandlerPriority handlerPriority) {
+        this.handlerPriority = handlerPriority;
     }
     
-    /*
-    * indicate that a task is executing
-    */
-    public void loop() {
-        this.loopCount = this.loopCount == 0 ? 0 : this.loopCount - 1;
+    public void setHandler(MotorHandler...handlers) {
+        // debug
+        // clear queue
+        try {
+            handlersQueue.clear();
+            for (MotorHandler handler : handlers) {
+                handlersQueue.put(handler);
+            } 
+        } catch(InterruptedException e) {
+            Thread.currentThread().interrupt();
+            println("Error Updating Handler");
+        }
+    }
+    
+    public MotorHandler[] getHandler() {
+        return handlersQueue.toArray(new MotorHandler[0]);
+    }
+    
+    public MotorHandler getFrontHandler() {
+        return this.handlersQueue.peek();
+    }
+    
+    public int getHandlerSize() {
+        return this.handlersQueue.size();
+    }
+    
+    public boolean isQueueEmpty() {
+        return handlersQueue.size() ==  0;
     }
     
     public void execute() {
+        
+        // debug
+        if (isQueueEmpty()) {
+            throw new RuntimeException("Check Implementation");
+        }
+        
+        MotorHandler handler = getFrontHandler();      
         handler.execute();
+        println("Executing task: " + this.instance.getThreadName() + " handler name: " + handler.getHandlerName());
+        
+    }
+    
+    public void loop() {
+        
+        if (isQueueEmpty()) {
+            return;
+        }
+        
+        handlersQueue.remove();
+        // println("Removing handler from queue");
+        // println("Queue size: " + handlersQueue.size());
     }
     
 }

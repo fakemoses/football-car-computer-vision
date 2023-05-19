@@ -1,20 +1,37 @@
 import ipcapture.*;
 import hypermedia.net.*;
-import java.awt.*;
-import processing.video.*;
 import gab.opencv.*;
-import java.awt.Frame;
+import processing.video.*;
 import processing.awt.PSurfaceAWT;
 import processing.awt.PSurfaceAWT.SmoothCanvas;
+import java.awt.*;
+import java.awt.Frame;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.Shape;
+import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.util.Collections;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.ListIterator;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.net.*;
+import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 //Herausgezogene wichtige Parameter des Systems
-boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = false;
-float VORTRIEB = 0.7;
-float PROPORTIONALE_VERSTAERKUNG = 0.50;
-float INTEGRALE_VERSTAERKUNG = 0.15f;
-float DIFFERENTIALE_VERSTAERKUNG = 0.1f;
-float ASYMMETRIE = 1.0; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
+boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = true;
+// float VORTRIEB = 0.72;
+float VORTRIEB = 0.83;
+float ASYMMETRIE = 1.01; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 // float ASYMMETRIE = 1.01; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 
 //VERSION FÜR TP-Link_59C2
@@ -41,39 +58,36 @@ float ASYMMETRIE = 1.0; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS 
 String NACHRICHT = "";
 //String TEMPERATUR = "";
 //String IP = "192.168.137.92";
-//String IP = "192.168.0.102";
-String IP = "192.168.178.48";
+//String IP = "192.168.178.70";
+String IP = "192.168.178.65";
 int PORT = 6000;
 
-double antriebMultiplier = 0.8;
+double antriebMultiplier = 1.0;
 
 UDPcomfort udpcomfort;  
 Antrieb antrieb;
-IPCapture cam;
-Bildverarbeitung bildverarbeitung;
+CustomCam cam;
+
 Algo algo;
-LineDetection lineDetection;
-BallDetection ballDetection;
-CarDetection carDetection;
-GoalDetection goalDetection;
 MotorControl motorControl;
-Ransac ransac;
+
+DataContainer dataContainer;
+
 Boundary boundary;
-ColorHSV yellowCV;
-CascadeDetection ballCascade;
+ColorFilter goalFilter;
+ColorFilter lineFilter;
+ColorFilter ballFilter;
+Detector<Line> lineDetector;
+Detector<Rectangle> goalDetector;
+Detector<Rectangle> ballDetector;
+LineDetection lineDetection;
+GoalDetection goalDetection;
+BallDetection ballDetection;
+
 OscP5 oscP5;
 NetAddress myRemoteLocation;
 Comm comm;
 String isBall = "/isBall";
-
-// HSV Color Extraction
-boolean yellow = false;
-ColorHSV maskYellow;
-PImage img, out1;
-PImage redMask, yellowMask, boundary_result, blueMask, greenMask;
-PImage gd_result;
-PImage ld_result;
-PImage bd_result;
 
 
 // camera Parameters
@@ -84,24 +98,11 @@ int camHeight = 240;
 int r_maxIteration = 500;
 float r_threshhold = 0.2;
 
-// Image Draw Parameters
-color ld_color = color(255, 0, 0);
-int ld_thickness = 2;
-
-color gd_color = color(0, 255, 0);
-int gd_thickess = 2;
-
-color bd_color = color(0, 0, 255);
-color bd_roi_color = color(255, 0, 0, 20);
-int bd_thickness = 2;
-
 void setup() {
     size(1280,720);
-    frameRate(10);
+    frameRate(15);
     
-    redMask = createImage(camWidth, camHeight, RGB);
-    
-    cam = new IPCapture(this, "http://" + IP + ":81/stream", "", "");
+    cam = new CustomCam(this, "http://" + IP + ":81/stream", "", "");
     cam.start();
     
     surface.setLocation( -5, 0);
@@ -110,69 +111,66 @@ void setup() {
     // myRemoteLocation = new NetAddress("192.168.178.43",12000); // IP and port of the server that the client will send to
     // comm = new Comm(oscP5,myRemoteLocation,isBall); // Unique id for the communication
     
-    // win = new PWindow(cam, 320, 0, 320, 240, "Cascade Detection");
-    // mainWin = new DrawWindow();
-    
-    bildverarbeitung = new Bildverarbeitung(camWidth, camHeight);
     udpcomfort = new UDPcomfort(IP, PORT);
     antrieb = new Antrieb(udpcomfort, antriebMultiplier);    
     
     motorControl = new MotorControl(antrieb);
     
-    ransac = new Ransac(r_maxIteration,r_threshhold,camWidth,camHeight);
+    dataContainer = new DataContainer();
+    
+    lineFilter = new HSVFilter(HSVColorRange.combine(HSVColorRange.RED1, HSVColorRange.RED2));
     boundary = new Boundary(camWidth,camHeight);
-    lineDetection = new LineDetection(motorControl, bildverarbeitung, ransac, boundary);
+    lineDetector = new RansacDetector(r_maxIteration,r_threshhold, 400,camWidth,camHeight);
+    lineDetection = new LineDetection(motorControl, dataContainer, lineFilter, lineDetector, boundary);
     
-    ballCascade = new CascadeDetection(camWidth, camHeight);
-    ballDetection = new BallDetection(motorControl, bildverarbeitung, ballCascade);
+    ballFilter = new HSVFilter(HSVColorRange.YELLOW3).addPostFilter(new MedianFilter(3)).addPostFilter(new GaussianFilter1D(5, 100)).addPostFilter(new Padding(50,0,0,0));
+    ballDetector = new RansacDetectorRect(1000,150);
+    ballDetection = new BallDetection(motorControl, dataContainer, ballFilter, ballDetector, comm);
     
-    carDetection = new CarDetection(motorControl, bildverarbeitung);
+    goalFilter = new HSVFilter(HSVColorRange.GREEN).addPostFilter(new MedianFilter(9)).addPostFilter(new GaussianFilter1D(5, 200)).addPostFilter(new Padding(50,0,0,0));
+    goalDetector = new  RansacDetectorRect(1000,50);
+    goalDetection = new GoalDetection(motorControl, dataContainer, goalFilter, goalDetector);
     
-    yellowCV = new ColorHSV(camWidth, camHeight, HsvColorRange.YELLOW.getRange());
-    goalDetection = new GoalDetection(motorControl, bildverarbeitung, yellowCV);
-    
-    motorControl.register(lineDetection,4);
-    motorControl.register(ballDetection,1);
+    motorControl.register(lineDetection,1);
+    motorControl.register(ballDetection,2);
     motorControl.register(goalDetection,3);
     
-    algo = new Algo(cam, bildverarbeitung, lineDetection, ballDetection, carDetection, goalDetection);
+    // algo = new Algo(ballDetection);
+    algo = new Algo(lineDetection, ballDetection,goalDetection);
+    // algo = new Algo(goalDetection);
     algo.startALL();
 }
 
-
 boolean AKTIV = false;
 
-void draw() {
-    algo.runColorExtraction();
+void draw() {   
     
-    ld_result = algo.getLineDetectionResult(ld_color, ld_thickness);
-    redMask = algo.bildverarbeitung.getRedMask();
-    boundary_result = algo.lineDetection.bimg;
-    bd_result = algo.getBallDetectionResult(bd_color, bd_roi_color ,bd_thickness);
-    blueMask = algo.bildverarbeitung.getBlueMask();
-    gd_result = algo.getGoalDetectionResult(gd_color, gd_thickess);
-    yellowMask = algo.goalDetection.getYellowMask();
-    greenMask = algo.bildverarbeitung.getGreenMask();
+    if (cam.isDown()) {
+        noLoop();
+        println("Camera is down");
+        println("Reconnecting...");
+        cam.reconnect();
+        delay(5000);
+        loop();
+    }
     
-    image(cam, 0, 0);
-    image(ld_result, camWidth, 0);
-    image(redMask, camWidth, camHeight);
-    image(boundary_result, camWidth, camHeight * 2);
-    image(bd_result, camWidth * 2, 0);
-    image(blueMask, camWidth * 2, camHeight);
-    image(gd_result, camWidth * 3, 0);
-    image(yellowMask, camWidth * 3, camHeight);
-    image(greenMask, camWidth * 3, camHeight * 2);
+    
+    if (cam.isAvailable()) {
+        cam.read();
+        // is it possible that the pixels updated during grabbing image? need locking ?
+        algo.updateImage(cam);
+    }
+    
+    drawResults(algo.getDetectionResults());
     
     motorControl.run();
-    // mainWin.draw();    
 }
 
-//event handler for OSC messages
-void oscEvent(OscMessage theOscMessage) {
-    // /* check if theOscMessage has the address pattern we are looking for. */
-    comm.onEventRun(theOscMessage);       
-}
+// //event handler for OSC messages
+// void oscEvent(OscMessage theOscMessage) {
+//     // /* check if theOscMessage has the address pattern we are looking for. */
+//     comm.onEventRun(theOscMessage);       
+// }
 
 void keyPressed() {
     if (key == ' ') {
@@ -187,6 +185,7 @@ void keyPressed() {
         antrieb.fahrt(0.0, 0.0);
         motorControl.stop();
         NACHRICHT = "Fahrt gestoppt";
+        println("Fahrt gestoppt");
         AKTIV = false;
     } else if (key ==  '1') {//beide vor
         // antrieb.fahrt(1.0, 1.0);
@@ -219,4 +218,12 @@ void keyPressed() {
 
 void captureEvent(Capture c) {
     c.read();
+}
+
+void drawResults(PImage[][] results) {
+    for (int i = 0; i < results.length; i++) {
+        for (int j = 0; j < results[i].length; j++) {
+            image(results[i][j],camWidth * i, camHeight * j);
+        }
+    }
 }

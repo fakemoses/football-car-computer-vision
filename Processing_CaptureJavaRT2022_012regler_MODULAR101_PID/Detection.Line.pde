@@ -1,38 +1,24 @@
-// Example implementation of a thread
-
-public class LineDetection implements ThreadInterface, Runnable{
+public class LineDetection extends DetectionThread {
     
-    //Basic
-    private Thread myThread = null;
-    private boolean STARTED = false;
-    private ArrayList<Point> points;
-    private Line ransacLine;
-    private int minPointsSize = 400;
-    PImage bimg = new PImage(camWidth,camHeight);
+    private Detector<Line> lineDetector;
+    DataContainer data;
     
-    private Ransac ransac;
     private Boundary boundary;
-    private MotorControl motorControl;
-    private Bildverarbeitung bildverarbeitung;
+    private PImage boundaryResult;
     
-    public LineDetection(MotorControl motorControl, Bildverarbeitung bildverarbeitung,Ransac ransac, Boundary boundary) {
-        this.motorControl = motorControl;
-        this.bildverarbeitung = bildverarbeitung;
-        this.ransac = ransac;
+    private ArrayList<Line> lines;
+    private Line detectedLine;
+    
+    private final color lineColor = color(255, 0, 0);
+    private final int lineThickness = 2;
+    
+    public LineDetection(MotorControl motorControl, DataContainer data, ColorFilter colorFilter, Detector<Line> lineDetector, Boundary boundary) {
+        super(motorControl, colorFilter);
+        
+        this.data = data;
+        
+        this.lineDetector = lineDetector;
         this.boundary = boundary;
-        this.points = new ArrayList<Point>();
-    }
-    
-    public void startThread() {
-        if (myThread == null) {
-            myThread = new Thread(this);
-            myThread.start();
-        }
-        STARTED = true;
-    }
-    
-    public void stopThread() {
-        STARTED = false;
     }
     
     public String getThreadName() {
@@ -41,26 +27,41 @@ public class LineDetection implements ThreadInterface, Runnable{
     
     public void run() {
         while(STARTED) {
-            points = (ArrayList<Point>)bildverarbeitung.getRedList().clone();
-            if (points.size() < minPointsSize) {
-                ransacLine = null;
-            } else {
-                ransac.run(points);
-                ransacLine = ransac.getBestLine();
+            if (image == null) {
+                delay(50);
+                continue;
             }
-            bimg = boundary.updateImage(ransacLine);
-            if (boundary.isHelpNeeded()) {
-                motorControl.notify(this, motorControl.Reverse(), 7);
+            
+            mask = colorFilter.filter(image);
+            lines = lineDetector.detect(image, mask);
+            
+            Line result = getLineFromDetectionResult(lines);
+            
+            detectedLine = (Line)data.update(this, result);
+            
+            // TODO: boundary method seperate, -> update, isHelpNeeded
+            if (boundary.isHelpNeeded(detectedLine)) {
+                motorControl.notify(this, HandlerPriority.PRIORITY_HIGH, motorControl.Reverse(5));
             }
-            delay(50);
         }
     }
     
-    public Line getRansacLine() {
-        return ransacLine != null ? ransacLine : null;
+    public PImage[] getResults() {
+        if (image == null || mask == null) {
+            return null;
+        }
+        PImage[] results = new PImage[3];
+        
+        results[0] = detectedLine == null ? image : drawLine(image, detectedLine, lineThickness, lineColor);
+        results[1] = mask;
+        results[2] = boundary.getBoundaryResult();
+        return results;
     }
     
-    public void setMinPointsSize(int minPointsSize) {
-        this.minPointsSize = minPointsSize;
+    private Line getLineFromDetectionResult(ArrayList<Line> lines) {
+        if (lines == null || lines.size() == 0) {
+            return null;
+        }
+        return lines.get(0);
     }
 }
