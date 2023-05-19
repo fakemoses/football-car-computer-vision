@@ -28,6 +28,8 @@ const char* password = "ikanbilismasaklemakff12";
 unsigned long previousMillis = 0;
 unsigned long interval = 1000; // every n second check
 
+//const char* ssid = "AARON 5306"; //Aaron's Laptop
+//const char* password = "670F0:e5";
 
 AsyncUDP udp;
 

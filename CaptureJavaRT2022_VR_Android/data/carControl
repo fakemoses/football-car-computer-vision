@@ -1,0 +1,5 @@
+carControl
+X	X pos	3	SLIDER	X Axis	0	1.0	0.0
+Y	Y Pos	3	SLIDER	Y Axis	0	1.0	0.0
+Start	start	1	BUTTON	Button 0	0	0.0	0.0
+Stop	stop	1	BUTTON	Button 1	0	0.0	0.0
