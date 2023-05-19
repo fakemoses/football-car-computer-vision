@@ -41,7 +41,7 @@ public class Regler
     if ((px < tilt_thres || start) && !stop && (py > 0.05 || py < -0.05)) {
 
       start = true;
-      float s =  VORTRIEB * py * 3f;
+      float s =  VORTRIEB * py * 2.5f;
       if (pz > -0.1 && pz < 0.1) {
         direction ="Straight";
         u_links = s * 0.9f;
@@ -49,13 +49,13 @@ public class Regler
       } else if (pz > 0.1)
       {
         direction ="Right";
-        u_links = s * 0.5f;
+        u_links = s * 0.7f;
         u_rechts = (s*0.9f) + pz;
       } else if (pz < -0.1)
       {
         direction ="Left";
         u_links = (s*0.9f) + abs(pz);
-        u_rechts = s * 0.5f;
+        u_rechts = s * 0.7f;
       }
 
       if (px > 0.8) {
