@@ -32,7 +32,7 @@ String NACHRICHT = "";
 //String TEMPERATUR = "";
 //String IP = "192.168.137.92";
 //String IP = "192.168.0.102";
-String IP = "192.168.178.76";
+String IP = "192.168.137.157";
 //String IP = "192.168.137.222";
 int PORT = 6000;
 

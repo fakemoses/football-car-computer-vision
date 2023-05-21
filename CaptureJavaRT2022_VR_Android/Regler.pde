@@ -41,19 +41,19 @@ public class Regler
       start = true;
       float s =  VORTRIEB * py * 2.5f;
       if (pz > -0.1 && pz < 0.1) {
-        direction ="Straight";
-        u_links = s * 0.9f;
-        u_rechts = s * 0.9f;
+        direction ="Straight";  // added (-) to make car forward when head moves down, but car reverse when head moves up
+        u_links = s * -0.8f;
+        u_rechts = s * -0.8f;
       } else if (pz > 0.1)
       {
         direction ="Right";
-        u_links = s * 0.7f;
-        u_rechts = (s*0.9f) + pz;
+        u_links = s * 0.5f;
+        u_rechts = (s*0.6f) + pz;
       } else if (pz < -0.1)
       {
-        direction ="Left";
-        u_links = (s*0.9f) + abs(pz);
-        u_rechts = s * 0.7f;
+        direction ="Left";   // for MT1 car, i make left turning little stronger than right to make it balanced 
+        u_links = (s*0.7f) + abs(pz);  // HAVE TO RECHECK VALUES WITH OTHER CAR
+        u_rechts = s * 0.6f;
       }
 
       if (px > 0.8) {
