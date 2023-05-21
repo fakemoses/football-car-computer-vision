@@ -125,7 +125,7 @@ void drawMainScreen() {
 
   //recheck the sensor value in case exceeding range
   sensorValX = ((sensorData.x) / 90.0f)-regler.offSetX;
-  sensorValY = ((sensorData.y) / 90.0f)-regler.offSetY;
+  sensorValY = -(((sensorData.y) / 90.0f)-regler.offSetY);
   sensorValZ = ((sensorData.z) / 180.0f)-regler.offSetZ;
 
   // Limit the values to the range of -1 to 1

@@ -41,9 +41,9 @@ public class Regler
       start = true;
       float s =  VORTRIEB * py * 2.5f;
       if (pz > -0.1 && pz < 0.1) {
-        direction ="Straight";  // added (-) to make car forward when head moves down, but car reverse when head moves up
-        u_links = s * -0.8f;
-        u_rechts = s * -0.8f;
+        direction ="Straight";  // added -() to make car forward when head moves down, but car reverse when head moves up
+        u_links = -(s * 0.8f);
+        u_rechts = -(s * 0.8f);
       } else if (pz > 0.1)
       {
         direction ="Right";
