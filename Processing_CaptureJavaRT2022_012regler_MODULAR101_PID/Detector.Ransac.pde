@@ -1,4 +1,4 @@
-public class RansacDetector implements Detector<Line> {   
+public class RansacLineDetector implements Detector<Line> {   
     private final int numIterations;
     private final double threshold;
     
@@ -6,11 +6,7 @@ public class RansacDetector implements Detector<Line> {
     private double confidence;
     private int min_point;
     
-    public RansacDetector(int numIterations, double threshold, int min_point, PImage image) {
-        this(numIterations, threshold, min_point, image.width, image.height);
-    }
-    
-    public RansacDetector(int numIterations, double threshold, int min_point) {
+    public RansacLineDetector(int numIterations, double threshold, int min_point) {
         this.numIterations = numIterations;
         this.threshold = threshold;
         this.min_point = min_point;

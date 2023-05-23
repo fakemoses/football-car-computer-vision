@@ -1,70 +1,71 @@
 public class GaussianFilter2D implements PostFilter{  
     
     private double[][] gaussianKernel;
-    private int threshold;
     private int kernelSize;
     private int halfSize;
+    final private ImageBorderAdder borderAdder;
     
-    public GaussianFilter2D(double sigma, int threshold) {
-        this.threshold = threshold;
+    public GaussianFilter2D(int kernelSize, double sigma, BorderType borderType) {
+        if (kernelSize % 2 == 0) {
+            throw new IllegalArgumentException("kernelSize must be odd");
+        }
+        
+        this.kernelSize = kernelSize;
+        this.halfSize = kernelSize / 2;
+        
         this.gaussianKernel = calculateGaussianKernel(sigma);
+        this.borderAdder = new ImageBorderAdder(borderType);
     } 
     
-    public PImage apply(PImage image) {
-        int w = image.width;
-        int h = image.height;
-        PImage result = createImage(w, h, RGB);
+    public PImage apply(final PImage image) {
+        return conv2D(image);
+    }
+    
+    private PImage conv2D(PImage src) {
+        PImage result = src.copy();
+        
+        PImage imageWithBorder = borderAdder.addBorder(src, halfSize);
+        result.loadPixels();
         
         // iterate over each pixel in the image
-        for (int y = 0; y < h; y++) {
-            for (int x = 0; x < w; x++) {
-                double sum = 0.0;
-                double weightSum = 0.0;
+        for (int y = 0; y < src.height; y++) {
+            for (int x = 0; x < src.width; x++) {
+                float sum = 0.0;
                 
-                // iterate over each pixel in the kernel
-                for (int j = -gaussianKernel.length / 2; j <= gaussianKernel.length / 2; j++) {
-                    for (int i = -gaussianKernel[0].length / 2; i <= gaussianKernel[0].length / 2; i++) {
+                // Expensive computation, O(n^2)
+                // Alternative: Use GaussianFilter1D instead
+                // Result should be the same ?
+                // slightly different results, due to floating point precision
+                for (int j = 0; j < kernelSize; j++) {
+                    for (int i = 0; i < kernelSize; i++) {
                         int px = x + i;
                         int py = y + j;
                         
-                        // check if the pixel is inside the image
-                        // Expensive computation, O(n^2)
-                        // Alternative: Use GaussianFilter1D instead
-                        // Does it differ ?
-                        if (px >= 0 && py >= 0 && px < w && py < h) {
-                            // get the pixel value and weight from the kernel
-                            double pixelValue = brightness(image.pixels[py * w + px]);
-                            double weight = gaussianKernel[j + gaussianKernel.length / 2][i + gaussianKernel[0].length / 2];
-                            
-                            // accumulate the sum and weight sum
-                            sum += pixelValue * weight;
-                            weightSum += weight;
-                        }
+                        int kernelIdx = imageWithBorder.width * py + px;
+                        int c = imageWithBorder.pixels[kernelIdx];
+                        
+                        double weight = gaussianKernel[j][i];
+                        sum += weight * (c >> 16 & 0xFF);
                     }
                 }
-                
-                // calculate the new pixel value as the weighted average
-                int newValue = (int)(sum / weightSum);
-                result.pixels[y * w + x] = color(newValue);
+                int idx = src.width * y + x;
+                result.pixels[idx] = color(sum);
             }
-        }
-        
-        result.updatePixels();
+        }      
         return result;
     }
     
-    private double[][] calculateGaussianKernel(double sigma) {
-        this.kernelSize = calculateKernelSize(sigma);
-        this.halfSize = kernelSize / 2;
-        
+    private double[][] calculateGaussianKernel(double sigma) {        
         double[][] gaussianKernel = new double[kernelSize][kernelSize];
         
         double sum = 0;
         
         for (int j = 0; j < kernelSize; j++) {
             for (int i = 0; i < kernelSize; i++) {
-                double exponent = -0.5 * (Math.pow((i - halfSize) / sigma, 2.0) + Math.pow((j - halfSize) / sigma, 2.0));
-                gaussianKernel[j][i] = Math.exp(exponent);
+                double exponent = (double) Math.exp( -0.5 * ((Math.pow((i - halfSize), 2.0) + Math.pow((j - halfSize), 2.0)) / Math.pow(sigma,2.0))) / (2 * Math.PI * sigma * sigma);
+                
+                // double exponent = -0.5 * (Math.pow((i - halfSize) / sigma, 2.0) + Math.pow((j - halfSize) / sigma, 2.0));
+                gaussianKernel[j][i] = exponent;
                 sum += gaussianKernel[j][i];
             }
         }
@@ -77,10 +78,5 @@ public class GaussianFilter2D implements PostFilter{
         }
         
         return gaussianKernel;
-    }
-    
-    private int calculateKernelSize(double sigma) {
-        return(int) Math.ceil(sigma * 3) * 2 + 1;
-    }
-    
+    }  
 }

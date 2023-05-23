@@ -1,99 +1,92 @@
 public class GaussianFilter1D implements PostFilter{  
     
     private double[] gaussianKernel;
-    private int threshold;
     private int kernelSize;
     private int halfSize;
+    final private ImageBorderAdder borderAdder;
     
-    public GaussianFilter1D(double sigma, int threshold) {
-        this.threshold = threshold;
+    public GaussianFilter1D(int kernelSize, double sigma, BorderType borderType) {
+        if (kernelSize % 2 == 0) {
+            throw new IllegalArgumentException("kernelSize must be odd");
+        }
+        
+        this.kernelSize = kernelSize;
+        this.halfSize = kernelSize / 2;
+        
         this.gaussianKernel = calculateGaussianKernel(sigma);
+        this.borderAdder = new ImageBorderAdder(borderType);
     } 
     
-    public PImage apply(PImage img) {
+    public PImage apply(final PImage img) {
         PImage convX = convoluteInX(img);
-        return convoluteInYWithThreshhold(convX, img);
+        return convoluteInY(convX);
     }
     
-    private PImage convoluteInX(PImage img) {
-        PImage returnImage = createImage(img.width, img.height, ALPHA);
-        returnImage.loadPixels();
+    private PImage convoluteInX(PImage src) {
+        PImage result = src.copy();
         
-        for (int y = 0; y < img.height; y++) {
-            for (int x = halfSize; x < img.width - halfSize; x++) {
-                float sumR = 0;
-                for (int i = 0; i < kernelSize; i++) {
-                    int kernelIdx = img.width * y + x - halfSize + i;
-                    int c = img.pixels[kernelIdx];
-                    double weight = gaussianKernel[i];
-                    sumR += weight * (c >> 16 & 0xFF);
-                }
-                int idx = img.width * y + x;
-                returnImage.pixels[idx] = color(sumR);
-            }
-        }
-        return returnImage;
-    }
-    
-    private PImage convoluteInY(PImage img) {
-        PImage returnImage = createImage(img.width, img.height, ALPHA);
-        returnImage.loadPixels();
+        PImage imageWithBorder = borderAdder.addBorder(src, halfSize);
+        result.loadPixels();
         
-        for (int y = halfSize; y < img.height - halfSize; y++) {
-            for (int x = 0; x < img.width; x++) {
-                float sumR = 0, sumG = 0, sumB = 0, sumA = 0;
+        for (int y = 0; y < src.height; y++) {
+            for (int x = 0; x < src.width; x++) {
+                float sum = 0;
                 for (int i = 0; i < kernelSize; i++) {
-                    int kernelIdx = img.width * (y - halfSize + i) + x;
-                    int c = img.pixels[kernelIdx];
+                    int px = x + i;
+                    int py = y + halfSize;
+                    
+                    int kernelIdx = imageWithBorder.width * py + px;
+                    int c = imageWithBorder.pixels[kernelIdx];
+                    
                     double weight = gaussianKernel[i];
-                    sumR += weight * (c >> 16 & 0xFF);
+                    sum += weight * (c >> 16 & 0xFF);
                 }
-                int idx = img.width * y + x;
-                returnImage.pixels[idx] = color(sumR);
+                int idx = src.width * y + x;
+                result.pixels[idx] = color(sum);
             }
         }
-        return returnImage;
+        return result;
     }
     
-    private PImage convoluteInYWithThreshhold(PImage img, PImage src) {
-        PImage returnImage = src.copy();
-        returnImage.loadPixels();
-        for (int y = halfSize; y < img.height - halfSize; y++) {
-            for (int x = 0; x < img.width; x++) {
-                float sumR = 0;
+    private PImage convoluteInY(PImage src) {
+        PImage result = src.copy();
+        
+        PImage imageWithBorder = borderAdder.addBorder(src, halfSize);
+        result.loadPixels();
+        
+        for (int y = 0; y < src.height; y++) {
+            for (int x = 0; x < src.width; x++) {
+                float sum = 0;
                 for (int i = 0; i < kernelSize; i++) {
-                    int kernelIdx = img.width * (y - halfSize + i) + x;
-                    int c = img.pixels[kernelIdx];
+                    int px = x + halfSize;
+                    int py = y + i;
+                    
+                    int kernelIdx = imageWithBorder.width * py + px;
+                    int c = imageWithBorder.pixels[kernelIdx];
+                    
                     double weight = gaussianKernel[i];
-                    sumR += weight * (c >> 16 & 0xFF);
+                    sum += weight * (c >> 16 & 0xFF);
                 }
-                int idx = img.width * y + x;
-                returnImage.pixels[idx] = sumR > threshold ? 0xFFFFFFFF : 0xFF000000;
+                int idx = src.width * y + x;
+                result.pixels[idx] = color(sum);
             }
         }
-        return returnImage;
+        return result;
     }
     
     private double[] calculateGaussianKernel(double sigma) {
-        this.kernelSize = calculateKernelSize(sigma);
-        this.halfSize = kernelSize / 2;
         double[] gaussianKernel = new double[kernelSize];
         
         double sum = 0;
         for (int i = 0; i < kernelSize; i++) {
-            gaussianKernel[i] = (double) Math.exp( -0.5 * Math.pow((i - halfSize) / sigma, 2));
+            gaussianKernel[i] = (double) Math.exp( -0.5 * Math.pow((i - halfSize) / sigma, 2)) / (sigma * Math.sqrt(2 * Math.PI));
             sum += gaussianKernel[i];
         }
         
-        // Normalize the gaussianKernel
         for (int i = 0; i < kernelSize; i++) {
             gaussianKernel[i] /= sum;
         }
+        
         return gaussianKernel;
     }
-    
-    private int calculateKernelSize(double sigma) {
-        return(int) Math.ceil(sigma * 3) * 2 + 1;
-    }
-    
 }

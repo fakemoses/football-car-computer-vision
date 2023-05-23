@@ -1,12 +1,12 @@
 
-public class RansacDetectorRect implements Detector<Rectangle> {     
+public class RansacRectangleDetector implements Detector<Rectangle> {     
     private double best_inliers;
     private double confidence;
     
     private int numIterations;
     private int minPoints;
     
-    public RansacDetectorRect(int numIterations, int minPoints) {
+    public RansacRectangleDetector(int numIterations, int minPoints) {
         this.numIterations = numIterations;
         this.minPoints = minPoints;
     }

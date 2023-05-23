@@ -1,7 +1,7 @@
-public class Algo {
+public class ThreadController {
     DetectionThread[] threads;
     
-    public Algo(DetectionThread...threads) {
+    public ThreadController(DetectionThread...threads) {
         this.threads = threads;
     }
     

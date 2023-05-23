@@ -50,7 +50,7 @@ public class BallDetection extends DetectionThread {
             Rectangle result = getRectangleFromDetectionResult(rects);
             
             data.update(this, result);
-            lastMemory = data.getBallMemory();
+            lastMemory = data.getLatestBallMemory();
             
             if (lastMemory == null) {
                 data.setIsTurn(true);
