@@ -45,7 +45,7 @@ public class DataContainer {
     public void update(DetectionThread instance, Shape shape) {
         try {
             writeLock.lock();
-            return route(instance, shape);
+            route(instance, shape);
         } finally {
             writeLock.unlock();
         }
@@ -53,35 +53,30 @@ public class DataContainer {
     
     private void route(DetectionThread instance, Shape shape) {
         if (instance instanceof BallDetection) {
-            return ballDetectionRoute((Rectangle) shape);
+            ballDetectionRoute((Rectangle) shape);
         } 
         
         if (instance instanceof GoalDetection) {
-            return goalDetectionRoute((Rectangle) shape);
+            goalDetectionRoute((Rectangle) shape);
         } 
         
         if (instance instanceof LineDetection) {
-            return lineDetectionRoute((Line) shape);
+            lineDetectionRoute((Line) shape);
         } 
         
         throw new IllegalArgumentException("Unknown instance type. Check Implementation");
     }
     
-    private Rectangle ballDetectionRoute(Rectangle shape) {
+    private void ballDetectionRoute(Rectangle shape) {
         ballMemory.addCurrentMemory(shape);
-        latestBallMemory = ballMemory.getLastRememberedMemory();
-        return latestBallMemory;
     }
     
-    private Rectangle goalDetectionRoute(Rectangle shape) {
+    private void goalDetectionRoute(Rectangle shape) {
         goalMemory.addCurrentMemory(shape);
-        latestGoalMemory = goalMemory.getLastRememberedMemory();
-        return latestGoalMemory;
     }
     
-    private Line lineDetectionRoute(Line line) {
+    private void lineDetectionRoute(Line line) {
         latestLineMemory = line;
-        return latestLineMemory;
     }
     
     private Rectangle getLatestBallMemory() {
