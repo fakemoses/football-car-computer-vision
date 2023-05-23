@@ -62,10 +62,7 @@ public class GaussianFilter2D implements PostFilter{
         
         for (int j = 0; j < kernelSize; j++) {
             for (int i = 0; i < kernelSize; i++) {
-                double exponent = (double) Math.exp( -0.5 * ((Math.pow((i - halfSize), 2.0) + Math.pow((j - halfSize), 2.0)) / Math.pow(sigma,2.0))) / (2 * Math.PI * sigma * sigma);
-                
-                // double exponent = -0.5 * (Math.pow((i - halfSize) / sigma, 2.0) + Math.pow((j - halfSize) / sigma, 2.0));
-                gaussianKernel[j][i] = exponent;
+                gaussianKernel[j][i] = (double) Math.exp( -0.5 * ((Math.pow((i - halfSize), 2.0) + Math.pow((j - halfSize), 2.0)) / Math.pow(sigma, 2.0))) / (2 * Math.PI * sigma * sigma);
                 sum += gaussianKernel[j][i];
             }
         }
