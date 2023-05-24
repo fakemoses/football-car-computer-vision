@@ -4,7 +4,7 @@ import ipcapture2.*;
 
 //Herausgezogene wichtige Parameter des Systems
 boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = true;
-float VORTRIEB = 0.9;
+float VORTRIEB = 0.84;
 float ASYMMETRIE = 1; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 
 //VERSION FÜR TP-Link_59C2
@@ -31,9 +31,10 @@ float ASYMMETRIE = 1; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS ST
 String NACHRICHT = "";
 //String TEMPERATUR = "";
 //String IP = "192.168.137.92";
-//String IP = "192.168.0.102";
-String IP = "192.168.137.157";
-//String IP = "192.168.137.222";
+String IP = "192.168.178.66";
+//String IP = "192.168.137.157";
+//String IP = "192.168.137.243";
+//String IP = "192.168.137.163";
 int PORT = 6000;
 
 //UDP udp;  // define the UDP object
@@ -49,7 +50,7 @@ SensorM sensorData;
 long currTime = System.currentTimeMillis();
 long maxDuration = 10000;
 float tilt_thres = -0.2;
-boolean stats = true;
+boolean stats = false;
 
 int w = 320;
 int h = 240;
@@ -78,8 +79,6 @@ void setup()
   udpcomfort = new UDPcomfort(IP, PORT);
   antrieb = new Antrieb(udpcomfort);
   regler = new Regler(antrieb, sensorData);
-
-  frameRate(5);
 }
 
 
@@ -97,7 +96,6 @@ void draw()
   imageMode(CENTER);
   translate(0, 0, 200);
   long timeDiff = System.currentTimeMillis() - currTime;
-
   if (timeDiff <= maxDuration) {
     drawStartScreen(timeDiff);
   } else {
@@ -151,6 +149,7 @@ void drawMainScreen() {
   rotateY(PI);
   image(cam, 0, 0);
 
+  //translate(0, 0, 100);
   // region: show Text in Image
   drawIndicator(true, sensorValZ, largerRectWidth, largerRectHeight, 200, 0, 255, 255);
   drawIndicator(false, sensorValY, largerRectWidth, largerRectHeight, 200, 0, 0, 255);
@@ -170,13 +169,13 @@ void drawMainScreen() {
 
   if ((((sensorData.x) / 90.0f)-regler.offSetX > tilt_thres || regler.stop) && !regler.start) {
     fill(255, 0, 0);
-    rect(150, 130, 50, 50);
+    rect(100, 130, 50, 50);
   } else if (regler.start && !regler.stop) {
     fill(0, 255, 0);
-    rect(150, 130, 50, 50);
+    rect(100, 130, 50, 50);
   } else {
     fill(255, 0, 0);
-    rect(150, 130, 50, 50);
+    rect(100, 130, 50, 50);
   }
 }
 

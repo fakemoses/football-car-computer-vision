@@ -39,23 +39,65 @@ public class Regler
     if ((px < tilt_thres || start) && !stop && (py > 0.05 || py < -0.05)) {
 
       start = true;
-      float s =  VORTRIEB * py * 2.5f;
-      if (pz > -0.1 && pz < 0.1) {
+      float s =  VORTRIEB;
+      float rf=0, rl=0, rr=0;
+
+      if (py < -0.05)
+        s *= -1;
+      // else s = -s;
+      if (pz > -0.2 && pz < 0.2) {
         direction ="Straight";  // added -() to make car forward when head moves down, but car reverse when head moves up
-        u_links = -(s * 0.8f);
-        u_rechts = -(s * 0.8f);
-      } else if (pz > 0.1)
-      {
-        direction ="Right";
-        u_links = s * 0.5f;
-        u_rechts = (s*0.6f) + pz;
-      } else if (pz < -0.1)
-      {
-        direction ="Left";   // for MT1 car, i make left turning little stronger than right to make it balanced 
-        u_links = (s*0.7f) + abs(pz);  // HAVE TO RECHECK VALUES WITH OTHER CAR
-        u_rechts = s * 0.6f;
+        //u_links = -(s * 0.9f);
+        //u_rechts = -(s * 0.9f);
+        //rf =  s < 0 ? (s * 0.9f):(s * 0.9f);
+        rf = (s*0.9f);
       }
 
+      if (pz > 0.2)
+      {
+        direction ="Right";
+        //u_links = -(s * 0.6f);
+        //u_rechts = -((s*0.75f) + (pz*.5f));
+        rl = -(0.6f);
+        rr = (pz*.5f);
+        rf = (s*0.9f);
+      } else if (pz < -0.2
+      )
+      {
+        direction ="Left";   // for MT1 car, i make left turning little stronger than right to make it balanced
+        //if(py > 0)
+        //u_links = -((s*0.75f) + abs((pz*.5f)));  // HAVE TO RECHECK VALUES WITH OTHER CAR
+        //else         u_links = abs(abs(s*0.75f) + abs((pz*.5f)));  // HAVE TO RECHECK VALUES WITH OTHER CAR
+
+        //u_rechts = -(s * 0.6f);
+        rr = -(0.6f);
+        rl = (pz*.5f);
+        rf = (s*0.9f);
+      }
+      println(s);
+      float val = 0.6;
+      if (rf < 0) {
+        println("pos " + rf + "   " + s);
+        if ( pz >-0.2 && pz < 0.2) {
+          u_links = sqrt(pow(rf, 2)+pow(rl, 2));
+          u_rechts = sqrt(pow(rf, 2)+pow(rr, 2));
+        } else
+        {
+          u_links = sqrt(pow(rf*val, 2)+pow(rl, 2));
+          u_rechts = sqrt(pow(rf*val, 2)+pow(rr, 2));
+        }
+      } else {
+        println("neg " + rf + "   " + s);
+
+        if ( pz >-0.2 && pz < 0.2) {
+          u_links = -sqrt(pow(rf, 2)+pow(rl, 2));
+          u_rechts = -sqrt(pow(rf, 2)+pow(rr, 2));
+        } else
+        {
+          u_links = -sqrt(pow(rf*val, 2)+pow(rl, 2));
+          u_rechts = -sqrt(pow(rf*val, 2)+pow(rr, 2));
+        }
+      }
       if (px > 0.8) {
         stop = true;
       }
