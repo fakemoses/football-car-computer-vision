@@ -22,8 +22,8 @@
 
 #include "camera_pins.h"
 
-const char* ssid = "PinnutNet 2.4 Ghz"; //Smartphone Pixel
-const char* password = "ikanbilismasaklemakff12";
+//const char* ssid = "PinnutNet 2.4 Ghz"; //Smartphone Pixel
+//const char* password = "ikanbilismasaklemakff12";
 
 //const char* ssid = "carwifi"; //Smartphone Pixel
 //const char* password = "wifipass";
@@ -31,8 +31,8 @@ const char* password = "ikanbilismasaklemakff12";
 unsigned long previousMillis = 0;
 unsigned long interval = 1000; // every n second check
 
-//const char* ssid = "AARON 5306"; //Aaron's Laptop
-//const char* password = "670F0:e5";
+const char* ssid = "TP-Link_3F12"; //Aaron's Laptop
+const char* password = "26643182";
 
 AsyncUDP udp;
 

@@ -3,7 +3,7 @@ import processing.vr.*;
 import ipcapture2.*;
 
 //Herausgezogene wichtige Parameter des Systems
-boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = true;
+boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = false;
 float VORTRIEB = 0.84;
 float ASYMMETRIE = 1; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 
@@ -31,10 +31,12 @@ float ASYMMETRIE = 1; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS ST
 String NACHRICHT = "";
 //String TEMPERATUR = "";
 //String IP = "192.168.137.92";
-String IP = "192.168.178.66";
+//String IP = "192.168.178.66";
 //String IP = "192.168.137.157";
 //String IP = "192.168.137.243";
 //String IP = "192.168.137.163";
+
+String IP = "192.168.0.101"; // $G Car connected to Hotspot111
 int PORT = 6000;
 
 //UDP udp;  // define the UDP object
