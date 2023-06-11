@@ -17,12 +17,12 @@ jobs:
 
       - name: Read file list
         run: |
-          cat ./.github/workflows/file_list.txt | 
-          while read -r line; do
+          cat ${{ github.workspace }}/file_list.txt | while read -r line; do
             src_folder=$(echo "${line%%,*}")
             dest_folder=$(echo "${line##*,}")
             source_file+=("${src_folder}${line%%,*}")
             target_file+=("${dest_folder}${line##*,}")
+            echo "Reading file: ${src_folder}${line%%,*} -> ${dest_folder}${line##*,}"
           done
           echo "::set-output name=source_file::${source_file[*]}"
           echo "::set-output name=target_file::${target_file[*]}"
@@ -42,7 +42,8 @@ jobs:
           target_file=(${{ steps.read_file_list.outputs.target_file }})
           for ((i=0; i<${#source_file[@]}; i++))
           do
-            cat "${source_file[$i]}" > "${target_file[$i]}"
+            echo "Combining file: ${source_file[$i]} -> ${target_file[$i]}"
+            cat "${source_file[$i]}" >> "${target_file[$i]}"
           done
           echo "Files combined successfully"
 
