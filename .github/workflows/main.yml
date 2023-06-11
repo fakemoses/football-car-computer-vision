@@ -1,4 +1,4 @@
-name: Workflow to combine files
+name: Combine files
 on:
   push:
     branches:
@@ -17,7 +17,7 @@ jobs:
 
       - name: Read file list
         run: |
-          cat file_list.txt | while read -r line; do
+          cat ${{ github.workspace }}/file_list.txt | while read -r line; do
             src_folder=$(echo "${line%%,*}")
             dest_folder=$(echo "${line##*,}")
             source_file+=("${src_folder}${line%%,*}")
@@ -32,6 +32,8 @@ jobs:
           for folder in "${target_folder[@]}"; do
             mkdir -p "$folder"
           done
+          echo "Destination folders created successfully"
+          echo "::set-output name=target_folder::${target_folder[*]}"
 
       - name: Combine files
         run: |
@@ -43,9 +45,9 @@ jobs:
           done
           echo "Files combined successfully"
 
-      - name: Commit changes
-        run: |
-          git config --global user.name "Your Name"
-          git config --global user.email "youremail@example.com"
-          git add .
-          git commit -m "Combine files"
+      # - name: Commit changes
+      #   run: |
+      #     git config --global user.name "Your Name"
+      #     git config --global user.email "youremail@example.com"
+      #     git add .
+      #     git commit -m "Combine files"
