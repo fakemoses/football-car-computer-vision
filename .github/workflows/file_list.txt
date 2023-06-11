@@ -1,2 +1,0 @@
-Processing_CaptureJavaRT2022_012regler_MODULAR101_PID/,CaptureJavaRT2022_Autonomous/
-Processing_CaptureJavaRT2022_012regler_MODULAR101_PID.pde,CaptureJavaRT2022_Autonomous.pde

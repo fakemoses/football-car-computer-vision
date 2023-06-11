@@ -1,0 +1,97 @@
+{
+    "source_folder": "Processing_CaptureJavaRT2022_012regler_MODULAR101_PID",
+    "target_folder": "CaptureJavaRT2022_Autonomous",
+    "files": [
+        {
+            "source": [
+                "Processing_CaptureJavaRT2022_012regler_MODULAR101_PID.pde"
+            ],
+            "target": "CaptureJavaRT2022_Autonomous.pde"
+        },
+        {
+            "source": [
+                "Detection.pde",
+                "Detection.Ball.pde",
+                "Detection.Goal.pde",
+                "Detection.Line.pde",
+                "Detection.ThreadController.pde",
+                "Detection.Car.pde"
+            ],
+            "target": "Detection.pde"
+        },
+        {
+            "source": [
+                "ColorFilter.RGB.pde",
+                "ColorFilter.HSV.pde",
+                "ColorFilter.HSV_CV.pde",
+                "ColorFilter.HSV_Range.pde"
+            ],
+            "target": "ColorFilter.pde"
+        },
+        {
+            "source": [
+                "Detector.Cascade.pde",
+                "Detector.Contour.pde",
+                "Detector.Ransac_Rect.pde",
+                "Detector.Ransac.pde"
+            ],
+            "target": "Detector.pde"
+        },
+        {
+            "source": [
+                "Post.Gaussian1D.pde",
+                "Post.Gaussian2D.pde",
+                "Post.MedianFilter.pde",
+                "Post.Padding.pde",
+                "Post.Sobel.pde",
+                "Post.Threshold.pde"
+            ],
+            "target": "ImageProcessing.pde"
+        },
+        {
+            "source": [
+                "MotorControl.pde",
+                "Task.pde",
+                "Array.Task.pde",
+                "MotorHandler.pde"
+            ],
+            "target": "MotorControl.pde"
+        },
+        {
+            "source": [
+                "Array.Memory.pde",
+                "DataContainer.pde",
+                "Boundary.pde",
+                "Post.Utils.pde",
+                "Image.Utils.pde",
+                "Line.pde",
+                "Array.Point.pde"
+            ],
+            "target": "Utils.pde"
+        },
+        {
+            "source": [
+                "Antrieb.pde"
+            ],
+            "target": "Antrieb.pde"
+        },
+        {
+            "source": [
+                "Interface.pde"
+            ],
+            "target": "Interface.pde"
+        },
+        {
+            "source": [
+                "Cam.pde"
+            ],
+            "target": "Camera.pde"
+        },
+        {
+            "source": [
+                "UDPcomfort.pde"
+            ],
+            "target": "UDPcomfort.pde"
+        }
+    ]
+}
