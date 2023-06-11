@@ -2,6 +2,8 @@ public enum BorderType {
     BLACK, REFLECT, REPLICATE
 }
 
+// Utility class for adding borders to images
+// Used with ImageProcessing involving convolution / kernels
 public class ImageBorderAdder {
     final private BorderType borderType;
     

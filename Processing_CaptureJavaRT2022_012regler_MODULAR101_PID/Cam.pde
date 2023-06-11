@@ -1,3 +1,10 @@
+// Custom Camera Implementation
+// Added Reconect Functionality
+// TODO: Add a way to check if the camera is down
+// TODO: Add better reconnect functionality
+
+// Fork: https://github.com/singintime/ipcapture
+
 class CustomCam extends IPCaptureCustom {
     
     private int numUnavailable;
@@ -30,9 +37,6 @@ class CustomCam extends IPCaptureCustom {
         numUnavailable = 0;
     }
 }
-
-
-// Fork: https://github.com/singintime/ipcapture
 
 public class IPCaptureCustom extends PImage implements Runnable {
     private String urlString;

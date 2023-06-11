@@ -1,3 +1,7 @@
+// Utility class for drawing lines and rectangles directly on Image
+// By searching for the points that make up the line or rectangle, and then
+// setting the color of those points, we can draw directly on the image
+// without having to use the Processing drawing functions.
 class ImageUtils{
     
     public ImageUtils() {

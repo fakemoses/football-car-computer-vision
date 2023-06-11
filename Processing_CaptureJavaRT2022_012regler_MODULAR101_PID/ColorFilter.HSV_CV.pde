@@ -1,3 +1,4 @@
+// Wrapper for OpenCV HSV filtering
 public class HSVFilterCV extends PApplet implements ColorFilter {
     private OpenCV opencv;
     

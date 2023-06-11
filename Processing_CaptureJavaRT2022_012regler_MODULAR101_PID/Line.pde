@@ -1,3 +1,4 @@
+// Custom Line class with extra methods
 class Line extends Line2D.Double {
     
     private int w = 320;

@@ -1,10 +1,4 @@
-/*
-* IDEA:
-1. Mat always start with Blank Images
--> Fill with Green
-2. the first Line set should be always have smaller region 
-*/
-
+// Util class to visualize the boundary of the current line
 public class Boundary {
     
     private Line prevLine = null;
@@ -71,11 +65,11 @@ public class Boundary {
     
     // !MAX SUS CODE -> MORE TESTING NEEDED
     // TODO: Better Implementation
-    /*
-    * 1 = green -> Available
-    * 2 = red -> Unavailable
-    * 3 = blue -> Border Change
-    */
+    
+    // 1 = green -> Available
+    // 2 = red -> Unavailable
+    // 3 = blue -> Border Change
+    
     private int whereAmI(Point p) {
         if (currentLine.isVertical() && prevLine.isVertical()) {
             if (p.x < currentLine.yIntercept() && p.x < prevLine.yIntercept()) {

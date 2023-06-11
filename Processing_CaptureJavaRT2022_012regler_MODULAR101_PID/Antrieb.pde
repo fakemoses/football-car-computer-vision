@@ -1,10 +1,8 @@
 public class Antrieb
 {
     private UDPcomfort udpcomfort;
-    private final double multiplier;
-    public Antrieb(UDPcomfort udpcomfort, double multiplier) {
+    public Antrieb(UDPcomfort udpcomfort) {
         this.udpcomfort = udpcomfort;
-        this.multiplier = multiplier <= 1.0 ? multiplier : 1.0; // for safety, max 1.0
     }
     
     /**
@@ -24,10 +22,9 @@ public class Antrieb
     
     */
     
-    //  public void fahrt( float rechts, float links)
     public void fahrt(float links, float rechts) {
-        if (TAUSCHE_ANTRIEB_LINKS_RECHTS)
-            {
+        
+        if (TAUSCHE_ANTRIEB_LINKS_RECHTS) {
             float h = links;
             links = rechts;
             rechts = h;

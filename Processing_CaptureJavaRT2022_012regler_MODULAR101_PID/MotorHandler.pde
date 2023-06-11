@@ -2,7 +2,9 @@ public enum HandlerPriority {
     PRIORITY_HIGH,
     PRIORITY_MEDIUM,
     PRIORITY_LOW,
-    PRIORITY_LOWEST; // temporary priority for random handlers
+    
+    
+    PRIORITY_LOWEST; // temporary priority for random handlers <- should be avoided to override
     
     public boolean isHigherPriorityThan(HandlerPriority otherPriority) {
         return compareTo(otherPriority) < 0;
