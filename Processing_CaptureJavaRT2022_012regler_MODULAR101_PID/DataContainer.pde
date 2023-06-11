@@ -26,7 +26,7 @@ public class DataContainer {
     
     // Motor State 
     //TODO: Should this be combined together? sync with MotorState
-    private boolean isTurn;
+    private boolean isSearch;
     private boolean isShot;
     
     
@@ -42,53 +42,41 @@ public class DataContainer {
         this.isGoalInRoi = false;
     }
     
-    public Shape update(DetectionThread instance, Shape shape) {
+    public void update(DetectionThread instance, Shape shape) {
         try {
             writeLock.lock();
-            return route(instance, shape);
+            route(instance, shape);
         } finally {
             writeLock.unlock();
         }
     }
     
-    private Shape route(DetectionThread instance, Shape shape) {
+    private void route(DetectionThread instance, Shape shape) {
         if (instance instanceof BallDetection) {
-            return ballDetectionRoute((Rectangle) shape);
+            ballDetectionRoute((Rectangle) shape);
         } 
         
         if (instance instanceof GoalDetection) {
-            return goalDetectionRoute((Rectangle) shape);
+            goalDetectionRoute((Rectangle) shape);
         } 
         
         if (instance instanceof LineDetection) {
-            return lineDetectionRoute((Line) shape);
+            lineDetectionRoute((Line) shape);
         } 
         
         throw new IllegalArgumentException("Unknown instance type. Check Implementation");
-        
     }
     
-    private Rectangle ballDetectionRoute(Rectangle shape) {
+    private void ballDetectionRoute(Rectangle shape) {
         ballMemory.addCurrentMemory(shape);
-        latestBallMemory = ballMemory.getLastRememberedMemory();
-        return latestBallMemory;
     }
     
-    private Rectangle goalDetectionRoute(Rectangle shape) {
+    private void goalDetectionRoute(Rectangle shape) {
         goalMemory.addCurrentMemory(shape);
-        
-        // if (goalMemory.getLastRememberedMemory() == null) {
-        //     latestGoalMemory = null;
-        //     return null;
-    // }
-        // latestGoalMemory = trimmed(goalMemory.getAllMemory(), 20);
-        latestGoalMemory = goalMemory.getLastRememberedMemory();
-        return latestGoalMemory;
     }
     
-    private Line lineDetectionRoute(Line line) {
+    private void lineDetectionRoute(Line line) {
         latestLineMemory = line;
-        return latestLineMemory;
     }
     
     private Rectangle getLatestBallMemory() {
@@ -181,19 +169,19 @@ public class DataContainer {
         }
     }
     
-    public void setIsTurn(boolean isTurn) {
+    public void setIsSearch(boolean isSearch) {
         try{
             writeLock.lock();
-            this.isTurn = isTurn;
+            this.isSearch = isSearch;
         } finally {
             writeLock.unlock();
         }
     }
     
-    public boolean isTurn() {
+    public boolean isSearch() {
         try{
             readLock.lock();
-            return isTurn;
+            return isSearch;
         } finally {
             readLock.unlock();
         }
@@ -215,30 +203,5 @@ public class DataContainer {
         } finally {
             readLock.unlock();
         }
-    }
-    
-    public Rectangle trimmed(Rectangle[] all, double percentage) {
-        Arrays.sort(all, new Comparator<Rectangle>() {
-            @Override
-            public int compare(Rectangle o1, Rectangle o2) {
-                return(o1.width * o1.height) - (o2.width * o2.height);
-            }
-        });
-        
-        int trim = (int)(all.length * percentage);
-        
-        Rectangle[] trimmed = Arrays.copyOfRange(all, trim, all.length - trim);
-        
-        int x = 0, y = 0, width = 0, height = 0;
-        for (Rectangle r : trimmed) {
-            x += r.x;
-            y += r.y;
-            width += r.width;
-            height += r.height;
-        }
-        
-        return new Rectangle(x / trimmed.length, y / trimmed.length, width / trimmed.length, height / trimmed.length);
-    }
-    
-    
+    }     
 }

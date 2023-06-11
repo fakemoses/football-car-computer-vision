@@ -43,7 +43,7 @@ class Line extends Line2D.Double {
     public Line intersectionAtImageBorder() {
         /*
         * start is start point
-        * end isend point
+        * end is end point
         
         * start ideally would start on left image boundary
         * if not it will located at top image boundary

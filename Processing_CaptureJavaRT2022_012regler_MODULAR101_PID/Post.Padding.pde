@@ -1,14 +1,14 @@
 class Padding implements PostFilter {
-    private final int top;
-    private final int bottom;
-    private final int right;
-    private final int left;
+    private final int startX;
+    private final int startY;
+    private final int w;
+    private final int h;
     
-    public Padding(int top, int bottom, int right, int left) {
-        this.top = top;
-        this.bottom = bottom;
-        this.right = right;
-        this.left = left;
+    public Padding(int startX, int startY, int w, int h) {
+        this.startX = startX;
+        this.startY = startY;
+        this.w = w;
+        this.h = h;
     }
     
     public PImage apply(PImage image) {
@@ -16,13 +16,22 @@ class Padding implements PostFilter {
         
         for (int i = 0; i < result.width; i++) {          
             for (int j = 0; j < result.height; j++) {
-                if (i < left || i >= result.width - right || j < top || j >= result.height - bottom) {
-                    result.pixels[i + j * result.width] = 0;
-                }   
+                if (j < startY) {
+                    continue;
+                }
+                if (j > startY + h) {
+                    continue;
+                }
+                if (i < startX) {
+                    continue;
+                }
+                if (i > startX + w) {
+                    continue;
+                }
+                result.pixels[i + j * result.width] = 0xFFFF0000;
             }
         }
         
         return result;
-    }
-    
+    } 
 }

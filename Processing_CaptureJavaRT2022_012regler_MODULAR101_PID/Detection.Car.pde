@@ -1,10 +1,13 @@
 public class CarDetection extends DetectionThread {
     
-    Detector<Rectangle> objectDetector;
+    private Detector<Rectangle> objectDetector;
+    private ColorFilter colorFilter;
     
-    public CarDetection(MotorControl motorControl, ColorFilter colorFilter, Detector<Rectangle> objectDetector) {
-        super(motorControl, colorFilter);
+    public CarDetection(MotorControl motorControl, DataContainer data, ColorFilter colorFilter, Detector<Rectangle> objectDetector) {
+        super(motorControl, data);
+        
         this.objectDetector = objectDetector;
+        this.colorFilter = colorFilter;
     }
     
     public String getThreadName() {

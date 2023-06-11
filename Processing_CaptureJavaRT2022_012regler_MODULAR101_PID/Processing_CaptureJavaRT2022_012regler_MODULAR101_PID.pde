@@ -2,8 +2,10 @@ import ipcapture.*;
 import hypermedia.net.*;
 import gab.opencv.*;
 import processing.video.*;
+
 import processing.awt.PSurfaceAWT;
 import processing.awt.PSurfaceAWT.SmoothCanvas;
+
 import java.awt.*;
 import java.awt.Frame;
 import java.awt.geom.Line2D;
@@ -12,6 +14,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.Shape;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+
 import java.util.Collections;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -21,10 +24,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import java.net.*;
+
 import java.io.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+
 import javax.imageio.ImageIO;
 
 //Herausgezogene wichtige Parameter des Systems
@@ -68,7 +74,7 @@ UDPcomfort udpcomfort;
 Antrieb antrieb;
 CustomCam cam;
 
-Algo algo;
+ThreadController threadController;
 MotorControl motorControl;
 
 DataContainer dataContainer;
@@ -84,10 +90,9 @@ LineDetection lineDetection;
 GoalDetection goalDetection;
 BallDetection ballDetection;
 
-OscP5 oscP5;
-NetAddress myRemoteLocation;
-Comm comm;
-String isBall = "/isBall";
+// OscP5 oscP5;
+// NetAddress myRemoteLocation;
+// String isBall = "/isBall";
 
 
 // camera Parameters
@@ -98,6 +103,8 @@ int camHeight = 240;
 int r_maxIteration = 500;
 float r_threshhold = 0.2;
 
+boolean AKTIV = false;
+
 void setup() {
     size(1280,720);
     frameRate(15);
@@ -105,6 +112,7 @@ void setup() {
     cam = new CustomCam(this, "http://" + IP + ":81/stream", "", "");
     cam.start();
     
+    // TODO: is this necessary?
     surface.setLocation( -5, 0);
     
     // oscP5 = new OscP5(this,12000); // Port that the client will listen to
@@ -120,28 +128,27 @@ void setup() {
     
     lineFilter = new HSVFilter(HSVColorRange.combine(HSVColorRange.RED1, HSVColorRange.RED2));
     boundary = new Boundary(camWidth,camHeight);
-    lineDetector = new RansacDetector(r_maxIteration,r_threshhold, 400,camWidth,camHeight);
+    lineDetector = new RansacLineDetector(r_maxIteration,r_threshhold, 400);
     lineDetection = new LineDetection(motorControl, dataContainer, lineFilter, lineDetector, boundary);
     
-    ballFilter = new HSVFilter(HSVColorRange.YELLOW3).addPostFilter(new MedianFilter(3)).addPostFilter(new GaussianFilter1D(5, 100)).addPostFilter(new Padding(50,0,0,0));
-    ballDetector = new RansacDetectorRect(1000,150);
-    ballDetection = new BallDetection(motorControl, dataContainer, ballFilter, ballDetector, comm);
+    ballFilter = new HSVFilter(HSVColorRange.YELLOW3).addPostFilter(new MedianFilter(3, BorderType.BLACK)).addPostFilter(new GaussianFilter1D(31, 5, BorderType.BLACK)).addPostFilter(new Threshold(100)).addPostFilter(new Padding(0,0,320,50));
+    ballDetector = new RansacRectangleDetector(1000,150);
+    ballDetection = new BallDetection(motorControl, dataContainer, ballFilter, ballDetector);
     
-    goalFilter = new HSVFilter(HSVColorRange.GREEN).addPostFilter(new MedianFilter(9)).addPostFilter(new GaussianFilter1D(5, 200)).addPostFilter(new Padding(50,0,0,0));
-    goalDetector = new  RansacDetectorRect(1000,50);
+    goalFilter = new HSVFilter(HSVColorRange.GREEN).addPostFilter(new MedianFilter(9, BorderType.BLACK)).addPostFilter(new GaussianFilter1D(31, 5, BorderType.BLACK)).addPostFilter(new Threshold(100)).addPostFilter(new Padding(0,0,320,50));
+    goalDetector = new  RansacRectangleDetector(1000,50);
     goalDetection = new GoalDetection(motorControl, dataContainer, goalFilter, goalDetector);
     
     motorControl.register(lineDetection,1);
     motorControl.register(ballDetection,2);
     motorControl.register(goalDetection,3);
     
-    // algo = new Algo(ballDetection);
-    algo = new Algo(lineDetection, ballDetection,goalDetection);
-    // algo = new Algo(goalDetection);
-    algo.startALL();
+    // threadController = new ThreadController(ballDetection);
+    threadController = new ThreadController(lineDetection, ballDetection,goalDetection);
+    // threadController = new ThreadController(goalDetection);
+    threadController.startAllThread();
 }
 
-boolean AKTIV = false;
 
 void draw() {   
     
@@ -157,20 +164,13 @@ void draw() {
     
     if (cam.isAvailable()) {
         cam.read();
-        // is it possible that the pixels updated during grabbing image? need locking ?
-        algo.updateImage(cam);
+        threadController.updateImage(cam);
     }
     
-    drawResults(algo.getDetectionResults());
+    drawResults(threadController.getDetectionResults());
     
     motorControl.run();
 }
-
-// //event handler for OSC messages
-// void oscEvent(OscMessage theOscMessage) {
-//     // /* check if theOscMessage has the address pattern we are looking for. */
-//     comm.onEventRun(theOscMessage);       
-// }
 
 void keyPressed() {
     if (key == ' ') {

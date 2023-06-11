@@ -1,16 +1,11 @@
-public class Algo {
+public class ThreadController {
     DetectionThread[] threads;
     
-    
-    public Algo(DetectionThread...threads) {
+    public ThreadController(DetectionThread...threads) {
         this.threads = threads;
     }
     
-    public void startALL() {
-        /* 
-        * should bildVerarbaitung also run on different thread?
-        * Right now it is running on main Thread by runColorDetection();
-        */
+    public void startAllThread() {
         for (DetectionThread t : threads) {
             t.startThread();
         }
@@ -31,5 +26,3 @@ public class Algo {
         return images;
     }
 }
-
-// todo : Thread race / Sync ?

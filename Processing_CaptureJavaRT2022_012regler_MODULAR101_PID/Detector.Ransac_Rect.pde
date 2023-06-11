@@ -1,69 +1,67 @@
 
-// TODO variable names
-public class RansacDetectorRect implements Detector<Rectangle> {     
+public class RansacRectangleDetector implements Detector<Rectangle> {     
     private double best_inliers;
     private double confidence;
     
-    // TODO debug - temp
-    boolean isEvalSize = true;
-    
-    private int numIterations;;
+    private int numIterations;
     private int minPoints;
     
-    public RansacDetectorRect(int numIterations, int minPoints) {
+    public RansacRectangleDetector(int numIterations, int minPoints) {
         this.numIterations = numIterations;
         this.minPoints = minPoints;
     }
     
     public ArrayList<Rectangle> detect(PImage image, PImage mask) { 
         ArrayList<Point> points = maskToPoints(mask);
-        ArrayList<Rectangle> bester = new ArrayList<Rectangle>();
-        Rectangle bestrects = null;
         
         if (points.size() <= minPoints) {
             return null;
         }  
+        
+        ArrayList<Rectangle> goodRectCollection = new ArrayList<Rectangle>();
+        Rectangle bestRectangle = null;
         
         best_inliers = 0;
         for (int i = 0; i < numIterations; i++) {
             
             Point2D p1 = points.get((int)(Math.random() * points.size()));
             Point2D p2 = points.get((int)(Math.random() * points.size()));
-            Rectangle tryRect = generateRectangleFromTwoPoints(p1, p2);
+            Rectangle hyphRectangle = generateRectangleFromTwoPoints(p1, p2);
             
-            PointArray<Point2D> inliers = new PointArray<Point2D>();
+            ArrayList<Point2D> inliers = new ArrayList<Point2D>();
             for (Point2D p : points) {
-                if (tryRect.contains(p)) {
+                if (hyphRectangle.contains(p)) {
                     inliers.add(p);
                 }
             }
             
-            double ratio = fillRatio(tryRect, inliers);
+            double ratio = calculateDensityRatio(hyphRectangle, inliers);
             if (ratio > best_inliers) {
                 best_inliers = ratio;
-                bestrects = tryRect;
-                bester.add(tryRect);
+                bestRectangle = hyphRectangle;
+                goodRectCollection.add(hyphRectangle);
             }
             
-            if (bestrects == null || !isEvalSize) {
+            if (bestRectangle == null) {
                 continue;
             }
             
-            if (ratio >= best_inliers && tryRect.width * tryRect.height > bestrects.width * bestrects.height) {
+            if (ratio >= best_inliers && hyphRectangle.width * hyphRectangle.height > bestRectangle.width * bestRectangle.height) {
                 best_inliers = ratio;
-                bestrects = tryRect;
-                bester.add(tryRect);
+                bestRectangle = hyphRectangle;
+                goodRectCollection.add(hyphRectangle);
             }
             
         }
+        
         confidence = (double)best_inliers / points.size();
         
-        Collections.reverse(bester);
-        return bester.size() > 0 ? bester : null;
+        Collections.reverse(goodRectCollection);
+        return goodRectCollection.size() > 0 ? goodRectCollection : null;
     }
     
     private ArrayList<Point> maskToPoints(PImage mask) {
-        PointArray<Point> points = new PointArray<Point>(mask.width, mask.height);
+        ArrayList<Point> points = new ArrayList<Point>();
         for (int x = 0; x < mask.width; x++) {
             for (int y = 0; y < mask.height; y++) {
                 if (mask.get(x, y) == 0xFFFFFFFF) {
@@ -83,7 +81,7 @@ public class RansacDetectorRect implements Detector<Rectangle> {
         return new Rectangle((int)x,(int)y,(int)w,(int)h);
     }
     
-    private double fillRatio(Rectangle rect, PointArray<Point2D> points) {
+    private double calculateDensityRatio(Rectangle rect, ArrayList<Point2D> points) {
         int count = points.size();
         int total = rect.width * rect.height;
         

@@ -2,6 +2,9 @@ public class ContourDetector extends PApplet implements Detector<Rectangle> {
     private OpenCV opencv;
     private int max_rects = 10;
     
+    ContourDetector() {
+    }
+    
     ContourDetector(int w, int h) {
         opencv = new OpenCV(this, w, h);
     }   
@@ -12,6 +15,14 @@ public class ContourDetector extends PApplet implements Detector<Rectangle> {
     }
     
     public ArrayList<Rectangle> detect(PImage image, PImage mask) {
+        if (image.width != mask.width || image.height != mask.height) {
+            throw new IllegalArgumentException("Image and mask must be the same size");
+        }
+        
+        if (opencv == null) {
+            opencv = new OpenCV(this, image.width, image.height);
+        }
+        
         ArrayList<Contour> contours = this.detectContours(mask);
         
         ArrayList<Rectangle> rects = new ArrayList<Rectangle>();

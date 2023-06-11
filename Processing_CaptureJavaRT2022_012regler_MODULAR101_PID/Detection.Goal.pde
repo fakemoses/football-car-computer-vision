@@ -1,7 +1,7 @@
 public class GoalDetection extends DetectionThread{
     
-    Detector<Rectangle> objectDetector;
-    DataContainer data;
+    private Detector<Rectangle> objectDetector;
+    private ColorFilter colorFilter;
     
     private ArrayList<Rectangle> rects;
     private Rectangle lastMemory;
@@ -27,10 +27,10 @@ public class GoalDetection extends DetectionThread{
     
     
     public GoalDetection(MotorControl motorControl, DataContainer data, ColorFilter colorFilter, Detector<Rectangle> objectDetector) {
-        super(motorControl, colorFilter);
+        super(motorControl, data);
         
         this.objectDetector = objectDetector;
-        this.data = data;        
+        this.colorFilter = colorFilter;       
         
         int w = (int)(End.x - Start.x);
         int h = (int)(End.y - Start.y);
@@ -55,7 +55,8 @@ public class GoalDetection extends DetectionThread{
             
             Rectangle result = getRectangleFromDetectionResult(rects);
             
-            lastMemory = (Rectangle)data.update(this, result);
+            data.update(this, result);
+            lastMemory = data.getLatestGoalMemory();
             
             if (lastMemory == null) {
                 motorControl.notify(this, HandlerPriority.PRIORITY_LOW,motorControl.Turn(1));  
@@ -64,7 +65,7 @@ public class GoalDetection extends DetectionThread{
             
             float motorSignal = toMotorSignalLinear((int)lastMemory.getCenterX());
             double bboxArea = lastMemory.getWidth() * lastMemory.getHeight();
-
+            
             println("bboxArea: " + bboxArea);
             
             data.setIsGoalInRoi(bboxArea > MIN_GOAL_AREA);
@@ -122,7 +123,7 @@ public class GoalDetection extends DetectionThread{
             return null;
         }
         PImage[] results = new PImage[2];
-        results[0] = lastMemory == null ? image : drawRect(image, lastMemory, boxThickness, boxColor, false);
+        results[0] = lastMemory == null ? image : imageUtils.drawRect(image, lastMemory, boxThickness, boxColor, false);
         results[1] = mask;
         return results;
     }

@@ -44,6 +44,4 @@ class MemoryArray<T> extends ArrayList<T>{
     public T[] getAllMemory() {
         return(T[]) toArray();
     }
-    
-    
 }
