@@ -13,11 +13,11 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Read file list
         run: |
-          cat ${{ github.workspace }}/file_list.txt | while read -r line; do
+          cat ./.github/workflows/file_list.txt | while read -r line; do
             src_folder=$(echo "${line%%,*}")
             dest_folder=$(echo "${line##*,}")
             source_file+=("${src_folder}${line%%,*}")
