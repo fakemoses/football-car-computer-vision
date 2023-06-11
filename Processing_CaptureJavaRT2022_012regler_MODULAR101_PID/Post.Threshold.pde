@@ -1,8 +1,8 @@
-public class Threshhold implements PostFilter{
-    final int threshhold;
+public class Threshold implements PostFilter{
+    final int threshold;
     
-    Threshhold(int threshhold) {
-        this.threshhold = threshhold;
+    Threshold(int threshold) {
+        this.threshold = threshold;
     }
     
     public PImage apply(PImage img) {
@@ -12,7 +12,7 @@ public class Threshhold implements PostFilter{
             int c = result.pixels[i];
             int r = (int) red(c);
             
-            result.pixels[i] = r < threshhold ? 0xFF000000 : 0xFFFFFFFF;
+            result.pixels[i] = r < threshold ? 0xFF000000 : 0xFFFFFFFF;
         }
         
         return result;

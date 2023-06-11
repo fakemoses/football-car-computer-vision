@@ -5,7 +5,7 @@ public class ThreadController {
         this.threads = threads;
     }
     
-    public void startALL() {
+    public void startAllThread() {
         for (DetectionThread t : threads) {
             t.startThread();
         }

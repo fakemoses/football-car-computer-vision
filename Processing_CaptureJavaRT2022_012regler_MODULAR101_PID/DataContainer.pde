@@ -26,7 +26,7 @@ public class DataContainer {
     
     // Motor State 
     //TODO: Should this be combined together? sync with MotorState
-    private boolean isTurn;
+    private boolean isSearch;
     private boolean isShot;
     
     
@@ -169,19 +169,19 @@ public class DataContainer {
         }
     }
     
-    public void setIsTurn(boolean isTurn) {
+    public void setIsSearch(boolean isSearch) {
         try{
             writeLock.lock();
-            this.isTurn = isTurn;
+            this.isSearch = isSearch;
         } finally {
             writeLock.unlock();
         }
     }
     
-    public boolean isTurn() {
+    public boolean isSearch() {
         try{
             readLock.lock();
-            return isTurn;
+            return isSearch;
         } finally {
             readLock.unlock();
         }

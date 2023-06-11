@@ -5,6 +5,8 @@ public enum BorderType {
 public class ImageBorderAdder {
     final private BorderType borderType;
     
+    
+    
     public ImageBorderAdder(BorderType borderType) {
         this.borderType = borderType; 
     }
@@ -104,7 +106,4 @@ public class ImageBorderAdder {
         result.updatePixels();
         return result;
     }
-    
-    
-    
 }

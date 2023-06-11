@@ -28,7 +28,7 @@ public class RansacRectangleDetector implements Detector<Rectangle> {
             Point2D p2 = points.get((int)(Math.random() * points.size()));
             Rectangle hyphRectangle = generateRectangleFromTwoPoints(p1, p2);
             
-            PointArray<Point2D> inliers = new PointArray<Point2D>();
+            ArrayList<Point2D> inliers = new ArrayList<Point2D>();
             for (Point2D p : points) {
                 if (hyphRectangle.contains(p)) {
                     inliers.add(p);
@@ -61,7 +61,7 @@ public class RansacRectangleDetector implements Detector<Rectangle> {
     }
     
     private ArrayList<Point> maskToPoints(PImage mask) {
-        PointArray<Point> points = new PointArray<Point>(mask.width, mask.height);
+        ArrayList<Point> points = new ArrayList<Point>();
         for (int x = 0; x < mask.width; x++) {
             for (int y = 0; y < mask.height; y++) {
                 if (mask.get(x, y) == 0xFFFFFFFF) {
@@ -81,7 +81,7 @@ public class RansacRectangleDetector implements Detector<Rectangle> {
         return new Rectangle((int)x,(int)y,(int)w,(int)h);
     }
     
-    private double calculateDensityRatio(Rectangle rect, PointArray<Point2D> points) {
+    private double calculateDensityRatio(Rectangle rect, ArrayList<Point2D> points) {
         int count = points.size();
         int total = rect.width * rect.height;
         

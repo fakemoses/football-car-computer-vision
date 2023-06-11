@@ -45,6 +45,11 @@ static class HSVRange {
         int lower;
         
         Range(int upper, int lower) {
+            
+            if (upper < lower) {
+                throw new IllegalArgumentException("Upper bound must be greater than lower bound");
+            }
+
             this.upper = upper;
             this.lower = lower;
         }

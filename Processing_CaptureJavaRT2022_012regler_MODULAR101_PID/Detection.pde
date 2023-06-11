@@ -3,14 +3,18 @@ abstract class DetectionThread implements IDetectionThread, Runnable {
     protected boolean STARTED = false;
     
     protected MotorControl motorControl;
-    protected ColorFilter colorFilter;
+    protected DataContainer data;
+    
+    protected ImageUtils imageUtils;
     
     PImage image;
     PImage mask;   
     
-    public DetectionThread(MotorControl motorControl, ColorFilter colorFilter) {
+    public DetectionThread(MotorControl motorControl, DataContainer data) {
         this.motorControl = motorControl;
-        this.colorFilter = colorFilter;
+        this.data = data;
+        
+        this.imageUtils = new ImageUtils();
     }
     
     public void startThread() {
@@ -23,50 +27,6 @@ abstract class DetectionThread implements IDetectionThread, Runnable {
     
     public void stopThread() {
         STARTED = false;
-    }
-    
-    protected PImage drawRect(PImage image, Rectangle rect, int thickness, color c, boolean fill) { 
-        PointArray<Point> points = new PointArray<Point>();
-        if (thickness > 0) {
-            for (int i = rect.x; i <= rect.x + rect.width; i++) {
-                for (int j = ceil(rect.y - (thickness / 2)); j <= floor(rect.y + (thickness / 2)); j++) {
-                    points.add(new Point(i, j));
-                    points.add(new Point(i, j + rect.height));
-                }
-            }
-            
-            for (int i = rect.y; i <= rect.y + rect.height; i++) {
-                for (int j = ceil(rect.x - (thickness / 2)); j <= floor(rect.x + (thickness / 2)); j++) {
-                    points.add(new Point(j, i));
-                    points.add(new Point(j + rect.width, i));
-                }
-            } 
-        }
-        
-        if (fill) {
-            for (int i = rect.x; i <= rect.x + rect.width; i++) {
-                for (int j = rect.y; j <= rect.y + rect.height; j++) {
-                    points.add(new Point(i, j));
-                }
-            }
-        }
-        
-        return drawPoint(image, points, c);
-    }
-    
-    protected PImage drawLine(PImage image, Line line, int thickness, color c) { 
-        PointArray<Point> points = line.getPoints(thickness);
-        
-        return drawPoint(image, points, c);
-    }
-    
-    protected PImage drawPoint(PImage image, PointArray<Point> points ,color c) { 
-        PImage returnImage = image.copy();
-        int[] pixels = returnImage.pixels;        
-        for (Point p : points) {
-            pixels[p.x + p.y * returnImage.width] = c;
-        }
-        return returnImage;
     }
     
     public void setImage(PImage image) {

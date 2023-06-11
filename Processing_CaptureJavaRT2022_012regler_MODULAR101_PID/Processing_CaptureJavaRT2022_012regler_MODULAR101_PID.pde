@@ -90,10 +90,9 @@ LineDetection lineDetection;
 GoalDetection goalDetection;
 BallDetection ballDetection;
 
-OscP5 oscP5;
-NetAddress myRemoteLocation;
-Comm comm;
-String isBall = "/isBall";
+// OscP5 oscP5;
+// NetAddress myRemoteLocation;
+// String isBall = "/isBall";
 
 
 // camera Parameters
@@ -113,6 +112,7 @@ void setup() {
     cam = new CustomCam(this, "http://" + IP + ":81/stream", "", "");
     cam.start();
     
+    // TODO: is this necessary?
     surface.setLocation( -5, 0);
     
     // oscP5 = new OscP5(this,12000); // Port that the client will listen to
@@ -131,11 +131,11 @@ void setup() {
     lineDetector = new RansacLineDetector(r_maxIteration,r_threshhold, 400);
     lineDetection = new LineDetection(motorControl, dataContainer, lineFilter, lineDetector, boundary);
     
-    ballFilter = new HSVFilter(HSVColorRange.YELLOW3).addPostFilter(new MedianFilter(3, BorderType.BLACK)).addPostFilter(new GaussianFilter1D(31, 5, BorderType.BLACK)).addPostFilter(new Threshhold(100)).addPostFilter(new Padding(50,0,0,0));
+    ballFilter = new HSVFilter(HSVColorRange.YELLOW3).addPostFilter(new MedianFilter(3, BorderType.BLACK)).addPostFilter(new GaussianFilter1D(31, 5, BorderType.BLACK)).addPostFilter(new Threshold(100)).addPostFilter(new Padding(0,0,320,50));
     ballDetector = new RansacRectangleDetector(1000,150);
-    ballDetection = new BallDetection(motorControl, dataContainer, ballFilter, ballDetector, comm);
+    ballDetection = new BallDetection(motorControl, dataContainer, ballFilter, ballDetector);
     
-    goalFilter = new HSVFilter(HSVColorRange.GREEN).addPostFilter(new MedianFilter(9, BorderType.BLACK)).addPostFilter(new GaussianFilter1D(31, 5, BorderType.BLACK)).addPostFilter(new Threshhold(100)).addPostFilter(new Padding(50,0,0,0));
+    goalFilter = new HSVFilter(HSVColorRange.GREEN).addPostFilter(new MedianFilter(9, BorderType.BLACK)).addPostFilter(new GaussianFilter1D(31, 5, BorderType.BLACK)).addPostFilter(new Threshold(100)).addPostFilter(new Padding(0,0,320,50));
     goalDetector = new  RansacRectangleDetector(1000,50);
     goalDetection = new GoalDetection(motorControl, dataContainer, goalFilter, goalDetector);
     
@@ -146,7 +146,7 @@ void setup() {
     // threadController = new ThreadController(ballDetection);
     threadController = new ThreadController(lineDetection, ballDetection,goalDetection);
     // threadController = new ThreadController(goalDetection);
-    threadController.startALL();
+    threadController.startAllThread();
 }
 
 

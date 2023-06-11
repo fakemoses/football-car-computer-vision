@@ -1,8 +1,7 @@
 public class BallDetection extends DetectionThread {
     
     Detector<Rectangle> objectDetector;
-    DataContainer data;
-    Comm comm;
+    private ColorFilter colorFilter;
     
     private ArrayList<Rectangle> rects;
     private Rectangle lastMemory;
@@ -20,11 +19,11 @@ public class BallDetection extends DetectionThread {
     
     private float motorPower = 1.0f;
     
-    public BallDetection(MotorControl motorControl , DataContainer data, ColorFilter colorFilter, Detector<Rectangle> objectDetector, Comm comm) {
-        super(motorControl, colorFilter);
+    public BallDetection(MotorControl motorControl , DataContainer data, ColorFilter colorFilter, Detector<Rectangle> objectDetector) {
+        super(motorControl, data);
         
         this.objectDetector = objectDetector;
-        this.data = data;
+        this.colorFilter = colorFilter;
         
         int w = (int)(End.x - Start.x);
         int h = (int)(End.y - Start.y);
@@ -53,15 +52,15 @@ public class BallDetection extends DetectionThread {
             lastMemory = data.getLatestBallMemory();
             
             if (lastMemory == null) {
-                data.setIsTurn(true);
+                data.setIsSearch(true);
                 motorControl.notify(this, HandlerPriority.PRIORITY_LOWEST,motorControl.randomHandler(10, 3));  
                 continue;
             }
             
             float motorSignal = toMotorSignalLinear((int)lastMemory.getCenterX());
             
-            if (data.isTurn()) {
-                data.setIsTurn(false);
+            if (data.isSearch()) {
+                data.setIsSearch(false);
                 motorControl.notify(this, HandlerPriority.PRIORITY_HIGH, motorControl.Stop(15), motorControl.Forward(2, motorSignal, 0.9f));
                 continue;
             }
@@ -103,11 +102,11 @@ public class BallDetection extends DetectionThread {
         
         PImage[] results = new PImage[2];
         
-        PImage retImage = drawRect(image, roi, roiThickness, roiColor, false);
+        PImage retImage = imageUtils.drawRect(image, roi, roiThickness, roiColor, false);
         
         color boxColor = data.isBallInRoi() ? boxColorIn : boxColorOut;
         
-        results[0] = lastMemory == null ? retImage : drawRect(retImage, lastMemory, boxThickness, boxColor, false);
+        results[0] = lastMemory == null ? retImage : imageUtils.drawRect(retImage, lastMemory, boxThickness, boxColor, false);
         results[1] = mask;
         
         return results;
