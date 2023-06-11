@@ -1,0 +1,51 @@
+name: Workflow to combine files
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  combine_files:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Read file list
+        run: |
+          cat file_list.txt | while read -r line; do
+            src_folder=$(echo "${line%%,*}")
+            dest_folder=$(echo "${line##*,}")
+            source_file+=("${src_folder}${line%%,*}")
+            target_file+=("${dest_folder}${line##*,}")
+          done
+          echo "::set-output name=source_file::${source_file[*]}"
+          echo "::set-output name=target_file::${target_file[*]}"
+
+      - name: Create destination folders
+        run: |
+          target_folder=(${{ steps.read_file_list.outputs.target_file }})
+          for folder in "${target_folder[@]}"; do
+            mkdir -p "$folder"
+          done
+
+      - name: Combine files
+        run: |
+          source_file=(${{ steps.read_file_list.outputs.source_file }})
+          target_file=(${{ steps.read_file_list.outputs.target_file }})
+          for ((i=0; i<${#source_file[@]}; i++))
+          do
+            cat "${source_file[$i]}" > "${target_file[$i]}"
+          done
+          echo "Files combined successfully"
+
+      - name: Commit changes
+        run: |
+          git config --global user.name "Your Name"
+          git config --global user.email "youremail@example.com"
+          git add .
+          git commit -m "Combine files"
