@@ -1,3 +1,4 @@
+
 abstract class DetectionThread implements IDetectionThread, Runnable {
     protected Thread myThread = null;
     protected boolean STARTED = false;
@@ -10,6 +11,11 @@ abstract class DetectionThread implements IDetectionThread, Runnable {
     PImage image;
     PImage mask;   
     
+    /**
+    * Constructor
+    * @param motorControl The MotorControl object
+    * @param data The DataContainer object
+    */
     public DetectionThread(MotorControl motorControl, DataContainer data) {
         this.motorControl = motorControl;
         this.data = data;
