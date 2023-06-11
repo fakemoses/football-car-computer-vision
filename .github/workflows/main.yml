@@ -1,4 +1,4 @@
-name: Combine files
+name: combine_files
 
 on:
   push:
@@ -12,6 +12,10 @@ jobs:
   combine_files:
     runs-on: ubuntu-latest
 
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the changed files back to the repository.
+      contents: write
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -24,10 +28,7 @@ jobs:
       - name: Run Python script
         run: python ./.github/workflows/combine.py
 
-
-      # - name: Commit changes
-      #   run: |
-      #     git config --global user.name "Your Name"
-      #     git config --global user.email "youremail@example.com"
-      #     git add .
-      #     git commit -m "Combine files"
+      - name: Push changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Auto Commit - Combine Files
