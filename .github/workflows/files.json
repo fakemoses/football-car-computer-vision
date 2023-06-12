@@ -1,5 +1,5 @@
 {
-    "source_folder": "Processing_CaptureJavaRT2022_012regler_MODULAR101_PID",
+    "source_folder": "Dev/Processing_CaptureJavaRT2022_012regler_MODULAR101_PID",
     "target_folder": "CaptureJavaRT2022_Autonomous",
     "files": [
         {
@@ -70,27 +70,19 @@
             "target": "Utils.pde"
         },
         {
-            "source": [
-                "Antrieb.pde"
-            ],
+            "source": ["Antrieb.pde"],
             "target": "Antrieb.pde"
         },
         {
-            "source": [
-                "Interface.pde"
-            ],
+            "source": ["Interface.pde"],
             "target": "Interface.pde"
         },
         {
-            "source": [
-                "Cam.pde"
-            ],
+            "source": ["Cam.pde"],
             "target": "Camera.pde"
         },
         {
-            "source": [
-                "UDPcomfort.pde"
-            ],
+            "source": ["UDPcomfort.pde"],
             "target": "UDPcomfort.pde"
         }
     ]
