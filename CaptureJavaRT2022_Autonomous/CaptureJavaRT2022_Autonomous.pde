@@ -134,7 +134,7 @@ void setup() {
     motorControl.register(goalDetection,3);
     
     // threadController = new ThreadController(ballDetection);
-    threadController = new ThreadController(lineDetection, ballDetection,goalDetection);
+    threadController = new ThreadController(lineDetection, ballDetection, goalDetection);
     // threadController = new ThreadController(goalDetection);
     threadController.startAllThread();
 }

@@ -251,7 +251,7 @@ class Padding implements PostFilter {
                 if (i > startX + w) {
                     continue;
                 }
-                result.pixels[i + j * result.width] = 0xFFFF0000;
+                result.pixels[i + j * result.width] = 0xFF000000;
             }
         }
         

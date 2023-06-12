@@ -102,15 +102,20 @@ public class DataContainer {
     private void route(DetectionThread instance, Shape shape) {
         if (instance instanceof BallDetection) {
             ballDetectionRoute((Rectangle) shape);
+            return;
         } 
         
         if (instance instanceof GoalDetection) {
             goalDetectionRoute((Rectangle) shape);
+            return;
+            
         } 
         
         if (instance instanceof LineDetection) {
             lineDetectionRoute((Line) shape);
-        } 
+            return;
+            
+        }
         
         throw new IllegalArgumentException("Unknown instance type. Check Implementation");
     }
