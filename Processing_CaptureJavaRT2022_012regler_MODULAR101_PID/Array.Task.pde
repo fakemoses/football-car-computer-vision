@@ -13,7 +13,6 @@ class TaskArray<E extends ITask> extends ArrayList<E> {
     
     /**
     * Returns true if there is a task available
-    
     */
     public boolean isTaskAvailable() {
         for (E task : this) {
