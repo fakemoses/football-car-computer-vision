@@ -23,7 +23,7 @@ public class GoalDetection extends DetectionThread{
     Rectangle roi;
     
     private float motorPower = 1.0f;
-    private final double MIN_GOAL_AREA = 10000.0;
+    private final double MIN_GOAL_AREA = 2000.0;
     
     
     public GoalDetection(MotorControl motorControl, DataContainer data, ColorFilter colorFilter, Detector<Rectangle> objectDetector) {
@@ -70,7 +70,7 @@ public class GoalDetection extends DetectionThread{
             
             data.setIsGoalInRoi(bboxArea > MIN_GOAL_AREA);
             
-            if (data.isGoalInRoi()) {
+            if (!data.isGoalInRoi() && !data.isShot()) {
                 motorControl.notify(this, HandlerPriority.PRIORITY_MEDIUM ,motorControl.Forward(1,motorSignal,motorPower));       
                 continue;
             } 	

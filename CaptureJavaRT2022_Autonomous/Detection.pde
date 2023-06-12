@@ -96,14 +96,18 @@ public class BallDetection extends DetectionThread {
             
             Rectangle result = getRectangleFromDetectionResult(rects);
             
+            if (result == null){
+            println("result null");} else println("result not null");
+            
             data.update(this, result);
             lastMemory = data.getLatestBallMemory();
             
             if (lastMemory == null) {
+              println("empty");
                 data.setIsSearch(true);
                 motorControl.notify(this, HandlerPriority.PRIORITY_LOWEST,motorControl.randomHandler(10, 3));  
                 continue;
-            }
+            } else {println("not");}
             
             float motorSignal = toMotorSignalLinear((int)lastMemory.getCenterX());
             
@@ -466,4 +470,3 @@ public class CarDetection extends DetectionThread {
         throw new UnsupportedOperationException("Method not implemented yet.");
     }
 }
-

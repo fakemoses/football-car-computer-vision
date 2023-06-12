@@ -445,5 +445,3 @@ static class HSVRange {
         return "H: " + h.toString() + " S: " + s.toString() + " V: " + v.toString();
     }
 }
-
-

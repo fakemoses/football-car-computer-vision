@@ -423,4 +423,3 @@ public class Threshold implements PostFilter{
         return result;
     }
 }
-

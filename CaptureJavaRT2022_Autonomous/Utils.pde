@@ -740,4 +740,3 @@ class PointArray<E extends Point2D> extends ArrayList<E> {
         return super.add(e);
     }
 }
-

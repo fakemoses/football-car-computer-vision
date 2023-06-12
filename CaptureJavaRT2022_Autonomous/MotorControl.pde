@@ -461,4 +461,3 @@ class StopForGoalHandler extends MotorHandler {
         return "StopForGoalHandler";
     }
 }
-
