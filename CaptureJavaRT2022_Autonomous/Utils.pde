@@ -122,10 +122,12 @@ public class DataContainer {
     
     private void ballDetectionRoute(Rectangle shape) {
         ballMemory.addCurrentMemory(shape);
+        latestBallMemory = ballMemory.getLastRememberedMemory();
     }
     
     private void goalDetectionRoute(Rectangle shape) {
         goalMemory.addCurrentMemory(shape);
+        latestGoalMemory = goalMemory.getLastRememberedMemory();
     }
     
     private void lineDetectionRoute(Line line) {
@@ -740,3 +742,4 @@ class PointArray<E extends Point2D> extends ArrayList<E> {
         return super.add(e);
     }
 }
+

@@ -243,3 +243,4 @@ public class RansacLineDetector implements Detector<Line> {
         return points;
     }
 }
+

@@ -34,9 +34,9 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 //Herausgezogene wichtige Parameter des Systems
-boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = true;
+boolean TAUSCHE_ANTRIEB_LINKS_RECHTS = false;
 // float VORTRIEB = 0.72;
-float VORTRIEB = 0.83;
+float VORTRIEB = 0.87;
 float ASYMMETRIE = 1.01; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 // float ASYMMETRIE = 1.01; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS STAERKER
 
