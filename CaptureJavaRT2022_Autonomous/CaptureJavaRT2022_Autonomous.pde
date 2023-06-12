@@ -68,8 +68,6 @@ String NACHRICHT = "";
 String IP = "192.168.178.65";
 int PORT = 6000;
 
-double antriebMultiplier = 1.0;
-
 UDPcomfort udpcomfort;  
 Antrieb antrieb;
 CustomCam cam;
@@ -89,10 +87,6 @@ Detector<Rectangle> ballDetector;
 LineDetection lineDetection;
 GoalDetection goalDetection;
 BallDetection ballDetection;
-
-// OscP5 oscP5;
-// NetAddress myRemoteLocation;
-// String isBall = "/isBall";
 
 
 // camera Parameters
@@ -115,12 +109,8 @@ void setup() {
     // TODO: is this necessary?
     surface.setLocation( -5, 0);
     
-    // oscP5 = new OscP5(this,12000); // Port that the client will listen to
-    // myRemoteLocation = new NetAddress("192.168.178.43",12000); // IP and port of the server that the client will send to
-    // comm = new Comm(oscP5,myRemoteLocation,isBall); // Unique id for the communication
-    
     udpcomfort = new UDPcomfort(IP, PORT);
-    antrieb = new Antrieb(udpcomfort, antriebMultiplier);    
+    antrieb = new Antrieb(udpcomfort);    
     
     motorControl = new MotorControl(antrieb);
     

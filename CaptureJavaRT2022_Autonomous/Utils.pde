@@ -254,13 +254,7 @@ public class DataContainer {
     }     
 }
 
-/*
-* IDEA:
-1. Mat always start with Blank Images
--> Fill with Green
-2. the first Line set should be always have smaller region 
-*/
-
+// Util class to visualize the boundary of the current line
 public class Boundary {
     
     private Line prevLine = null;
@@ -327,11 +321,11 @@ public class Boundary {
     
     // !MAX SUS CODE -> MORE TESTING NEEDED
     // TODO: Better Implementation
-    /*
-    * 1 = green -> Available
-    * 2 = red -> Unavailable
-    * 3 = blue -> Border Change
-    */
+    
+    // 1 = green -> Available
+    // 2 = red -> Unavailable
+    // 3 = blue -> Border Change
+    
     private int whereAmI(Point p) {
         if (currentLine.isVertical() && prevLine.isVertical()) {
             if (p.x < currentLine.yIntercept() && p.x < prevLine.yIntercept()) {
@@ -391,6 +385,8 @@ public enum BorderType {
     BLACK, REFLECT, REPLICATE
 }
 
+// Utility class for adding borders to images
+// Used with ImageProcessing involving convolution / kernels
 public class ImageBorderAdder {
     final private BorderType borderType;
     
@@ -497,6 +493,10 @@ public class ImageBorderAdder {
     }
 }
 
+// Utility class for drawing lines and rectangles directly on Image
+// By searching for the points that make up the line or rectangle, and then
+// setting the color of those points, we can draw directly on the image
+// without having to use the Processing drawing functions.
 class ImageUtils{
     
     public ImageUtils() {
@@ -555,6 +555,7 @@ class ImageUtils{
     }
 }
 
+// Custom Line class with extra methods
 class Line extends Line2D.Double {
     
     private int w = 320;
@@ -709,6 +710,10 @@ class Line extends Line2D.Double {
     }   
 }
 
+// Util class for updating image pixels locations
+// predefined the image witdth and height
+// if the point is out of the image, it will not be added to the array
+// handling of NullPointerException is not required
 class PointArray<E extends Point2D> extends ArrayList<E> {
     private final int MAX_WIDTH;
     private final int MAX_HEIGHT;
@@ -727,7 +732,6 @@ class PointArray<E extends Point2D> extends ArrayList<E> {
         if (e.getX() < 0 || e.getX() >= MAX_WIDTH || e.getY() < 0 || e.getY() >= MAX_HEIGHT) {
             return false;
         }
-        // println("Adding point: " + e);
         return super.add(e);
     }
 }

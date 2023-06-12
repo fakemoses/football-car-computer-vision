@@ -270,6 +270,7 @@ public class HSVFilter implements ColorFilter {
 // 3 ranges -> 4ms
 
 
+// Wrapper for OpenCV HSV filtering
 public class HSVFilterCV extends PApplet implements ColorFilter {
     private OpenCV opencv;
     
