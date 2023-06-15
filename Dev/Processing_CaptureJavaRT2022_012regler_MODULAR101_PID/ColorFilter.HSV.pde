@@ -53,7 +53,11 @@ public class HSVFilter implements ColorFilter {
             if (delta == 0) {
                 h = 0;
             } else if (max == rF) {
-                h = (((gF - bF) / delta) % 6) * 60f;
+                // might cause issues
+                h = (((gF - bF) / delta)) * 60f; 
+                
+                // use this one if the above one doesn't work
+                // h = (((gF - bF) / delta) % 6) * 60f;
             } else if (max == gF) {
                 h = (((bF - rF) / delta) + 2) * 60f;
             } else if (max == bF) {
