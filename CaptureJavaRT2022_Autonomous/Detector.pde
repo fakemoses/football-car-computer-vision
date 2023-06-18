@@ -1,6 +1,5 @@
 class CascadeDetector extends PApplet implements Detector<Rectangle>{
     OpenCV opencv;
-    private final String cf = "ball_detection4.xml";
     private int max_rects = 10;
     
     double scaleFactor = 1.25;
@@ -10,9 +9,9 @@ class CascadeDetector extends PApplet implements Detector<Rectangle>{
     int maxSize = 300;
     double MAX_THRESHOLD = 20;
     
-    CascadeDetector(int w, int h) {
+    CascadeDetector(String name, int w, int h) {
         opencv = new OpenCV(this, w, h);
-        opencv.loadCascade(cf);
+        opencv.loadCascade(name);
     }
     
     public ArrayList<Rectangle> detect(PImage image, PImage mask) {
