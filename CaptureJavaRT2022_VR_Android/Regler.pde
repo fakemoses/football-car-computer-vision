@@ -8,8 +8,6 @@ public class Regler
   String direction ="";
 
   private float u_links, u_rechts;
-
-  //reset to private later -> just to print some stuffs
   public float offSetX, offSetY, offSetZ;
   long startTime;
 
@@ -25,8 +23,10 @@ public class Regler
 
   public void fahren()
   {
+    //load latest data from sensor
     getLatestDatainNormal();
-    //takes time to load app. 2s is fine
+
+    //2 seconds after start, set the offset
     if (!offS && System.currentTimeMillis() - startTime > 2000) {
       this.offSetX = (sensorData.x) / 90.0f;
       this.offSetY = (sensorData.y) / 90.0f;
@@ -34,47 +34,36 @@ public class Regler
       offS = true;
     }
 
-    //TODO: Sensor seems to be inverted -> need to check if it's the case for all phones
-    // start is when the phone is slanted to the left, stop when to the right -> pz is checked
+    // start moving if the tilt is below the threshold and the robot is not moving
     if ((px < tilt_thres || start) && !stop && (py > 0.05 || py < -0.05)) {
 
       start = true;
       float s =  VORTRIEB;
       float rf=0, rl=0, rr=0;
 
+      //define the speed of the wheels depending on the direction
       if (py < -0.05)
         s *= -1;
-      // else s = -s;
       if (pz > -0.2 && pz < 0.2) {
-        direction ="Straight";  // added -() to make car forward when head moves down, but car reverse when head moves up
-        //u_links = -(s * 0.9f);
-        //u_rechts = -(s * 0.9f);
-        //rf =  s < 0 ? (s * 0.9f):(s * 0.9f);
+        direction ="Straight";
         rf = (s*0.9f);
       }
 
       if (pz > 0.2)
       {
         direction ="Right";
-        //u_links = -(s * 0.6f);
-        //u_rechts = -((s*0.75f) + (pz*.5f));
         rl = -(0.6f);
         rr = (pz*.5f);
         rf = (s*0.9f);
-      } else if (pz < -0.2
-      )
+      } else if (pz < -0.2)
       {
-        direction ="Left";   // for MT1 car, i make left turning little stronger than right to make it balanced
-        //if(py > 0)
-        //u_links = -((s*0.75f) + abs((pz*.5f)));  // HAVE TO RECHECK VALUES WITH OTHER CAR
-        //else         u_links = abs(abs(s*0.75f) + abs((pz*.5f)));  // HAVE TO RECHECK VALUES WITH OTHER CAR
-
-        //u_rechts = -(s * 0.6f);
+        direction ="Left";
         rr = -(0.6f);
         rl = (pz*.5f);
         rf = (s*0.9f);
       }
-      println(s);
+      
+      //compute the speed of the wheels using vector addition
       float val = 0.6;
       if (rf < 0) {
         println("pos " + rf + "   " + s);
@@ -88,7 +77,6 @@ public class Regler
         }
       } else {
         println("neg " + rf + "   " + s);
-
         if ( pz >-0.2 && pz < 0.2) {
           u_links = -sqrt(pow(rf, 2)+pow(rl, 2));
           u_rechts = -sqrt(pow(rf, 2)+pow(rr, 2));
@@ -116,11 +104,7 @@ public class Regler
   }
 
   private void getLatestDatainNormal() {
-    // convert data to normal and clamp between [-1,1] since it's in degree for all, for x and y / 90.0f and for z / 180.0f
-    // Don't forget to consider the offset for z. Also consider the direction of the angle. since Z is in between [-180,180]
-    // Z Offset is too big due to the phone rotation, hence when eg: OffsetZ = 0.6, when we move the phone to right, it will increase from 0.6
-    // gradually to a certain value. Hence when adding this value with the offset
-
+    //convert the sensor data to a range of -1 to 1
     px = ((sensorData.x) / 90.0f) - offSetX;
     py = ((sensorData.y ) / 90.0f) - offSetY;
     pz = ((sensorData.z ) / 180.0f) - offSetZ;

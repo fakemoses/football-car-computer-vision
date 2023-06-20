@@ -13,10 +13,15 @@ public class Regler
         this.control = control;
     }
     
+    // Motor Controller
     public void fahren()
     {
       String direction = "";
+
+      //get latest input value
       updateInput();
+
+      //only drive if throttle is pressed with minimum threshold for both directions 
       if((py > 0.05 || py < -0.05)){
 
          float s =  VORTRIEB * py;

@@ -29,12 +29,6 @@ float ASYMMETRIE = 1; // 1.0==voll symmetrisch, >1, LINKS STAERKER, <1 RECHTS ST
 //  Fahrzeug Kramann: 192.168.0.102
 
 String NACHRICHT = "";
-//String TEMPERATUR = "";
-//String IP = "192.168.137.92";
-//String IP = "192.168.178.66";
-//String IP = "192.168.137.157";
-//String IP = "192.168.137.243";
-//String IP = "192.168.137.163";
 
 String IP = "192.168.0.101"; // $G Car connected to Hotspot111
 int PORT = 6000;
@@ -65,7 +59,7 @@ float sensorValZ = 0;
 
 void setup()
 {
-  //size(320,240);
+
   cameraUp();
   camera = new VRCamera(this);
   fullScreen(VR);
@@ -109,6 +103,7 @@ void draw()
   delay(16);
 }
 
+//screen before start VR with timer
 void drawStartScreen(long timeDiff) {
 
   background(0);
@@ -121,6 +116,7 @@ void drawStartScreen(long timeDiff) {
   }
 }
 
+//main screen
 void drawMainScreen() {
 
   //recheck the sensor value in case exceeding range
@@ -151,7 +147,6 @@ void drawMainScreen() {
   rotateY(PI);
   image(cam, 0, 0);
 
-  //translate(0, 0, 100);
   // region: show Text in Image
   drawIndicator(true, sensorValZ, largerRectWidth, largerRectHeight, 200, 0, 255, 255);
   drawIndicator(false, sensorValY, largerRectWidth, largerRectHeight, 200, 0, 0, 255);
@@ -181,6 +176,8 @@ void drawMainScreen() {
   }
 }
 
+
+//region: draw Indicator
 void drawIndicator(boolean isHorizontal, float sensorData, float largerRectWidth, float largerRectHeight, int offset, int rSmall, int gSmall, int bSmall) {
 
   float smallerRectWidth = largerRectWidth;

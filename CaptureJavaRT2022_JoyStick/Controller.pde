@@ -13,6 +13,7 @@ public class Controller{
         control = ControlIO.getInstance(applet);
     }
 
+    // Checks if the controller is available
     public boolean isDeviceAvailable(){
         stick = control.filter(GCP.STICK).getMatchedDevice(controllerName);
         if(stick == null){
@@ -21,6 +22,7 @@ public class Controller{
         return true;
     }
   
+    // Returns the user input from the controller and save it in a UserInput object
     public UserInput getUserInput() {
         float px = map(stick.getSlider("direction").getValue(), -1, 1, 0, width);
         float py = map(stick.getSlider("throttle").getValue(), -1, 1, 0, height); 
@@ -30,6 +32,7 @@ public class Controller{
     }
 }
 
+// Class to store the user input
 public class UserInput {
     public float px;
     public float py;

@@ -15,20 +15,26 @@ public class SensorM{
 
   public float x,y,z;
 
+  //listener for rotation vector sensor
   private RotVecListener listenerRotVec;
   
   public SensorM(PApplet parent){
+    // passing parent to get access to activity and context
     this.parent = parent;
     this.context = parent.getActivity();
-    this.manager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
 
+    //initialize sensor manager and sensor for rotation vector
+    this.manager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
     this.sensorVector = manager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+
+    //initialize and register listener for rotation vector sensor
     this.listenerRotVec = new RotVecListener(this);
     this.manager.registerListener(listenerRotVec, sensorVector, SensorManager.SENSOR_DELAY_NORMAL);
   }
   
 }
 
+// listener for rotation vector sensor
 class RotVecListener implements SensorEventListener {
   private SensorM sensorM;
   float[] rotationMatrix = new float[9];
@@ -38,8 +44,9 @@ class RotVecListener implements SensorEventListener {
     this.sensorM = sensorM;
   }
 
+  // listen to sensor and update rotation matrix and orientation whenever new sensor data is available
   public void onSensorChanged(SensorEvent event) {
-      /// Get rotation vector from sensor data
+        // Get rotation vector from sensor data
         float[] rotationVector = new float[4];
         System.arraycopy(event.values, 0, rotationVector, 0, 4);
 
@@ -58,6 +65,7 @@ class RotVecListener implements SensorEventListener {
         sensorM.z = z;
   }
 
+  //do nothing. Just required to be override as part of SensorEventListener
   public void onAccuracyChanged(Sensor sensor, int accuracy) {
   }
 }

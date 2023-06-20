@@ -53,6 +53,7 @@ void setup()
      cam.start();
      control = new Controller(this, controllerName);
 
+     // Check if there is a suitable device available
      if (!control.isDeviceAvailable()) {
           println("No suitable device configured");
           System.exit(-1); // End the program NOW!
